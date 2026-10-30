@@ -363,13 +363,14 @@ def tidy_body(body: str, title: str = "") -> str | None:
         One-paragraph pitch.
 
         **Contacts:** @alice, Bob Smith
-        **Type:** General Sprint · **Working groups:** PZ · 🌱 New contributor friendly
         **Links:** Slack: #desc-pz
 
         ### Goals and deliverables
         ...
 
-    `parse_issue_body` reads both layouts to the same fields (older forms' separate
+    The sprint type, working groups and "new contributor friendly" are left out: the
+    triage bot turns them into labels first, and the build reads them from the labels.
+    `parse_issue_body` reads both layouts to the same other fields (older forms' separate
     "Prerequisites" are folded into "More details").
 
     Parameters
@@ -397,15 +398,8 @@ def tidy_body(body: str, title: str = "") -> str | None:
     meta = []
     if f["contacts"]:
         meta.append(f"**Contacts:** {' '.join(f['contacts'].split())}")
-    kind = []
-    if f["type"]:
-        kind.append(f"**Type:** {f['type']}")
-    if f["working_groups"]:
-        kind.append(f"**Working groups:** {', '.join(f['working_groups'])}")
-    if any("new contributor" in o.lower() for o in f["options"]):
-        kind.append("🌱 New contributor friendly")
-    if kind:
-        meta.append(" · ".join(kind))
+    # Sprint type, working groups and "new contributor friendly" become labels (see
+    # `sprintweek.bot.triage`), so they are not repeated in the text.
     if f["links"]:
         lines = [ln.strip() for ln in f["links"].splitlines() if ln.strip()]
         meta.append(f"**Links:** {lines[0]}" if len(lines) == 1 else "**Links:**\n" + "\n".join(lines))

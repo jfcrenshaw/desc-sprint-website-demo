@@ -2,6 +2,8 @@ import importlib.util
 import unittest
 from pathlib import Path
 
+from sprintweek.build import build_sprint
+from sprintweek.config import load_config
 from sprintweek.parse import (
     parse_contacts,
     parse_issue_body,
@@ -240,17 +242,9 @@ if __name__ == "__main__":
     unittest.main()
 
 
-FIELDS_COMPARED = (
-    "pitch",
-    "contacts",
-    "type",
-    "working_groups",
-    "goals",
-    "links",
-    "wrapup",
-    "options",
-    "schedule_note",
-)
+# Fields that tidy_body keeps in the text (type, working groups and the flag become labels).
+FIELDS_COMPARED = ("pitch", "contacts", "goals", "links", "wrapup", "schedule_note")
+CONFIG = load_config(Path(__file__).resolve().parent.parent / "sprintweek.yaml", repo="example/sprints")
 
 
 class TestTidyBody(unittest.TestCase):
@@ -260,11 +254,12 @@ class TestTidyBody(unittest.TestCase):
         self.assertTrue(
             tidy.startswith("Build a **pipeline** for LBGs.\n\n**Contacts:** @alice, Bob Smith (@bsmith)\n")
         )
-        self.assertIn("**Type:** Paper Sprint · **Working groups:** PZ, WLSS · 🌱 New contributor friendly", tidy)
         self.assertIn("**Links:** Slack: #desc-lbg", tidy)
         self.assertIn("### Goals and deliverables\n\n1. A pipeline", tidy)
         self.assertIn("### More details\n\n```python", tidy)
         self.assertNotIn("Prerequisites", tidy)
+        for text in ("Type:", "Working groups", "New contributor"):  # these live in the labels
+            self.assertNotIn(text, tidy)
         self.assertNotIn("### Wrap-up\n\n", tidy)  # the fixture's "### Wrap-up" is inside a code block
 
     def test_round_trip_and_idempotence(self):
@@ -279,7 +274,7 @@ class TestTidyBody(unittest.TestCase):
             "### Short pitch\n\nJust an idea.\n\n### Contact person(s)\n\n_No response_\n\n"
             "### Sprint type\n\nGeneral Sprint\n"
         )
-        self.assertEqual(tidy_body(body), "Just an idea.\n\n**Type:** General Sprint\n")
+        self.assertEqual(tidy_body(body), "Just an idea.\n")
 
     def test_old_prerequisites_are_folded_into_more_details(self):
         body = "### Short pitch\n\nHi\n\n### Prerequisites\n\n- Python\n- NERSC\n\n### Detailed description\n\nMore."
@@ -317,6 +312,16 @@ class TestTidyBody(unittest.TestCase):
             with self.subTest(title=sp["title"]):
                 for key in FIELDS_COMPARED:
                     self.assertEqual(before[key], after[key], key)
+                # What left the text comes back from the labels the triage bot adds.
+                labels = [{"name": name, "color": "ededed"} for name in seed.labels_for(sp)]
+                base = {"number": 1, "title": sp["title"], "html_url": "u", "state": "open", "user": "a",
+                        "assignees": [],
+                        "created_at": "2026-10-01T00:00:00Z", "updated_at": "2026-10-01T00:00:00Z"}  # fmt: skip
+                raw_sp, _ = build_sprint({**base, "body": raw, "labels": []}, [], CONFIG)
+                tidy_sp, _ = build_sprint({**base, "body": tidy, "labels": labels}, [], CONFIG)
+                self.assertEqual(raw_sp["type"], tidy_sp["type"])
+                self.assertEqual(set(raw_sp["working_groups"]), set(tidy_sp["working_groups"]))  # labels: form order
+                self.assertEqual(raw_sp["new_contributor_friendly"], tidy_sp["new_contributor_friendly"])
                 self.assertIn(before["details"], after["details"])
                 self.assertEqual(after["prerequisites"], "")
                 self.assertIsNone(tidy_body(tidy, sp["title"]))

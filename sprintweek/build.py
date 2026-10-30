@@ -44,8 +44,9 @@ def _tags(fields: dict, labels: list[dict], config: Config) -> list[dict]:
         add(fields["type"], "type")
     for wg in fields["working_groups"]:
         add(wg, "group")
+    groups = {wg.lower() for wg in config.working_groups}
     for lb in labels:
-        kind = "type" if lb["name"] in config.type_colors else "label"
+        kind = "type" if lb["name"] in config.type_colors else "group" if lb["name"].lower() in groups else "label"
         add(lb["name"], kind)
     return list(tags.values())
 
@@ -85,6 +86,11 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
         wrap-up dates that could not be read).
     """
     fields = parse_issue_body(issue["body"], issue["title"])
+    # Tidied issues keep the sprint type, working groups and the new-contributor flag only as labels.
+    fields["type"] = fields["type"] or config.label_type(issue["labels"])
+    fields["working_groups"] = fields["working_groups"] or config.label_working_groups(issue["labels"])
+    if any(lb["name"].lower() == "new contributor friendly" for lb in issue["labels"]):
+        fields["options"] = [*fields["options"], "New contributor friendly"]
     contacts = parse_contacts(fields["contacts"]) or [{"login": issue["user"], "name": None}]
     people = {issue["user"].lower(), *(a.lower() for a in issue["assignees"])}
     people |= {c["login"].lower() for c in contacts if c["login"]}

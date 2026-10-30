@@ -92,7 +92,13 @@ def triage(gh: GitHub, config: Config, number: int, greet: bool, tidy: bool = Fa
             wanted.append("New Contributor Friendly")
         existing = {lb["name"].lower(): lb["name"] for lb in gh.paginate(f"/repos/{repo}/labels")}
         current = {lb["name"].lower() for lb in issue["labels"]}
-        add = sorted({existing[w.lower()] for w in wanted if w and w.lower() in existing and w.lower() not in current})
+        for name in {w for w in wanted if w and w.lower() not in existing}:
+            # The tidied text no longer mentions these, so the label must exist to keep the information.
+            color = config.type_colors.get(name, "#ededed").lstrip("#")
+            gh.request("POST", f"/repos/{repo}/labels", {"name": name, "color": color})
+            existing[name.lower()] = name
+            log.append(f"created label {name}")
+        add = sorted({existing[w.lower()] for w in wanted if w and w.lower() not in current})
         if add:
             gh.request("POST", f"/repos/{repo}/issues/{number}/labels", {"labels": add})
             log.append(f"#{number}: added labels {', '.join(add)}")

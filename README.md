@@ -26,7 +26,8 @@ Only the title and a short pitch are required.
 You do **not** need to know when you will meet: proposals without sessions are listed on the website under *Not yet scheduled*, where people can find them and join.
 
 The form asks for contacts, sprint type, working groups, goals, links, and *More details* (prerequisites, background, anything else).
-Right after you submit, the bot tidies the issue into a compact layout: empty fields are left out, the pitch comes first, and short answers go on one line each.
+Right after you submit, the bot tidies the issue into a compact layout: empty fields are left out, the pitch comes first, and contacts and links go on one line each.
+The sprint type, working groups and "new contributor friendly" become labels (the bot creates any that are missing), and the website reads them from there; change them by editing the labels.
 This happens only once, so it never touches your later edits.
 Everything can be changed later by editing the issue (the "…" menu → *Edit*).
 The website updates within a few minutes.

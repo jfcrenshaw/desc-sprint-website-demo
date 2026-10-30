@@ -231,3 +231,38 @@ class TestNotices(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FakeGitHub:
+    """Records requests; serves one issue and the repository's labels."""
+
+    def __init__(self, issue, labels):
+        self.issue, self.labels, self.calls = issue, labels, []
+
+    def request(self, method, path, data=None, params=None):
+        self.calls.append((method, path, data))
+        return (self.issue if method == "GET" else {}), {}
+
+    def paginate(self, path, params=None):
+        return self.labels if path.endswith("/labels") else []
+
+
+class TestTriageLabels(unittest.TestCase):
+    def test_missing_labels_are_created_then_added(self):
+        from sprintweek.bot import triage
+
+        body = (
+            "### Short pitch\n\nHi\n\n### Sprint type\n\nPaper Sprint\n\n"
+            "### Working groups\n\nPZ (Photometric Redshifts), DKM (Dark Matter)"
+        )
+        gh = FakeGitHub(
+            {"number": 3, "title": "T", "body": body, "labels": []}, [{"name": "Paper Sprint"}, {"name": "pz"}]
+        )
+        log = triage(gh, load(), 3, greet=False, tidy=True)
+        created = [d["name"] for m, p, d in gh.calls if m == "POST" and p.endswith("/labels") and "/issues/" not in p]
+        added = next(d["labels"] for m, p, d in gh.calls if m == "POST" and p.endswith("/issues/3/labels"))
+        self.assertEqual(created, ["DKM"])
+        self.assertEqual(sorted(added), ["DKM", "Paper Sprint", "pz"])
+        tidied = next(d["body"] for m, p, d in gh.calls if m == "PATCH")
+        self.assertNotIn("Paper Sprint", tidied)
+        self.assertIn("created label DKM", log)

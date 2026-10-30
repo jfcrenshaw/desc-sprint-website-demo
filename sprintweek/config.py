@@ -80,6 +80,17 @@ class Config:
     type_colors: dict[str, str]
     program: list[dict] = field(default_factory=list)
     root: Path = DEFAULT_CONFIG.parent  # folder of the configuration file (the repository root)
+    working_groups: list[str] = field(default_factory=list)  # from the issue form's dropdown
+
+    def label_type(self, labels: list[dict]) -> str:
+        """The sprint type given by a label (e.g. "General Sprint"), or ""."""
+        types = {t.lower(): t for t in self.type_colors}
+        return next((types[lb["name"].lower()] for lb in labels if lb["name"].lower() in types), "")
+
+    def label_working_groups(self, labels: list[dict]) -> list[str]:
+        """Working groups given by labels, in the form's order."""
+        names = {lb["name"].lower() for lb in labels}
+        return [wg for wg in self.working_groups if wg.lower() in names]
 
     @property
     def days(self) -> list[dt.date]:
@@ -356,6 +367,23 @@ def _program(items, site: Site, days: list[dt.date], where: str) -> list[dict]:
     return out
 
 
+FORM = Path(".github/ISSUE_TEMPLATE/sprint.yml")
+
+
+def form_working_groups(root: Path) -> list[str]:
+    """Working groups offered by the sprint issue form ("PZ (Photometric Redshifts)" -> "PZ")."""
+    from .parse import parse_list
+
+    path = root / FORM
+    if not path.is_file():
+        return []
+    form = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader) or {}
+    for item in form.get("body") or []:
+        if isinstance(item, dict) and item.get("id") == "working-groups":
+            return parse_list(", ".join((item.get("attributes") or {}).get("options") or []))
+    return []
+
+
 def load_config(path: str | Path | None = None, repo: str | None = None) -> Config:
     """Read and validate the configuration file.
 
@@ -445,4 +473,5 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
         type_colors={k: v.strip() for k, v in colors.items()},
         program=program,
         root=path.parent.resolve(),
+        working_groups=form_working_groups(path.parent.resolve()),
     )

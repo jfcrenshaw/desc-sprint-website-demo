@@ -172,6 +172,19 @@ class TestBuildSprint(unittest.TestCase):
         self.assertEqual(by_source["issue"]["date"], "2026-10-29")
         self.assertEqual(by_source["comment"]["text"], "And a comment")
 
+    def test_type_groups_and_flag_from_labels(self):
+        names = ("Paper Sprint", "PZ", "WLSS", "New Contributor Friendly", "Paris")
+        sp, _ = build_sprint(issue(labels=[{"name": n, "color": "ededed"} for n in names]), [], CONFIG)
+        self.assertEqual(
+            (sp["type"], sp["working_groups"], sp["new_contributor_friendly"]), ("Paper Sprint", ["PZ", "WLSS"], True)
+        )
+        kinds = {t["name"]: t["kind"] for t in sp["tags"]}
+        self.assertEqual((kinds["Paper Sprint"], kinds["PZ"], kinds["Paris"]), ("type", "group", "label"))
+
+    def test_working_groups_come_from_the_issue_form(self):
+        self.assertIn("PZ", CONFIG.working_groups)
+        self.assertIn("WLSS", CONFIG.working_groups)
+
     def test_tags_merge_form_and_labels(self):
         body = "### Sprint type\n\nPaper Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)"
         labels = [{"name": "pz", "color": "2b9628"}, {"name": "Paris", "color": "c293b5"}]
