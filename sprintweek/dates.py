@@ -64,14 +64,26 @@ def _date(year: int, month: int, day: int) -> dt.date | None:
         return None
 
 
+MAX_LENGTH = 60  # longer text is never a date (and is not worth parsing)
+
+
+def _split_weekday(t: str) -> tuple[str | None, str]:
+    """Split "thu oct 29" into ("thu", "oct 29"); text without a leading weekday is returned whole."""
+    m = _WEEKDAY_RE.match(t)
+    return (m.group(1), m.group(2) or "") if m else (None, t)
+
+
 def looks_like_date(text: str) -> bool:
     """Does the whole text look like one of the accepted date forms (without checking it exists)?"""
     t = _clean(text)
+    if len(t) > MAX_LENGTH:
+        return False
     if t == PLACEHOLDER:
         return True
-    if m := _WEEKDAY_RE.match(t):
-        return m.group(2) is None or looks_like_date(m.group(2))
-    return any(r.match(t) for r in (_ISO_RE, _NUMERIC_RE, _MONTH_DAY_RE, _DAY_MONTH_RE))
+    weekday, rest = _split_weekday(t)
+    if weekday and not rest:
+        return True
+    return any(r.match(rest) for r in (_ISO_RE, _NUMERIC_RE, _MONTH_DAY_RE, _DAY_MONTH_RE))
 
 
 def parse_loose_date(text: str, days: list[dt.date]) -> tuple[dt.date | None, str]:
@@ -94,11 +106,12 @@ def parse_loose_date(text: str, days: list[dt.date]) -> tuple[dt.date | None, st
     t = _clean(text)
     if not t or t == PLACEHOLDER:
         return None, ""
+    if len(t) > MAX_LENGTH:
+        return None, "the date is too long to be read (write it like 2026-10-29)"
     year = days[0].year if days else dt.date.today().year
-    if m := _WEEKDAY_RE.match(t):
-        if m.group(2):  # "Thursday, Oct 29": the explicit date wins
-            return parse_loose_date(m.group(2), days)
-        matches = [d for d in days if d.weekday() == WEEKDAYS[m.group(1)]]
+    weekday, t = _split_weekday(t)  # "Thursday, Oct 29": the explicit date wins
+    if weekday and not t:
+        matches = [d for d in days if d.weekday() == WEEKDAYS[weekday]]
         return (matches[0], "") if matches else (None, f"there is no {text.strip()} during the Sprint Week")
     candidates: list[dt.date | None] = []
     if m := _ISO_RE.match(t):

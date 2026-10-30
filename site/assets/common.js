@@ -245,12 +245,19 @@ const FORBID_TAGS = ['style', 'form', 'button', 'textarea', 'select', 'iframe', 
 export function markdown(md, config, className = 'md', base = '') {
   const div = h('div', { class: className });
   if (!md) return div;
-  const html = window.marked.parse(md, { gfm: true, breaks: true, async: false });
-  div.innerHTML = window.DOMPurify.sanitize(html, {
-    FORBID_TAGS,
-    FORBID_ATTR: ['style', 'class', 'id'],
-    ALLOW_DATA_ATTR: false,
-  });
+  try {
+    const html = window.marked.parse(md, { gfm: true, breaks: true, async: false });
+    div.innerHTML = window.DOMPurify.sanitize(html, {
+      FORBID_TAGS,
+      FORBID_ATTR: ['style', 'class', 'id'],
+      ALLOW_DATA_ATTR: false,
+    });
+  } catch {
+    // e.g. thousands of nested quotes overflow the parser: show the text as typed instead
+    div.textContent = md;
+    div.style.whiteSpace = 'pre-wrap';
+    return div;
+  }
   if (base) {
     // Relative links and images (e.g. "slac-map.png" next to site-info/slac.md) resolve from `base`.
     const relative = u => u && !/^([a-z][a-z0-9+.-]*:|#|\/)/i.test(u);
@@ -304,9 +311,15 @@ function linkify(root, config) {
 
 /** Short plain-text preview of Markdown (for cards). */
 export function preview(md, limit = 220) {
-  const tpl = document.createElement('template'); // inert: images inside are not fetched
-  tpl.innerHTML = window.DOMPurify.sanitize(window.marked.parse(md || '', { async: false }));
-  let text = tpl.content.textContent.replace(/\s+/g, ' ').trim();
+  let text;
+  try {
+    const tpl = document.createElement('template'); // inert: images inside are not fetched
+    tpl.innerHTML = window.DOMPurify.sanitize(window.marked.parse(md || '', { async: false }));
+    text = tpl.content.textContent;
+  } catch {
+    text = md || '';
+  }
+  text = text.replace(/\s+/g, ' ').trim();
   if (text.length > limit) text = `${text.slice(0, limit).replace(/\s\S*$/, '')}…`;
   return text;
 }

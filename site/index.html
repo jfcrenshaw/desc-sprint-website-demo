@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Only this site's own files, plus images hosted on GitHub. The hash allows the inline theme script;
+       recompute it if that script changes (see CLAUDE.md). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AwEEuj4WyUcGdJbV1TW+yg959USbBioP+GQ//h0MOBE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github.com https://*.githubusercontent.com https://github-production-user-asset-6210df.s3.amazonaws.com; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
   <title>Sprint Week Calendar</title>
   <meta name="description" content="Schedule of the DESC Sprint Week, generated from GitHub Issues.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📅%3C/text%3E%3C/svg%3E">

@@ -193,7 +193,13 @@ def build_data(snapshot: dict, config: Config) -> dict:
     for issue in sorted(snapshot["issues"], key=lambda i: i["number"]):
         if _is_excluded(issue, config):
             continue
-        sprint, w = build_sprint(issue, by_issue[issue["number"]], config)
+        try:
+            sprint, w = build_sprint(issue, by_issue[issue["number"]], config)
+        except Exception as err:  # never let one odd issue take the whole site down
+            warnings.append(
+                f"#{issue['number']}: could not be read ({type(err).__name__}: {err}); left off the calendar"
+            )
+            continue
         sprints.append(sprint)
         warnings += [f"#{issue['number']}: {x}" for x in w]
         warnings += [

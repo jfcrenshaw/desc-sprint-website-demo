@@ -241,3 +241,10 @@ test('the form offers minutes in 5-minute steps and keeps an odd existing minute
   assert.match(odd, /<option value="09" selected>09<\/option>/);
   assert.match(odd, /<option value="07" selected>07<\/option>/);
 });
+
+test('user text cannot inject Markdown into bot comments', () => {
+  const tricky = { ...validateSession(form, config).session, online: 'https://zoom.us/j/1)&#32;@victim&#32;[x](https://evil.example)', by: 'alice' };
+  const body = renderSessionComment(tricky, { sites: config.sites });
+  assert.ok(body.includes('[Join online](<https://zoom.us/j/1)&#32;@victim&#32;[x](https://evil.example)>)'), 'the whole URL stays inside the link');
+  assert.equal(mdEscape('&commat;team'), '\\&commat;team');
+});

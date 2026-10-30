@@ -14,6 +14,7 @@
 - YAML is read with `yaml.BaseLoader` (everything stays text; `config.py` validates and converts). Never switch to `safe_load`: unquoted `10:30` would become 630.
 - The frontend has no build step: ES modules in `site/assets/`, vendored libraries in `site/vendor/` (versions in `site/vendor/VERSIONS.md`).
 - Never insert issue content with `innerHTML` except through `markdown()` in `site/assets/common.js` (DOMPurify).
+- `site/index.html` and `site/present.html` have a Content-Security-Policy meta tag whose `sha256-…` allows the inline theme script; recompute it (base64 SHA-256 of the script text) whenever that script changes.
 - Markdown files: one sentence per line.
 
 ## Contracts to keep in sync

@@ -87,6 +87,13 @@ class TestCommentRoundTrip(unittest.TestCase):
         body = render_session_comment(session(note="ping @everyone", by="alice"))
         self.assertNotIn("@everyone", body.split("-->", 1)[1])
 
+    def test_online_link_cannot_inject_markdown(self):
+        s = session(online="https://zoom.us/j/1)&#32;@victim&#32;[x](https://evil.example)", by="alice")
+        body = render_session_comment(s)
+        self.assertIn("[Join online](<https://zoom.us/j/1)", body)
+        self.assertIn("&commat;", render_session_comment(session(note="&commat;team")).replace("\\&", "&"))
+        self.assertIn("\\&commat;team", render_session_comment(session(note="&commat;team")))
+
     def test_day_change_is_shown(self):
         body = render_session_comment(session(start="08:00", end="09:00"), [("SLAC", "America/Los_Angeles")])
         self.assertIn("00:00–01:00 PDT (SLAC)", body)

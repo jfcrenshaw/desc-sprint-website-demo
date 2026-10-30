@@ -23,7 +23,7 @@ export function cleanText(value, limit) {
 
 /** Escape Markdown and defang @mentions in user text placed in a GitHub comment. */
 export function mdEscape(text) {
-  return String(text).replace(/([\\`*_{}[\]<>()#+!|~])/g, '\\$1').replace(/@/g, '@\u200b');
+  return String(text).replace(/([\\`*_{}[\]<>()#+!|~&])/g, '\\$1').replace(/@/g, '@\u200b');
 }
 
 export const isLogin = s => /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(s || '');
@@ -245,7 +245,7 @@ export function renderSessionComment(session, { sites = [], editUrl = '', update
   const where = [];
   const place = [session.site, session.location].filter(Boolean).map(mdEscape);
   if (place.length) where.push(`📍 ${place.join(' – ')}`);
-  if (session.online) where.push(`💻 [Join online](${session.online})`);
+  if (session.online) where.push(`💻 [Join online](<${session.online}>)`); // <...> so a ")" cannot end the link
   lines.push(`**Where:** ${where.length ? where.join(' · ') : 'to be announced'}`);
   if (session.note) lines.push(`**Note:** ${mdEscape(session.note)}`);
   const footer = [];

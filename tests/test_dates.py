@@ -47,3 +47,12 @@ class TestLooseDates(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestHostileInput(unittest.TestCase):
+    def test_long_repeated_weekdays_do_not_crash(self):
+        text = "mon " * 5000
+        self.assertFalse(looks_like_date(text))
+        date, problem = parse_loose_date(text, WEEK)
+        self.assertIsNone(date)
+        self.assertIn("too long", problem)

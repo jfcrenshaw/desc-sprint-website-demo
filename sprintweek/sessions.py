@@ -164,7 +164,7 @@ def encode_session_data(data: dict) -> str:
 
 def _md_escape(text: str) -> str:
     """Escape Markdown and defang @mentions in user-supplied text."""
-    text = re.sub(r"([\\`*_{}\[\]<>()#+!|~])", r"\\\1", text)
+    text = re.sub(r"([\\`*_{}\[\]<>()#+!|~&])", r"\\\1", text)
     return text.replace("@", "@​")
 
 
@@ -208,7 +208,7 @@ def render_session_comment(session: dict, other_timezones: Sequence[tuple[str, s
     if place:
         where.append("📍 " + " – ".join(place))
     if session.get("online"):
-        where.append(f"💻 [Join online]({session['online']})")
+        where.append(f"💻 [Join online](<{session['online']}>)")  # <...> so a ")" cannot end the link
     lines.append(f"**Where:** {' · '.join(where) if where else 'to be announced'}")
     if session.get("note"):
         lines.append(f"**Note:** {_md_escape(session['note'])}")

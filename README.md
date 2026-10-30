@@ -272,6 +272,8 @@ Repository layout:
 - Issue content is user-controlled.
   The frontend never inserts it as raw HTML: plain text goes through `textContent`, and Markdown is rendered by marked and sanitized by DOMPurify (no scripts, styles, iframes or forms).
   Links open with `rel="noopener noreferrer"`.
+- The pages have a Content Security Policy: scripts only come from the site itself, and images in issue text only load from GitHub (drag images into GitHub's editor; links to images elsewhere are not shown), so a posted image cannot track visitors.
+- Pathological issue text (for example thousands of nested quotes) is shown as plain text instead of breaking the page, and an issue that cannot be read at all is skipped with a build warning instead of stopping the build.
 - Session data is length-limited, and online links must be `https://`.
   Session comments from untrusted accounts are ignored.
 - The workflows use the automatic `GITHUB_TOKEN` with minimal permissions.

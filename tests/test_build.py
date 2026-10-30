@@ -118,6 +118,11 @@ class TestBuildSprint(unittest.TestCase):
         sp, _ = build_sprint(issue(), [late], CONFIG)
         self.assertEqual(sp["wrapups"][0]["date"], "2026-10-28")  # no sessions: first site (SLAC)
 
+    def test_hostile_wrapup_comment_from_anyone(self):
+        body = "## Wrap-up\n" + "mon " * 3000 + "\n\nDone"
+        sp, warnings = build_sprint(issue(), [comment(body, "author", created="2026-10-28T18:00:00Z")], CONFIG)
+        self.assertEqual(sp["wrapups"][0]["date"], "2026-10-28")
+
     def test_forgiving_wrapup_dates(self):
         for line in (
             "date: Thursday",
@@ -192,6 +197,25 @@ class TestBuildData(unittest.TestCase):
         }
         data = build_data(snapshot, CONFIG)
         self.assertEqual([s["number"] for s in data["sprints"]], [1, 5])
+
+    def test_one_unreadable_issue_does_not_stop_the_build(self):
+        from unittest import mock
+
+        import sprintweek.build as build
+
+        real = build.build_sprint
+
+        def flaky(issue, comments, config):
+            if issue["number"] == 2:
+                raise ValueError("boom")
+            return real(issue, comments, config)
+
+        with mock.patch.object(build, "build_sprint", flaky):
+            data = build.build_data(
+                {"issues": [issue(number=1), issue(number=2), issue(number=3)], "comments": []}, CONFIG
+            )
+        self.assertEqual([s["number"] for s in data["sprints"]], [1, 3])
+        self.assertIn("#2: could not be read (ValueError: boom)", data["warnings"][0])
 
     def test_demo_snapshot_builds_cleanly(self):
         snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())
