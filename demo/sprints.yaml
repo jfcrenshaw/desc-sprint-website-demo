@@ -406,6 +406,8 @@ sprints:
   pitch: Set up initial simulated LSST Y1 data vectors for dynamical dark energy analyses.
   contacts: '@aferte'
   type: Infrastructure Sprint
+  options:
+  - New contributor friendly
   working_groups:
   - MCP (Modelling and Combined Probes)
   labels:

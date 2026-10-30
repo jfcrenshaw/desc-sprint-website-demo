@@ -385,7 +385,7 @@
   {
    "number": 14,
    "title": "Prep for LSST Y1 dynamical dark energy",
-   "body": "> 🧪 Demo copy of SprintWeek2026 issue 36 for the calendar prototype. Mentions are disabled so nobody is notified.\n\nSet up initial simulated LSST Y1 data vectors for dynamical dark energy analyses.\n\n**Contacts:** `@aferte`\n**Type:** Infrastructure Sprint · **Working groups:** MCP\n**Links:** Slack: #desc-y1sharpde\n\n### Goals and deliverables\n\nWe will set up the repo and scripts to produce data vectors for an initial set of observables and run forecasts for dynamical dark energy models (w0wa, maybe Padé-w?). We will aim at visualizing these on the dashboard.\n",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 36 for the calendar prototype. Mentions are disabled so nobody is notified.\n\nSet up initial simulated LSST Y1 data vectors for dynamical dark energy analyses.\n\n**Contacts:** `@aferte`\n**Type:** Infrastructure Sprint · **Working groups:** MCP · 🌱 New contributor friendly\n**Links:** Slack: #desc-y1sharpde\n\n### Goals and deliverables\n\nWe will set up the repo and scripts to produce data vectors for an initial set of observables and run forecasts for dynamical dark energy models (w0wa, maybe Padé-w?). We will aim at visualizing these on the dashboard.\n",
    "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/14",
    "state": "open",
    "state_reason": null,
@@ -406,6 +406,11 @@
      "name": "Beyond wCDM",
      "color": "54374e",
      "description": "Beyond wCDM Topical Team"
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
     }
    ],
    "created_at": "2026-10-21T16:14:00Z",
