@@ -1,5 +1,6 @@
-# Welcome new sprint issues (links to the calendar and the scheduler) and add the labels
-# matching the sprint type and working groups chosen in the issue form.
+# Welcome new sprint issues (links to the calendar and the scheduler), add the labels
+# matching the sprint type and working groups chosen in the issue form, and tidy the
+# issue text into a compact layout (once, when the issue is opened).
 name: Welcome new sprints
 
 on:
@@ -33,9 +34,9 @@ jobs:
           REFRESH: ${{ inputs.refresh }}
         run: |
           if [ "$EVENT" = "workflow_dispatch" ]; then
-            if [ "$REFRESH" = "true" ]; then python -m sprintweek triage --all --greet; else python -m sprintweek triage --all; fi
+            if [ "$REFRESH" = "true" ]; then python -m sprintweek triage --all --greet --tidy; else python -m sprintweek triage --all --tidy; fi
           elif [ "$ACTION" = "opened" ]; then
-            python -m sprintweek triage --issue "$ISSUE" --greet
+            python -m sprintweek triage --issue "$ISSUE" --greet --tidy
           else
             python -m sprintweek triage --issue "$ISSUE"
           fi

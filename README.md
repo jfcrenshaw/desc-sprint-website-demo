@@ -25,7 +25,9 @@ Click **＋ Propose a sprint** on the website (or *New issue → Propose a sprin
 Only the title and a short pitch are required.
 You do **not** need to know when you will meet: proposals without sessions are listed on the website under *Not yet scheduled*, where people can find them and join.
 
-The form asks for contacts, sprint type, working groups, goals, prerequisites, links and a longer description.
+The form asks for contacts, sprint type, working groups, goals, links, and *More details* (prerequisites, background, anything else).
+Right after you submit, the bot tidies the issue into a compact layout: empty fields are left out, the pitch comes first, and short answers go on one line each.
+This happens only once, so it never touches your later edits.
 Everything can be changed later by editing the issue (the "…" menu → *Edit*).
 The website updates within a few minutes.
 
@@ -131,7 +133,7 @@ issue labels ───────────┘                              b
    Bursts of edits collapse into one queued build.
 4. **[Scheduling bot](worker/)** (a Cloudflare Worker plus a GitHub App) serves the session form and posts the session comments on behalf of signed-in sprint members.
    The build workflow also posts (and later resolves) the automatic room-change notices.
-5. **[Triage workflow](.github/workflows/triage.yml)** posts a welcome comment on new sprint issues and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
+5. **[Triage workflow](.github/workflows/triage.yml)** tidies new sprint issues into a compact layout, posts a welcome comment and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
 6. **Python package** [`sprintweek/`](sprintweek/) (standard library plus PyYAML) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
 7. **Frontend** [`site/`](site/) is plain HTML, CSS and JavaScript modules with three small vendored libraries: [EventCalendar](https://github.com/vkurko/calendar) (calendar views, MIT), [marked](https://github.com/markedjs/marked) (Markdown) and [DOMPurify](https://github.com/cure53/DOMPurify) (sanitizing).
    There is no build step.

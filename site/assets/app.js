@@ -625,7 +625,7 @@ function openSprint(number) {
     md('Goals and deliverables', sp.goals),
     md('Prerequisites', sp.prerequisites),
     md('Communication channel and links', sp.links),
-    md('Details', sp.details),
+    md('More details', sp.details),
     sp.warnings.length ? h('p', { class: 'warning', text: `⚠️ ${sp.warnings.length} session entr${sp.warnings.length > 1 ? 'ies' : 'y'} on the issue could not be read and ${sp.warnings.length > 1 ? 'are' : 'is'} not shown.` }) : null,
     h('div', { class: 'row footer-row' },
       h('a', { class: 'btn primary', href: sp.url, target: '_blank', rel: 'noopener' }, `Open GitHub issue #${sp.number} →`),

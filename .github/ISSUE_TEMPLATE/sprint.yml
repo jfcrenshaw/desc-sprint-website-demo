@@ -4,7 +4,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for proposing a sprint! Only the **title** and **short pitch** are required. You can fill in everything else now or later by editing the issue.
+        Thanks for proposing a sprint! Only the **title** and **short pitch** are required, and empty fields are left out of the issue. You can fill in everything else now or later by editing the issue.
 
         **You don't need to know when you will meet yet.** After you submit, a bot replies with links for scheduling sessions and, later, for adding wrap-ups.
 
@@ -64,12 +64,6 @@ body:
       description: What do you hope to have at the end of the week?
 
   - type: textarea
-    id: prerequisites
-    attributes:
-      label: Prerequisites
-      description: Skills, software, data or computing access that participants need (or "just enthusiasm").
-
-  - type: textarea
     id: links
     attributes:
       label: Communication channel and links
@@ -81,8 +75,10 @@ body:
   - type: textarea
     id: details
     attributes:
-      label: Detailed description
-      description: Anything else participants should know.
+      label: More details
+      description: >
+        Prerequisites (skills, software, data or computing access, or "just enthusiasm"), background,
+        and anything else participants should know.
 
   - type: checkboxes
     id: options

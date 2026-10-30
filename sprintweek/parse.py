@@ -53,7 +53,15 @@ LEGACY_KEYS = {
     "github repo": "links",
     "github repos": "links",
     "location": "schedule_note",
+    # the compact layout written by `tidy_body`
+    "type": "type",
+    "sprint type": "type",
+    "working groups": "working_groups",
+    "working group": "working_groups",
+    "links": "links",
 }
+FLAGS = {"new contributor friendly": "New contributor friendly"}
+_SEPARATOR_RE = re.compile(r"\s+·\s+")
 
 NO_RESPONSE = "_No response_"
 HANDLE_RE = re.compile(r"(?<![\w.@/])@([A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))\b")
@@ -122,36 +130,78 @@ def split_sections(body: str) -> dict[str, str]:
     return {k: "\n".join(v).strip() for k, v in sections.items()}
 
 
-def _parse_legacy_preamble(preamble: str, title: str) -> dict[str, str]:
-    """Extract ``Key: value`` lines and the pitch from an old-style template preamble."""
+def _key_line(line: str) -> list[tuple[str, str, str]] | None:
+    """Parse "Contacts: x" or "**Type:** a · **Working groups:** b · 🌱 New contributor friendly".
+
+    Returns ``[(target, label, value), ...]`` (target "flag" for flags) or None for other text.
+    """
+
+    def one(segment: str):
+        m = _LEGACY_RE.match(segment)
+        if m and (target := LEGACY_KEYS.get(_norm(m.group(1)))):
+            return target, m.group(1).strip(), m.group(2).strip()
+        if flag := FLAGS.get(_norm(segment)):
+            return "flag", flag, ""
+        return None
+
+    segments = [x for x in _SEPARATOR_RE.split(line.strip()) if x]
+    parsed = [one(x) for x in segments]
+    if segments and all(parsed):
+        return parsed
+    whole = one(line.strip())  # e.g. "Day/Time: Mon · Tue" is one value
+    return [whole] if whole and whole[0] != "flag" else None
+
+
+def _parse_legacy_preamble(preamble: str, title: str) -> dict:
+    """Extract ``Key: value`` lines and the pitch from the text before the first section.
+
+    Used for the old SprintWeek2026 template and for the compact layout of `tidy_body`.
+    The pitch is the text before the first ``Key: value`` line (quoted banners skipped).
+    """
     found: dict[str, list[str]] = {}
-    rest: list[str] = []
-    key = None
+    flags: list[str] = []
+    before: list[str] = []  # free text before the first key line
+    after: list[str] = []  # free text after it
+    seen_key = False
+    key, collecting = None, False  # collecting: lines following a key with no value ("Links:")
     for line in preamble.split("\n"):
-        m = _LEGACY_RE.match(line)
-        target = LEGACY_KEYS.get(_norm(m.group(1))) if m else None
-        if target:
-            key = target
-            value = m.group(2).strip()
-            label = m.group(1).strip()
-            if value:
-                prefix = f"{label}: " if target in ("links", "schedule_note") else ""
-                found.setdefault(target, []).append(prefix + value)
+        if not line.strip():
+            key, collecting = None, False
+            (after if seen_key else before).append(line)
             continue
-        if key and line.strip().startswith(("-", "*")):
-            found.setdefault(key, []).append(line.strip())  # continuation bullet under "Day/Time:"
+        parsed = _key_line(line)
+        if parsed:
+            seen_key = True
+            for target, label, value in parsed:
+                if target == "flag":
+                    flags.append(label)
+                    continue
+                key, collecting = target, not value
+                if value:
+                    prefix = f"{label}: " if target in ("links", "schedule_note") and _norm(label) != "links" else ""
+                    found.setdefault(target, []).append(prefix + value)
             continue
-        key = None
+        if key and (collecting or re.match(r"\s*[-*]\s", line)):
+            found.setdefault(key, []).append(line.strip())  # continuation, e.g. bullets under "Day/Time:"
+            continue
+        key, collecting = None, False
         h = _HEADING_RE.match(line)
         if h and (h.group(2).strip("[] ").lower() == title.strip().lower() or len(h.group(1)) == 1):
             continue  # "# [Your Sprint Title]" repeated at the top of the body
-        rest.append(line)
-    out = {k: "\n".join(v).strip() for k, v in found.items()}
-    paragraphs = [p.strip() for p in re.split(r"\n\s*\n", "\n".join(rest)) if p.strip()]
-    if paragraphs:
-        out["pitch"] = paragraphs[0]
-        if len(paragraphs) > 1:
-            out["intro_rest"] = "\n\n".join(paragraphs[1:])
+        (after if seen_key else before).append(line)
+    out: dict = {k: "\n".join(v).strip() for k, v in found.items()}
+
+    def paragraphs(lines: list[str]) -> list[str]:
+        return [x.strip() for x in re.split(r"\n\s*\n", "\n".join(lines)) if x.strip()]
+
+    pre = [x for x in paragraphs(before) if not x.startswith(">")]  # skip banners such as the demo notice
+    post = paragraphs(after)
+    pitch, rest = (pre, post) if seen_key else (pre[:1], pre[1:] + post)
+    if pitch:
+        out["pitch"] = "\n\n".join(pitch)
+    if rest:
+        out["intro_rest"] = "\n\n".join(rest)
+    out["flags"] = flags
     return out
 
 
@@ -298,9 +348,80 @@ def parse_issue_body(body: str, title: str = "") -> dict:
         "links": field("links"),
         "details": details,
         "wrapup": field("wrapup"),
-        "options": parse_checkboxes(sec.get("options", "")),
+        "options": parse_checkboxes(sec.get("options", "")) + legacy["flags"],
         "schedule_note": _clean(legacy.get("schedule_note", "")),
     }
+
+
+def tidy_body(body: str, title: str = "") -> str | None:
+    """Rewrite raw issue-form output into a compact layout without empty fields.
+
+    The form writes every field as a ``### Heading`` and empty ones as "_No response_".
+    The result puts the pitch first, short fields on ``**Key:** value`` lines, and long
+    fields under headings, e.g.::
+
+        One-paragraph pitch.
+
+        **Contacts:** @alice, Bob Smith
+        **Type:** General Sprint · **Working groups:** PZ · 🌱 New contributor friendly
+        **Links:** Slack: #desc-pz
+
+        ### Goals and deliverables
+        ...
+
+    `parse_issue_body` reads both layouts to the same fields (older forms' separate
+    "Prerequisites" are folded into "More details").
+
+    Parameters
+    ----------
+    body : str
+        Issue body.
+    title : str, optional
+        Issue title.
+
+    Returns
+    -------
+    str or None
+        The compact body, or None if ``body`` is not raw form output (already tidy,
+        written by hand, or an old template), so tidying twice changes nothing.
+    """
+    sec = split_sections(body)
+    if "pitch" not in sec or not re.search(r"^###\s+Short pitch\s*$", body or "", re.M):
+        return None
+    f = parse_issue_body(body, title)
+    parts = []
+    if banner := _COMMENT_RE.sub("", sec.get("preamble", "")).strip():
+        parts.append(banner)  # e.g. the demo notice; the parser skips quoted text before the pitch
+    if f["pitch"]:
+        parts.append(f["pitch"])
+    meta = []
+    if f["contacts"]:
+        meta.append(f"**Contacts:** {' '.join(f['contacts'].split())}")
+    kind = []
+    if f["type"]:
+        kind.append(f"**Type:** {f['type']}")
+    if f["working_groups"]:
+        kind.append(f"**Working groups:** {', '.join(f['working_groups'])}")
+    if any("new contributor" in o.lower() for o in f["options"]):
+        kind.append("🌱 New contributor friendly")
+    if kind:
+        meta.append(" · ".join(kind))
+    if f["links"]:
+        lines = [ln.strip() for ln in f["links"].splitlines() if ln.strip()]
+        meta.append(f"**Links:** {lines[0]}" if len(lines) == 1 else "**Links:**\n" + "\n".join(lines))
+    if meta:
+        parts.append("\n".join(meta))
+    if f["goals"]:
+        parts.append(f"### Goals and deliverables\n\n{f['goals']}")
+    more = f["details"]
+    if f["prerequisites"]:
+        sep = "\n" if "\n" in f["prerequisites"] else " "
+        more = "\n\n".join(x for x in (f"**Prerequisites:**{sep}{f['prerequisites']}", more) if x)
+    if more:
+        parts.append(f"### More details\n\n{more}")
+    if f["wrapup"]:
+        parts.append(f"### Wrap-up\n\n{f['wrapup']}")
+    return "\n\n".join(parts) + "\n"
 
 
 def plain_text(markdown: str, limit: int | None = None) -> str:

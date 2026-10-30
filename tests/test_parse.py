@@ -1,4 +1,6 @@
+import importlib.util
 import unittest
+from pathlib import Path
 
 from sprintweek.parse import (
     parse_contacts,
@@ -6,6 +8,7 @@ from sprintweek.parse import (
     parse_wrapup_comment,
     plain_text,
     split_sections,
+    tidy_body,
     wrapup_from_comment,
 )
 
@@ -235,3 +238,85 @@ class TestPlainText(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+FIELDS_COMPARED = (
+    "pitch",
+    "contacts",
+    "type",
+    "working_groups",
+    "goals",
+    "links",
+    "wrapup",
+    "options",
+    "schedule_note",
+)
+
+
+class TestTidyBody(unittest.TestCase):
+    def test_compact_layout(self):
+        tidy = tidy_body(FORM_BODY, "LBG sprint")
+        self.assertNotIn("_No response_", tidy)
+        self.assertTrue(
+            tidy.startswith("Build a **pipeline** for LBGs.\n\n**Contacts:** @alice, Bob Smith (@bsmith)\n")
+        )
+        self.assertIn("**Type:** Paper Sprint · **Working groups:** PZ, WLSS · 🌱 New contributor friendly", tidy)
+        self.assertIn("**Links:** Slack: #desc-lbg", tidy)
+        self.assertIn("### Goals and deliverables\n\n1. A pipeline", tidy)
+        self.assertIn("### More details\n\n```python", tidy)
+        self.assertNotIn("Prerequisites", tidy)
+        self.assertNotIn("### Wrap-up\n\n", tidy)  # the fixture's "### Wrap-up" is inside a code block
+
+    def test_round_trip_and_idempotence(self):
+        tidy = tidy_body(FORM_BODY, "LBG sprint")
+        before, after = parse_issue_body(FORM_BODY), parse_issue_body(tidy)
+        for key in FIELDS_COMPARED + ("details",):
+            self.assertEqual(before[key], after[key], key)
+        self.assertIsNone(tidy_body(tidy, "LBG sprint"))
+
+    def test_only_a_pitch(self):
+        body = (
+            "### Short pitch\n\nJust an idea.\n\n### Contact person(s)\n\n_No response_\n\n"
+            "### Sprint type\n\nGeneral Sprint\n"
+        )
+        self.assertEqual(tidy_body(body), "Just an idea.\n\n**Type:** General Sprint\n")
+
+    def test_old_prerequisites_are_folded_into_more_details(self):
+        body = "### Short pitch\n\nHi\n\n### Prerequisites\n\n- Python\n- NERSC\n\n### Detailed description\n\nMore."
+        tidy = tidy_body(body)
+        self.assertIn("### More details\n\n**Prerequisites:**\n- Python\n- NERSC\n\nMore.", tidy)
+        self.assertEqual(parse_issue_body(tidy)["prerequisites"], "")
+
+    def test_multi_line_links_and_multi_paragraph_pitch(self):
+        body = (
+            "### Short pitch\n\nFirst.\n\nSecond.\n\n"
+            "### Communication channel and links\n\nSlack: #a\nRepo: https://x.org"
+        )
+        tidy = tidy_body(body)
+        self.assertIn("**Links:**\nSlack: #a\nRepo: https://x.org", tidy)
+        parsed = parse_issue_body(tidy)
+        self.assertEqual((parsed["pitch"], parsed["links"]), ("First.\n\nSecond.", "Slack: #a\nRepo: https://x.org"))
+
+    def test_other_text_is_left_alone(self):
+        self.assertIsNone(tidy_body(LEGACY_BODY))
+        self.assertIsNone(tidy_body("Just some text I wrote."))
+        self.assertIsNone(tidy_body(""))
+
+    def test_legacy_value_with_a_middle_dot_is_kept_whole(self):
+        self.assertEqual(parse_issue_body("Day/Time: Mon · Tue\n\nPitch")["schedule_note"], "Day/Time: Mon · Tue")
+
+    def test_every_demo_issue_round_trips(self):
+        root = Path(__file__).resolve().parent.parent
+        spec = importlib.util.spec_from_file_location("seed", root / "demo" / "seed.py")
+        seed = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(seed)
+        for sp in seed.load_demo()["sprints"]:
+            raw = seed.issue_body(sp)
+            tidy = tidy_body(raw, sp["title"])
+            before, after = parse_issue_body(raw, sp["title"]), parse_issue_body(tidy, sp["title"])
+            with self.subTest(title=sp["title"]):
+                for key in FIELDS_COMPARED:
+                    self.assertEqual(before[key], after[key], key)
+                self.assertIn(before["details"], after["details"])
+                self.assertEqual(after["prerequisites"], "")
+                self.assertIsNone(tidy_body(tidy, sp["title"]))

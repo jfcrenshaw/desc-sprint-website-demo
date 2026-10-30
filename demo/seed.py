@@ -29,13 +29,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sprintweek.config import load_config  # noqa: E402
 from sprintweek.github import GitHub, find_token  # noqa: E402
-from sprintweek.parse import parse_list  # noqa: E402
+from sprintweek.parse import parse_list, tidy_body  # noqa: E402
 from sprintweek.sessions import extract_session_data, normalize_session, render_session_comment  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 SEEDER = "jfcrenshaw"  # mentions of this account are kept (people are not notified about themselves)
 
-# Form field id -> heading, in the order GitHub renders the issue form.
+# Form field id -> heading, in the order GitHub rendered the issue form when the demo was
+# created (it had separate Prerequisites and Detailed description fields); the triage bot
+# tidies such text into the compact layout, so the snapshot stores `tidy_body` of it.
 FORM = [
     ("pitch", "Short pitch"),
     ("contacts", "Contact person(s)"),
@@ -140,7 +142,7 @@ def write_snapshot(path: Path) -> None:
             {
                 "number": n,
                 "title": sp["title"],
-                "body": issue_body(sp),
+                "body": tidy_body(issue_body(sp), sp["title"]),
                 "html_url": url,
                 "state": "open",
                 "state_reason": None,

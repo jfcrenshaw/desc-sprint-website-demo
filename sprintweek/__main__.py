@@ -31,6 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     which.add_argument("--issue", type=int, help="issue number")
     which.add_argument("--all", action="store_true", help="every open issue")
     t.add_argument("--greet", action="store_true", help="post or refresh the welcome comment")
+    t.add_argument("--tidy", action="store_true", help="rewrite raw issue-form text compactly (once)")
 
     args = parser.parse_args(argv)
     try:
@@ -69,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         numbers = [args.issue]
     for n in numbers:
-        for line in triage(gh, config, n, args.greet):
+        for line in triage(gh, config, n, args.greet, args.tidy):
             print(line)
     return 0
 

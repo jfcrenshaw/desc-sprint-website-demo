@@ -2,6 +2,7 @@
 
 * Posts (or updates) one welcome comment with links to the calendar and the scheduler.
 * Adds the repository labels matching the sprint type and working groups chosen in the form.
+* Rewrites a new sprint's issue text into a compact layout without empty fields (once).
 * Asks sprint teams to move sessions out of rooms that are no longer available, and marks
   those notices resolved once the session has moved.
 """
@@ -11,7 +12,7 @@ from __future__ import annotations
 from .build import _is_excluded
 from .config import Config
 from .github import GitHub
-from .parse import parse_issue_body
+from .parse import parse_issue_body, tidy_body
 from .rooms import RESOLVED_MARKER, plan_notices
 
 GREETING_MARKER = "<!-- sprintweek:greeting -->"
@@ -52,7 +53,7 @@ def greeting(number: int, config: Config) -> str:
     return "\n".join(lines)
 
 
-def triage(gh: GitHub, config: Config, number: int, greet: bool) -> list[str]:
+def triage(gh: GitHub, config: Config, number: int, greet: bool, tidy: bool = False) -> list[str]:
     """Label a sprint issue and optionally post or refresh its welcome comment.
 
     Parameters
@@ -65,6 +66,9 @@ def triage(gh: GitHub, config: Config, number: int, greet: bool) -> list[str]:
         Issue number.
     greet : bool
         Post the welcome comment, or update it if it already exists.
+    tidy : bool, optional
+        Rewrite raw issue-form text compactly (see `sprintweek.parse.tidy_body`); text that
+        is already tidy or written by hand is left alone.
 
     Returns
     -------
@@ -92,6 +96,10 @@ def triage(gh: GitHub, config: Config, number: int, greet: bool) -> list[str]:
         if add:
             gh.request("POST", f"/repos/{repo}/issues/{number}/labels", {"labels": add})
             log.append(f"#{number}: added labels {', '.join(add)}")
+
+    if tidy and (compact := tidy_body(issue.get("body") or "", issue["title"])):
+        gh.request("PATCH", f"/repos/{repo}/issues/{number}", {"body": compact})
+        log.append(f"#{number}: tidied the issue text")
 
     if greet and config.greet_new_issues:
         body = greeting(number, config)
