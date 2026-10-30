@@ -71,11 +71,27 @@ class TestRoomConfig(unittest.TestCase):
         self.assertEqual(len(windows), 6)
         self.assertEqual(windows[0], {"date": "2026-10-26", "start": "09:00", "end": "12:00"})
 
+    def test_open_ended_windows(self):
+        rooms = load("      - { name: A, available: [{ days: [Fri], end: 13:00 }, { days: [Mon], start: 14:00 }] }")
+        room = rooms.sites[0].rooms[0]
+        self.assertEqual(
+            room.available,
+            [
+                {"date": "2026-10-26", "start": "14:00", "end": "24:00"},
+                {"date": "2026-10-30", "start": "00:00", "end": "13:00"},
+            ],
+        )
+        self.assertEqual(room.summary, "Fri 30 until 13:00; Mon 26 from 14:00")
+        by_site = rooms.rooms_by_site
+        friday = session(location="A", date="2026-10-30")
+        self.assertEqual(room_problem({**friday, "start": "08:00", "end": "12:30"}, by_site), "")
+        self.assertIn("until 13:00", room_problem({**friday, "start": "12:00", "end": "14:00"}, by_site))
+        self.assertEqual(room_problem({**friday, "date": "2026-10-26", "start": "15:00", "end": "23:59"}, by_site), "")
+
     def test_errors_name_the_room(self):
         cases = {
             "      - { name: A, capacity: 20 }": "unknown",
             "      - { name: A, available: [{ start: 9:00, end: 10:00 }] }": "days",
-            "      - { name: A, available: [{ days: [Mon], start: 9:00 }] }": "both start and end",
             "      - { name: A, available: [{ days: [Mon], start: 10:00, end: 9:00 }] }": "after start",
             "      - { name: A, available: [{ days: [Sat] }] }": "no Sat",
             "      - { name: A, available: [{ days: [Mon], start: 1pm, end: 3pm }] }": "24-hour",

@@ -263,12 +263,21 @@ def _rooms(items, days: list[dt.date], where: str) -> list[Room]:
                     dates = _days(w.get("days"), days, f"{at}.days")
                     start = _clock(w["start"], f"{at}.start") if w.get("start") else ""
                     end = _clock(w["end"], f"{at}.end") if w.get("end") else ""
+                    # Only an end means "until", only a start means "from"; neither is the whole day.
                     if bool(start) != bool(end):
-                        raise ConfigError(f"{at}: give both start and end, or neither for the whole day")
+                        start, end = start or "00:00", end or "24:00"
                     if start and end <= start:
                         raise ConfigError(f"{at}: end ({end}) must be after start ({start})")
                     available += [{"date": d.isoformat(), "start": start, "end": end} for d in dates]
-                    hours = f" {start}–{end}" if start else ""
+                    hours = (
+                        ""
+                        if not start
+                        else f" until {end}"
+                        if start == "00:00"
+                        else f" from {start}"
+                        if end == "24:00"
+                        else f" {start}–{end}"
+                    )
                     parts.append(", ".join(f"{d:%a} {d.day}" for d in dates) + hours)
                 available.sort(key=lambda w: (w["date"], w["start"]))
                 room = Room(name, available, "; ".join(parts))

@@ -227,7 +227,8 @@ function update(e) {
     const w = date ? r.available.filter(x => x.date === date) : r.available;
     if (!w.length) return [];
     const o = new Option(r.name, r.name);
-    if (date && !w.some(x => !x.start)) o.label = 'open ' + w.map(x => x.start + '–' + x.end).join(', ');
+    const hours = x => x.start === '00:00' ? 'until ' + x.end : x.end === '24:00' ? 'from ' + x.start : x.start + '–' + x.end;
+    if (date && !w.some(x => !x.start)) o.label = 'open ' + w.map(hours).join(', ');
     return [o];
   }));
   const norm = t => String(t || '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');

@@ -22,7 +22,8 @@ event:
 # rooms: suggestions in the scheduling form (people can still type their own room).
 #   A plain name is available all week. To restrict a room, give it "available" windows:
 #     days: all, weekday names (Mon, Tue, ...) or dates (2026-10-27), as a list
-#     start, end: optional hours; leave both out for the whole day
+#     start, end: optional hours; leave both out for the whole day, give only end
+#                 for "until" (e.g. end: 13:00) or only start for "from"
 #   The scheduling form only suggests rooms open on the chosen day, and the bot refuses
 #   sessions in a listed room outside its windows. If you change availability after people
 #   have scheduled, sessions now outside it are flagged on the website and the sprint gets
@@ -52,47 +53,74 @@ sites:
           - days: [Tue]
             start: 13:00
             end: 17:00
-      - name: KFB 2nd floor conference room
+      - name: FKB 2nd floor conference room
         available:
-          - days: [Mon]
+          - days: [Mon, Wed, Thu]
+          - days: [Fri]
+            end: 13:00 # until 1pm
+      - name: FKB 3rd floor conference room
+        available:
+          - days: [Wed]
+      - name: B53 Tulare
+        available:
+          - days: [Mon, Tue, Fri]
+      - name: B53 Yosemite
+        available:
+          - days: [Mon, Tue]
+      - name: B53 Toluca
+        available:
+          - days: [Tue, Thu, Fri]
     program:
       - title: Morning sprint pitches
         kind: plenary
         days: all
-        start: 08:30
-        end: 09:00
-        location: Redwood C-D
+        start: 09:00
+        end: 10:00
+        location: FKB auditorium
         online: https://zoom.us/j/0000000000
         note: Two minutes per sprint; slides come from the GitHub issues.
       - title: Coffee
         kind: break
-        days: all
-        start: 10:30
-        end: 11:00
-      - title: Lunch
-        kind: meal
-        days: all
-        start: 12:00
-        end: 13:00
-        location: Cafeteria
+        days: [Mon, Tue]
+        start: 08:30
+        end: 09:00
+        location: Outside the FKB auditorium
       - title: Coffee
         kind: break
-        days: all
-        start: 15:00
-        end: 15:30
+        days: [Wed, Thu, Fri]
+        start: 08:30
+        end: 09:00
+        location: Redwoods patio
+      - title: Lunch
+        kind: meal
+        days: [Mon, Tue]
+        start: 12:00
+        end: 13:00
+        location: Outside the FKB auditorium
+      - title: Lunch
+        kind: meal
+        days: [Wed, Thu, Fri]
+        start: 12:00
+        end: 13:00
+        location: Redwoods patio
+      - title: Afternoon snacks
+        kind: break
+        days: [Mon, Tue]
+        start: 15:30
+        end: 16:00
+        location: Outside the FKB auditorium
+      - title: Afternoon snacks
+        kind: break
+        days: [Wed, Thu, Fri]
+        start: 15:30
+        end: 16:00
+        location: Redwoods patio
       - title: Welcome reception
         kind: social
         days: [Mon]
         start: 17:00
         end: 19:00
-        location: Redwood lobby
-      - title: Closing plenary and wrap-ups
-        kind: plenary
-        days: [Fri]
-        start: 13:00
-        end: 14:30
-        location: Redwood C-D
-        online: https://zoom.us/j/0000000000
+        location: Redwoods patio
 
   - name: Paris
     timezone: Europe/Paris
