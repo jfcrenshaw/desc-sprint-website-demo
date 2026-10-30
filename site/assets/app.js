@@ -134,7 +134,7 @@ function events() {
       title: sessionTitle(sp, s),
       backgroundColor: color,
       textColor: inkFor(color),
-      classNames: [`mode-${(s.mode || 'tba').replace(' ', '-')}`],
+      classNames: [`mode-${(s.mode || 'tba').replace(' ', '-')}`, s.room_issue ? 'room-issue' : ''].filter(Boolean),
       extendedProps: { sprint: sp.number, session: s.id },
     };
   }));
@@ -352,6 +352,7 @@ function sessionItem(sp, s) {
       s.mode !== 'online' ? `📍 ${[s.site, s.location].filter(Boolean).join(' – ') || 'Location to be announced'}` : null,
       s.online ? h('a', { class: 'join', href: s.online, target: '_blank', rel: 'noopener' }, '💻 Join online') : null),
     s.note ? h('div', { class: 'note', text: s.note }) : null,
+    s.room_issue ? h('div', { class: 'room-warning', text: `⚠️ ${s.room_issue} The sprint team has been asked to pick another room.` }) : null,
     edit ? h('a', { class: 'link small', href: edit, target: '_blank', rel: 'noopener' }, 'Edit or cancel') : null,
   );
 }

@@ -2,6 +2,8 @@
 
 * Posts (or updates) one welcome comment with links to the calendar and the scheduler.
 * Adds the repository labels matching the sprint type and working groups chosen in the form.
+* Asks sprint teams to move sessions out of rooms that are no longer available, and marks
+  those notices resolved once the session has moved.
 """
 
 from __future__ import annotations
@@ -10,6 +12,7 @@ from .build import _is_excluded
 from .config import Config
 from .github import GitHub
 from .parse import parse_issue_body
+from .rooms import plan_notices
 
 GREETING_MARKER = "<!-- sprintweek:greeting -->"
 
@@ -92,3 +95,33 @@ def triage(gh: GitHub, config: Config, number: int, greet: bool) -> list[str]:
             gh.request("PATCH", f"/repos/{repo}/issues/comments/{mine[0]['id']}", {"body": body})
             log.append(f"#{number}: updated welcome comment")
     return log
+
+
+def notify_rooms(gh: GitHub, config: Config, data: dict, snapshot: dict) -> list[str]:
+    """Post room-change notices for new conflicts and resolve notices for fixed ones.
+
+    Parameters
+    ----------
+    gh : GitHub
+        Client authenticated with permission to write issues.
+    config : Config
+        Event configuration.
+    data : dict
+        Website data from `sprintweek.build.build_data`.
+    snapshot : dict
+        The repository snapshot ``data`` was built from (for existing notices).
+
+    Returns
+    -------
+    list of str
+        Human-readable log of what was done.
+    """
+    to_post, to_resolve = plan_notices(data, snapshot["comments"], config.scheduler_url)
+    log = []
+    for number, body in to_post:
+        gh.request("POST", f"/repos/{config.repo}/issues/{number}/comments", {"body": body})
+        log.append(f"#{number}: posted a room-change notice")
+    for comment_id, body in to_resolve:
+        gh.request("PATCH", f"/repos/{config.repo}/issues/comments/{comment_id}", {"body": body})
+        log.append(f"comment {comment_id}: marked its room notice resolved")
+    return log or ["no room notices to post or resolve"]

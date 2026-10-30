@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   validateSession, encodeSessionData, extractSessionData, renderSessionComment, renderCancelledComment, zonedToUtc,
   describeTimes, contactHandles, mdEscape, cleanText, sign, verify, pkcs1ToPkcs8, importPrivateKey, appJwt, fromB64url,
-  isTimeZone,
+  isTimeZone, roomProblem, siteRooms,
 } from '../src/lib.js';
 
 const config = {
@@ -153,4 +153,47 @@ test('GitHub App private keys in PKCS#1 and PKCS#8 both sign JWTs', async () => 
     assert.ok(ok);
     assert.equal(JSON.parse(Buffer.from(fromB64url(p)).toString()).iss, '12345');
   }
+});
+
+const roomConfig = {
+  ...config,
+  sites: [
+    {
+      ...config.sites[0],
+      rooms: [
+        'Redwood C-D',
+        { name: 'Redwood A', summary: 'Mon 26; Tue 27 13:00–17:00', available: [
+          { date: '2026-10-26', start: '', end: '' }, { date: '2026-10-27', start: '13:00', end: '17:00' }] },
+      ],
+    },
+    config.sites[1],
+  ],
+};
+const slac = { date: '2026-10-27', start: '10:00', end: '12:00', where: 'SLAC', tz: 'America/Los_Angeles' };
+
+test('room availability matches the Python checker', () => {
+  // Produced by sprintweek.rooms.room_problem for the same room and session.
+  const python = 'Redwood A is not available on Tue Oct 27 at 10:00–12:00 (available: Mon 26; Tue 27 13:00–17:00).';
+  assert.equal(roomProblem({ site: 'SLAC', location: ' redwood  A ', date: '2026-10-27', start: '10:00', end: '12:00' }, roomConfig.sites), python);
+});
+
+test('room availability windows', () => {
+  const check = (location, change = {}) => roomProblem({ site: 'SLAC', location, date: '2026-10-27', start: '13:00', end: '17:00', ...change }, roomConfig.sites);
+  assert.equal(check('Redwood A'), '', 'exactly the window');
+  assert.ok(check('Redwood A', { start: '12:30' }), 'starts too early');
+  assert.ok(check('Redwood A', { end: '17:30' }), 'ends too late');
+  assert.equal(check('Redwood A', { date: '2026-10-26', start: '08:00', end: '20:00' }), '', 'all day Monday');
+  assert.ok(check('Redwood A', { date: '2026-10-28' }), 'not on Wednesday');
+  assert.equal(check('Redwood C-D', { date: '2026-10-28' }), '', 'plain names are always available');
+  assert.equal(check("Alice's office"), '', 'typed-in rooms are not checked');
+  assert.equal(roomProblem({ site: 'Paris', location: 'Redwood A', ...slac }, roomConfig.sites), '', 'rooms belong to their site');
+  assert.deepEqual(siteRooms({ rooms: ['X'] }), [{ name: 'X', available: null, summary: 'all week' }]);
+});
+
+test('the bot refuses unavailable rooms', () => {
+  const bad = validateSession({ ...slac, location: 'Redwood A' }, roomConfig);
+  assert.equal(bad.session, null);
+  assert.match(bad.errors.location, /^Redwood A is not available on Tue Oct 27 at 10:00–12:00/);
+  assert.ok(validateSession({ ...slac, location: 'Redwood A', start: '13:00', end: '15:00' }, roomConfig).session);
+  assert.ok(validateSession({ ...slac, location: 'Redwood C-D' }, roomConfig).session);
 });

@@ -18,22 +18,43 @@ event:
   default_timezone: local
 
 # Physical sites. Sessions and program items at a site use that site's time zone.
-#   rooms:   suggestions in the scheduling form (people can also type their own)
-#   program: the organizers' schedule at that site (coffee, meals, plenaries, socials):
-#     title     what it is
-#     kind      break | meal | plenary | social
-#               Breaks and meals are drawn as shaded bands behind the sprint sessions,
-#               and only shown when viewing that site's time zone. Plenaries and socials
-#               are normal calendar entries, always shown, and included in the calendar feed.
-#     days      all, or a list of dates, e.g. [2026-10-26, 2026-10-28]
-#     start, end
-#     location, online (https:// link), note: optional
 #
-# NOTE: the program below is illustrative demo data, not the real 2026 schedule.
+# rooms: suggestions in the scheduling form (people can still type their own room).
+#   A plain name is available all week. To restrict a room, give it "available" windows:
+#     days: all, weekday names (Mon, Tue, ...) or dates (2026-10-27), as a list
+#     start, end: optional hours; leave both out for the whole day
+#   The scheduling form only suggests rooms open on the chosen day, and the bot refuses
+#   sessions in a listed room outside its windows. If you change availability after people
+#   have scheduled, sessions now outside it are flagged on the website and the sprint gets
+#   an automatic comment asking to pick another room (marked resolved once it moves).
+#
+# program: the organizers' schedule at that site.
+#   title     what it is
+#   kind      break | meal | plenary | social
+#             Breaks and meals are shaded bands behind the sprint sessions, shown when the
+#             viewer's clock matches the site's. Plenaries (and anything with an online link)
+#             are shown to everyone and included in the calendar feed.
+#   days      all, weekday names or dates, as for rooms
+#   start, end
+#   location, online (https:// link), note: optional
+#
+# NOTE: the rooms' availability and the program below are illustrative demo data,
+# not the real 2026 schedule.
 sites:
   - name: SLAC
     timezone: America/Los_Angeles
-    rooms: [Redwood A, Redwood B, Redwood C-D, KFB 2nd floor conference room]
+    rooms:
+      - Redwood B
+      - Redwood C-D
+      - name: Redwood A
+        available:
+          - days: [Mon, Wed, Thu, Fri]
+          - days: [Tue]
+            start: 13:00
+            end: 17:00
+      - name: KFB 2nd floor conference room
+        available:
+          - days: [Mon]
     program:
       - title: Morning sprint pitches
         kind: plenary
@@ -43,18 +64,31 @@ sites:
         location: Redwood C-D
         online: https://zoom.us/j/0000000000
         note: Two minutes per sprint; slides come from the GitHub issues.
-      - { title: Coffee, kind: break, days: all, start: 10:30, end: 11:00 }
-      - { title: Lunch, kind: meal, days: all, start: 12:00, end: 13:00, location: Cafeteria }
-      - { title: Coffee, kind: break, days: all, start: 15:00, end: 15:30 }
+      - title: Coffee
+        kind: break
+        days: all
+        start: 10:30
+        end: 11:00
+      - title: Lunch
+        kind: meal
+        days: all
+        start: 12:00
+        end: 13:00
+        location: Cafeteria
+      - title: Coffee
+        kind: break
+        days: all
+        start: 15:00
+        end: 15:30
       - title: Welcome reception
         kind: social
-        days: [2026-10-26]
+        days: [Mon]
         start: 17:00
         end: 19:00
         location: Redwood lobby
       - title: Closing plenary and wrap-ups
         kind: plenary
-        days: [2026-10-30]
+        days: [Fri]
         start: 13:00
         end: 14:30
         location: Redwood C-D
@@ -64,10 +98,26 @@ sites:
     timezone: Europe/Paris
     rooms: []
     program:
-      - { title: Coffee, kind: break, days: all, start: 10:30, end: 11:00 }
-      - { title: Lunch, kind: meal, days: all, start: 12:30, end: 14:00 }
-      - { title: Coffee, kind: break, days: all, start: 16:00, end: 16:30 }
-      - { title: Welcome drinks, kind: social, days: [2026-10-26], start: 18:00, end: 20:00 }
+      - title: Coffee
+        kind: break
+        days: all
+        start: 10:30
+        end: 11:00
+      - title: Lunch
+        kind: meal
+        days: all
+        start: 12:30
+        end: 14:00
+      - title: Coffee
+        kind: break
+        days: all
+        start: 16:00
+        end: 16:30
+      - title: Welcome drinks
+        kind: social
+        days: [Mon]
+        start: 18:00
+        end: 20:00
 
 github:
   # Repository whose issues are the sprints.

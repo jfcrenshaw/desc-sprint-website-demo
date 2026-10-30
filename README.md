@@ -116,6 +116,7 @@ issue labels ───────────┘                              b
    It downloads *all* issues and comments, so the site is always a fresh copy of GitHub and there is no state to drift.
    Bursts of edits collapse into one queued build.
 4. **[Scheduling bot](worker/)** (a Cloudflare Worker plus a GitHub App) serves the session form and posts the session comments on behalf of signed-in sprint members.
+   The build workflow also posts (and later resolves) the automatic room-change notices.
 5. **[Triage workflow](.github/workflows/triage.yml)** posts a welcome comment on new sprint issues and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
 6. **Python package** [`sprintweek/`](sprintweek/) (standard library plus PyYAML) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
 7. **Frontend** [`site/`](site/) is plain HTML, CSS and JavaScript modules with three small vendored libraries: [EventCalendar](https://github.com/vkurko/calendar) (calendar views, MIT), [marked](https://github.com/markedjs/marked) (Markdown) and [DOMPurify](https://github.com/cure53/DOMPurify) (sanitizing).
@@ -155,6 +156,29 @@ Edit the file on GitHub (pencil icon) and commit; the calendar updates a minute 
 - **Plenaries** are normal calendar entries shown to everyone, and **socials** are shown at their site (or to everyone if they have an online link).
   Both are included in the calendar feed.
 - A mistake (an impossible time, a misspelled `kind`, an unquoted color) stops the build with a message naming the setting; the website keeps showing the previous version until it is fixed.
+
+### Rooms and their availability
+
+Each site lists its rooms in [sprintweek.yaml](sprintweek.yaml).
+A plain name is available all week; a room can also be limited to some days and hours:
+
+```yaml
+    rooms:
+      - Redwood C-D                # all week
+      - name: Redwood A
+        available:
+          - days: [Mon, Wed]       # weekday names or dates (2026-10-28)
+          - days: [Tue]
+            start: 13:00           # only these hours; leave out for the whole day
+            end: 17:00
+```
+
+- The scheduling form only suggests rooms open on the chosen day (with their hours), warns as soon as someone picks a room outside its availability, and the bot refuses to save such a session.
+  People can still type a room that is not in the list ("Alice's office"); only listed rooms are checked.
+- **Changing availability after people have scheduled** never moves or deletes anyone's session.
+  Instead, sessions now outside their room's availability are listed as warnings in the build, flagged on the website, and the sprint issue gets one automatic comment asking the team to pick another room, with an edit link.
+  When the session is moved (or cancelled), that comment is struck through and marked resolved.
+- Renaming a room in the config leaves older sessions with the old name, which then counts as a typed-in room and is not checked.
 
 ### What counts as a sprint
 

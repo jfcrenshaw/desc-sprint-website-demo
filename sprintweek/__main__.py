@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from .bot import triage
+from .bot import notify_rooms, triage
 from .build import build_data, write_site
 from .config import ConfigError, load_config
 from .github import GitHub, fetch_snapshot, find_token
@@ -23,6 +23,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--out", default="_site", help="output directory (default: _site)")
     b.add_argument("--snapshot", help="read issues from this JSON snapshot instead of the GitHub API")
     b.add_argument("--save-snapshot", help="also save the fetched issues to this JSON file")
+
+    sub.add_parser("notify-rooms", help="ask sprint teams to move sessions out of unavailable rooms")
 
     t = sub.add_parser("triage", help="label sprint issues and post welcome comments")
     which = t.add_mutually_exclusive_group(required=True)
@@ -53,6 +55,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     gh = GitHub(find_token())
+    if args.command == "notify-rooms":
+        snapshot = fetch_snapshot(gh, config.repo)
+        for line in notify_rooms(gh, config, build_data(snapshot, config), snapshot):
+            print(line)
+        return 0
     if args.all:
         numbers = [
             i["number"]

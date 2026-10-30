@@ -11,6 +11,7 @@ from pathlib import Path
 from . import ics
 from .config import Config
 from .parse import parse_contacts, parse_issue_body, plain_text, wrapup_from_comment
+from .rooms import room_problem
 from .sessions import SessionError, extract_session_data, normalize_session
 
 SITE_DIR = Path(__file__).resolve().parent.parent / "site"
@@ -96,6 +97,7 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
             session.update(id=str(c["id"]), url=c["html_url"], updated_at=c["updated_at"])
             if not session["site"] and session["location"]:  # hand-written comment without a site
                 session["site"] = config.site_for_timezone(session["tz"]) or ""
+            session["room_issue"] = room_problem(session, config.rooms_by_site)
             sessions.append(session)
             continue
         text = wrapup_from_comment(c["body"])
@@ -165,6 +167,9 @@ def build_data(snapshot: dict, config: Config) -> dict:
         sprint, w = build_sprint(issue, by_issue[issue["number"]], config)
         sprints.append(sprint)
         warnings += [f"#{issue['number']}: {x}" for x in w]
+        warnings += [
+            f"#{issue['number']}: {s['room_issue']} ({s['url']})" for s in sprint["sessions"] if s["room_issue"]
+        ]
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": {"repo": snapshot.get("repo", config.repo), "fetched_at": snapshot.get("fetched_at")},

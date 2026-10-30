@@ -28,12 +28,29 @@ class ConfigError(ValueError):
 
 
 @dataclass
+class Room:
+    """A bookable room and when it can be used.
+
+    ``available`` is None for "the whole week", else a list of windows
+    ``{"date": "YYYY-MM-DD", "start": "HH:MM" or "", "end": "HH:MM" or ""}`` in the
+    site's local time; empty times mean the whole day.
+    """
+
+    name: str
+    available: list[dict] | None = None
+    summary: str = "all week"
+
+    def public(self) -> dict:
+        return {"name": self.name, "available": self.available, "summary": self.summary}
+
+
+@dataclass
 class Site:
     """A physical venue with its own time zone."""
 
     name: str
     timezone: str
-    rooms: list[str] = field(default_factory=list)
+    rooms: list[Room] = field(default_factory=list)
 
 
 @dataclass
@@ -66,6 +83,11 @@ class Config:
     def new_sprint_url(self) -> str:
         return f"https://github.com/{self.repo}/issues/new?template=sprint.yml"
 
+    @property
+    def rooms_by_site(self) -> dict[str, list[dict]]:
+        """Published room descriptions keyed by site name (see `sprintweek.rooms`)."""
+        return {s.name: [r.public() for r in s.rooms] for s in self.sites}
+
     def site_for_timezone(self, tz: str) -> str | None:
         """Return the name of the first site using time zone ``tz``, if any."""
         for site in self.sites:
@@ -95,7 +117,7 @@ class Config:
                     "timezone": s.timezone,
                     # Abbreviation during the event, e.g. "PDT" (browsers often only offer "GMT+1").
                     "abbr": noon.replace(tzinfo=ZoneInfo(s.timezone)).tzname(),
-                    "rooms": s.rooms,
+                    "rooms": [r.public() for r in s.rooms],
                 }
                 for s in self.sites
             ],
@@ -170,6 +192,96 @@ def _timezone(value, where: str) -> str:
     return text
 
 
+WEEKDAYS = {
+    **dict.fromkeys(("mon", "monday"), 0),
+    **dict.fromkeys(("tue", "tues", "tuesday"), 1),
+    **dict.fromkeys(("wed", "weds", "wednesday"), 2),
+    **dict.fromkeys(("thu", "thur", "thurs", "thursday"), 3),
+    **dict.fromkeys(("fri", "friday"), 4),
+    **dict.fromkeys(("sat", "saturday"), 5),
+    **dict.fromkeys(("sun", "sunday"), 6),
+}
+
+
+def _days(value, days: list[dt.date], where: str) -> list[dt.date]:
+    """Resolve ``all``, weekday names (``[Mon, Wed]``) and dates into sorted dates."""
+    if isinstance(value, str) and value.strip().lower() == "all":
+        return list(days)
+    out = []
+    for item in _list(value, where):
+        key = item.lower().rstrip(".")
+        if key in WEEKDAYS:
+            matches = [d for d in days if d.weekday() == WEEKDAYS[key]]
+            if not matches:
+                raise ConfigError(f"{where}: there is no {item} during the Sprint Week")
+            out += matches
+        else:
+            out.append(_date(item, where))
+    if not out:
+        raise ConfigError(f"{where}: give 'all', weekday names such as [Mon, Wed], or dates")
+    return sorted(set(out))
+
+
+def _clock(value, where: str) -> str:
+    text = _text(value, where)
+    m = re.fullmatch(r"([01]?\d|2[0-3]):([0-5]\d)", text)
+    if not m:
+        raise ConfigError(f"{where}: {text!r} is not a 24-hour time like 13:00")
+    return f"{int(m.group(1)):02d}:{m.group(2)}"
+
+
+def _rooms(items, days: list[dt.date], where: str) -> list[Room]:
+    """Validate a site's rooms: plain names (always available) or name + available windows."""
+    if items is None or items == "":
+        return []
+    if not isinstance(items, list):
+        raise ConfigError(f"{where}: expected a list of rooms")
+    rooms, seen = [], set()
+    for i, item in enumerate(items):
+        if isinstance(item, str):
+            room = Room(_text(item, f"{where}[{i + 1}]", required=True))
+        elif isinstance(item, dict):
+            name = _text(item.get("name"), f"{where}[{i + 1}].name", required=True)
+            here = f"{where} → {name!r}"
+            unknown = set(item) - {"name", "available"}
+            if unknown:
+                raise ConfigError(f"{here}: unknown setting(s) {', '.join(sorted(unknown))}")
+            windows = item.get("available")
+            if windows is None or windows == "":
+                room = Room(name)
+            else:
+                if not isinstance(windows, list) or not windows:
+                    raise ConfigError(f"{here}.available: expected a list of '- days: ...' entries")
+                available, parts = [], []
+                for j, w in enumerate(windows):
+                    at = f"{here}.available[{j + 1}]"
+                    if not isinstance(w, dict):
+                        raise ConfigError(f"{at}: expected days (and optionally start and end)")
+                    unknown = set(w) - {"days", "start", "end"}
+                    if unknown:
+                        raise ConfigError(f"{at}: unknown setting(s) {', '.join(sorted(unknown))}")
+                    dates = _days(w.get("days"), days, f"{at}.days")
+                    start = _clock(w["start"], f"{at}.start") if w.get("start") else ""
+                    end = _clock(w["end"], f"{at}.end") if w.get("end") else ""
+                    if bool(start) != bool(end):
+                        raise ConfigError(f"{at}: give both start and end, or neither for the whole day")
+                    if start and end <= start:
+                        raise ConfigError(f"{at}: end ({end}) must be after start ({start})")
+                    available += [{"date": d.isoformat(), "start": start, "end": end} for d in dates]
+                    hours = f" {start}–{end}" if start else ""
+                    parts.append(", ".join(f"{d:%a} {d.day}" for d in dates) + hours)
+                available.sort(key=lambda w: (w["date"], w["start"]))
+                room = Room(name, available, "; ".join(parts))
+        else:
+            raise ConfigError(f"{where}[{i + 1}]: expected a room name, or name and available")
+        key = " ".join(room.name.lower().split())
+        if key in seen:
+            raise ConfigError(f"{where}: room {room.name!r} is listed twice")
+        seen.add(key)
+        rooms.append(room)
+    return rooms
+
+
 def _program(items, site: Site, days: list[dt.date], where: str) -> list[dict]:
     """Validate a site's program and expand it into one entry per day."""
     if items is None or items == "":
@@ -188,14 +300,7 @@ def _program(items, site: Site, days: list[dt.date], where: str) -> list[dict]:
         kind = _text(item.get("kind"), f"{here}.kind", required=True).lower()
         if kind not in PROGRAM_KINDS:
             raise ConfigError(f"{here}.kind: must be one of {', '.join(PROGRAM_KINDS)}")
-        raw_days = item.get("days")
-        if isinstance(raw_days, str) and raw_days.strip().lower() == "all":
-            dates = days
-        else:
-            dates = [_date(d, f"{here}.days") for d in _list(raw_days, f"{here}.days")]
-            if not dates:
-                raise ConfigError(f"{here}.days: give 'all' or a list of dates")
-        for date in dates:
+        for date in _days(item.get("days"), days, f"{here}.days"):
             data = {
                 "date": date.isoformat(),
                 "start": _text(item.get("start"), f"{here}.start", required=True),
@@ -268,7 +373,7 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
         site = Site(
             name,
             _timezone(s.get("timezone"), f"sites → {name}.timezone"),
-            _list(s.get("rooms"), f"sites → {name}.rooms"),
+            _rooms(s.get("rooms"), days, f"sites → {name}.rooms"),
         )
         sites.append(site)
         program += _program(s.get("program"), site, days, f"sites → {name}.program")

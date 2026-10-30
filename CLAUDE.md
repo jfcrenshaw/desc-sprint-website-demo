@@ -21,6 +21,7 @@
 - The session comment format (`<!-- sprintweek:session {json} -->`) is written by `sprintweek/sessions.py` and by the scheduling bot (`worker/`), and read by `sprintweek/build.py`.
 - Issue form headings in `.github/ISSUE_TEMPLATE/sprint.yml` must stay recognizable by `FIELDS` in `sprintweek/parse.py`.
 - Sprint types in the form must match `types` in `sprintweek.yaml`.
+- Room availability rules exist twice: `sprintweek/rooms.py` (`room_problem`) and `worker/src/lib.js` (`roomProblem`); a test in each checks the same message.
 - `pyproject.toml` and `worker/wrangler.toml` stay TOML because their tools require it.
 
 ## Cautions

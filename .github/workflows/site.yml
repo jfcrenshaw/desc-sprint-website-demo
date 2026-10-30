@@ -58,3 +58,22 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # Ask sprint teams to move sessions out of rooms that are no longer available
+  # (e.g. after the organizers change room availability in sprintweek.yaml).
+  notify-rooms:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pyyaml
+      - name: Post or resolve room notices
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m sprintweek notify-rooms

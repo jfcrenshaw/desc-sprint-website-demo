@@ -146,7 +146,8 @@ function header(config, issue, user) {
     <h1><a class="plain" href="${esc(issue.html_url)}">${esc(issue.title)}</a></h1>`;
 }
 
-function formPage({ config, issue, user, values, errors = {}, mode, action, csrf, status = 200 }) {
+// Exported so the form can be rendered locally for previews.
+export function formPage({ config, issue, user, values, errors = {}, mode, action, csrf, status = 200 }) {
   const nonce = randomToken(16);
   const err = k => (errors[k] ? `<p class="error">${esc(errors[k])}</p>` : '');
   const days = [...config.days];
@@ -182,6 +183,7 @@ function formPage({ config, issue, user, values, errors = {}, mode, action, csrf
     <fieldset><legend>Where</legend><div class="picks">${whereOptions}</div>${err('where')}
       <label id="room-row">Room <input name="location" list="rooms" maxlength="200" value="${esc(values.location || '')}" placeholder="e.g. Redwood C-D (leave blank if not known yet)"></label>
       <datalist id="rooms"></datalist>
+      <p class="error" id="room-hint" hidden></p>${err('location')}
       <label>Online link <input type="url" name="online" maxlength="500" value="${esc(values.online || '')}" placeholder="https://…zoom.us/j/… (optional for in-person sessions)"></label>${err('online')}
     </fieldset>
     <fieldset><legend>Optional</legend>
@@ -217,8 +219,23 @@ function update(e) {
   const where = f.where.value, site = sites.find(s => s.name === where);
   if (e && e.target.name === 'where') f.tz.value = site ? site.timezone : (local && [...f.tz.options].some(o => o.value === local) ? local : f.tz.value);
   document.getElementById('room-row').hidden = !site;
-  document.getElementById('rooms').replaceChildren(...(site ? site.rooms : []).map(r => new Option(r)));
   const date = (f.querySelector('input[name=date]:checked') || {}).value, s = f.start.value, en = f.end.value, tz = f.tz.value;
+  const rooms = (site ? site.rooms : []).map(r => typeof r === 'string' ? { name: r, available: null } : r);
+  // Suggest the rooms open on the chosen day, with their hours when they are not open all day.
+  document.getElementById('rooms').replaceChildren(...rooms.flatMap(r => {
+    if (!r.available) return [new Option(r.name, r.name)];
+    const w = date ? r.available.filter(x => x.date === date) : r.available;
+    if (!w.length) return [];
+    const o = new Option(r.name, r.name);
+    if (date && !w.some(x => !x.start)) o.label = 'open ' + w.map(x => x.start + '–' + x.end).join(', ');
+    return [o];
+  }));
+  const norm = t => String(t || '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');
+  const room = rooms.find(r => norm(r.name) === norm(f.location.value));
+  const hint = document.getElementById('room-hint');
+  const ok = !room || !room.available || !date || !s || !en || room.available.some(x => x.date === date && (!x.start || (x.start <= s && en <= x.end)));
+  hint.hidden = ok;
+  hint.textContent = ok ? '' : room.name + ' is not available then (available: ' + room.summary + ').';
   const out = document.getElementById('preview');
   if (!date || !s || !en) { out.textContent = ''; return; }
   const a = toUtc(date, s, tz), b = toUtc(date, en, tz);

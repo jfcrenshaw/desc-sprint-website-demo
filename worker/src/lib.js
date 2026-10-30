@@ -114,6 +114,32 @@ export function describeTimes(session, sites = []) {
   return { when, also, start, end };
 }
 
+// ---------------------------------------------------------------- rooms
+
+const normName = s => String(s || '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');
+
+/** A site's rooms as objects (configs published before room availability used plain names). */
+export function siteRooms(site) {
+  return (site?.rooms || []).map(r => (typeof r === 'string' ? { name: r, available: null, summary: 'all week' } : r));
+}
+
+const fits = (s, w) => w.date === s.date && (!w.start || (w.start <= s.start && s.end <= w.end));
+
+/**
+ * Why a session's room is unavailable, or '' if it is fine. Mirrors room_problem in
+ * sprintweek/rooms.py: only configured rooms of the session's site are checked.
+ */
+export function roomProblem(session, sites) {
+  const site = (sites || []).find(x => x.name === session.site);
+  const wanted = normName(session.location);
+  if (!site || !wanted) return '';
+  const room = siteRooms(site).find(r => normName(r.name) === wanted);
+  if (!room || !room.available || room.available.some(w => fits(session, w))) return '';
+  const d = new Date(`${session.date}T12:00:00Z`);
+  const part = opt => new Intl.DateTimeFormat('en-US', { ...opt, timeZone: 'UTC' }).format(d);
+  return `${room.name} is not available on ${part({ weekday: 'short' })} ${part({ month: 'short' })} ${d.getUTCDate()} at ${session.start}–${session.end} (available: ${room.summary}).`;
+}
+
 // ---------------------------------------------------------------- sessions
 
 /**
@@ -152,6 +178,10 @@ export function validateSession(form, config, extraDays = []) {
     label: cleanText(form.label, LIMITS.label),
     note: cleanText(form.note, LIMITS.note),
   };
+  if (!Object.keys(errors).length) {
+    const problem = roomProblem(session, config.sites);
+    if (problem) errors.location = `${problem} Please choose another room or time.`;
+  }
   return { session: Object.keys(errors).length ? null : session, errors };
 }
 

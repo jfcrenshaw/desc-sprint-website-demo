@@ -17,6 +17,9 @@ It costs nothing at Sprint Week scale (Cloudflare's free plan allows 100,000 req
 
 Everyone else gets a polite "ask the sprint's contacts" page.
 
+The form suggests the rooms configured for the chosen site and day, and the bot refuses a session in a listed room outside the availability set in `sprintweek.yaml` (see [Rooms and their availability](../README.md#rooms-and-their-availability)).
+The bot reads the published calendar configuration and refreshes it every minute, so changes to rooms reach it about two minutes after they are committed.
+
 ## Security design
 
 - People sign in with GitHub only to prove who they are.
