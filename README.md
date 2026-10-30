@@ -2,13 +2,13 @@
 
 A lightweight Sprint Week website where **GitHub Issues are the single source of truth**.
 Each sprint is one GitHub issue.
-Each scheduled session is one comment on that issue.
+Each scheduled session is one comment on that issue, posted by a scheduling bot from a simple web form.
 A GitHub Action turns the issues into a static calendar on GitHub Pages, with daily and weekly views, a sprint directory, pitch and wrap-up slides, and calendar subscriptions.
 
 **Demo:** <https://jfcrenshaw.github.io/desc-sprint-website-demo/> (built from the [issues of this repository](https://github.com/jfcrenshaw/desc-sprint-website-demo/issues), which copy real SprintWeek2026 sprints).
 
-There is no database, no server to maintain and no new account for participants.
-Everything runs on free GitHub features.
+There is no database and no new account for participants.
+The calendar runs entirely on free GitHub features; the optional scheduling bot is a small, stateless Cloudflare Worker on the free plan.
 
 - [For participants](#for-participants)
 - [How it works](#how-it-works)
@@ -30,27 +30,40 @@ The website updates within a few minutes.
 
 ### Schedule, move or cancel a session
 
-A sprint can have any number of sessions, and each appears on the calendar on its own while linking back to the same issue.
-Each session is a comment on the sprint issue that starts with a hidden data line, for example:
+A sprint can have any number of sessions.
+Each appears on the calendar on its own and links back to the same issue.
+
+1. Click **📅 Schedule a session**: it is in the bot's welcome comment on your issue, and on the sprint's page on the website.
+2. Sign in with GitHub, then pick the day, start and end time, the site (or *Online only*) and optionally a room, a Zoom link, a session name and a note.
+   The form shows the time at the other sites as you type.
+3. Click **Schedule session**.
+   The bot posts the session as a comment on the issue, and the calendar shows it a minute or two later.
+
+To **move** or **cancel** a session, click **✏️ Edit or cancel this session** in its comment (or *Edit or cancel* on the website).
+Cancelled sessions stay on the issue, struck through, but disappear from the calendar.
+
+The sprint's author, assignees, contacts @mentioned in the issue and repository collaborators can schedule and edit its sessions.
+Organization members can also add sessions.
+See [worker/README.md](worker/README.md) for how the bot works and how to set it up.
+
+<details>
+<summary>Under the hood, and the manual fallback for organizers</summary>
+
+Each session comment starts with a hidden data line, for example:
 
 ```text
 <!-- sprintweek:session {"v":1,"date":"2026-10-27","start":"14:00","end":"16:00","tz":"Europe/Paris","site":"Paris","location":"Salle 3","online":"https://zoom.us/j/123","label":"Kickoff","note":"","by":"alice"} -->
 ```
 
-followed by a human-readable summary ("📅 Session scheduled · Tuesday, October 27 · 14:00–16:00 CET …").
+followed by a human-readable summary.
 Times are written in the session's own time zone (an IANA name such as `America/Los_Angeles`), and the website converts them for every viewer.
 
-- **Add a session:** post a new session comment.
-- **Move a session:** edit the comment and change the date, times or room.
-- **Cancel a session:** delete the comment, or change `sprintweek:session` to `sprintweek:cancelled` to keep a visible record.
+The build only accepts session comments written by the bot (`bot_login` in `sprintweek.toml`) or by people with write access to the repository (or members of the organization that owns it), so nobody else can put events on the calendar.
+Organizers can therefore also add a session by hand, by copying an existing session comment and editing its data line, or fix one by editing the line.
+Changing `sprintweek:session` to `sprintweek:cancelled` cancels a session.
+Malformed entries are skipped and reported as warnings in the build log; they never break the site.
 
-Session comments are only accepted from the scheduling bot and from people with write access to the repository (or members of the organization that owns it), so a stranger cannot put events on the calendar.
-Malformed entries are skipped and reported as warnings in the Action log; they never break the site.
-
-> **Coming next:** a scheduling bot.
-> New sprint issues will get a "📅 Schedule a session" link that opens a small form (day, time, room, Zoom link).
-> The bot then posts the session comment for you, with an "Edit or cancel" link.
-> Until it is enabled, organizers post session comments.
+</details>
 
 ### Add a wrap-up
 
@@ -89,7 +102,9 @@ GitHub issue (sprint) ──┐
   + session comments    │  issue / comment events     GitHub Action           GitHub Pages
   + wrap-up             ├────────────────────────────▶ python -m sprintweek ───▶ static site
 issue labels ───────────┘                              build                    data/sprints.json
-                                                                                calendar.ics
+          ▲                                                                     calendar.ics
+          │ posts session comments
+  scheduling bot (Cloudflare Worker + GitHub App) ◀── "Schedule a session" form
 ```
 
 1. **Issue form** ([.github/ISSUE_TEMPLATE/sprint.yml](.github/ISSUE_TEMPLATE/sprint.yml)) collects the sprint description with `### Heading` sections that are easy to edit by hand and easy to parse.
@@ -99,9 +114,10 @@ issue labels ───────────┘                              b
 3. **[Build workflow](.github/workflows/site.yml)** runs on every issue or relevant comment change, on pushes, and on demand.
    It downloads *all* issues and comments, so the site is always a fresh copy of GitHub and there is no state to drift.
    Bursts of edits collapse into one queued build.
-4. **[Triage workflow](.github/workflows/triage.yml)** posts a welcome comment on new sprint issues and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
-5. **Python package** [`sprintweek/`](sprintweek/) (standard library only) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
-6. **Frontend** [`site/`](site/) is plain HTML, CSS and JavaScript modules with three small vendored libraries: [EventCalendar](https://github.com/vkurko/calendar) (calendar views, MIT), [marked](https://github.com/markedjs/marked) (Markdown) and [DOMPurify](https://github.com/cure53/DOMPurify) (sanitizing).
+4. **[Scheduling bot](worker/)** (a Cloudflare Worker plus a GitHub App) serves the session form and posts the session comments on behalf of signed-in sprint members.
+5. **[Triage workflow](.github/workflows/triage.yml)** posts a welcome comment on new sprint issues and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
+6. **Python package** [`sprintweek/`](sprintweek/) (standard library only) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
+7. **Frontend** [`site/`](site/) is plain HTML, CSS and JavaScript modules with three small vendored libraries: [EventCalendar](https://github.com/vkurko/calendar) (calendar views, MIT), [marked](https://github.com/markedjs/marked) (Markdown) and [DOMPurify](https://github.com/cure53/DOMPurify) (sanitizing).
    There is no build step.
 
 ### Time zones
@@ -130,7 +146,9 @@ Older free-form issues (like the SprintWeek2026 template with `Contacts:` and `D
 7. **Run the build once:** *Actions → Build calendar → Run workflow* (pushing to `main` also triggers it).
    The site appears at `https://<owner>.github.io/<repository>/`.
 8. Update the calendar link in [.github/ISSUE_TEMPLATE/config.yml](.github/ISSUE_TEMPLATE/config.yml).
-9. Delete the demo issues, or start from an empty repository.
+9. **Set up the scheduling bot** by following [worker/README.md](worker/README.md) (about 30 minutes).
+   Without it, organizers add sessions by hand as described above.
+10. Delete the demo issues, or start from an empty repository.
 
 To refresh the welcome comments on existing issues (for example after changing the scheduler URL), run *Actions → Welcome new sprints → Run workflow*.
 
@@ -162,6 +180,7 @@ Repository layout:
 | `sprintweek/` | Build script: GitHub API client, parsers, `.ics` writer, triage bot |
 | `site/` | Static frontend: `index.html` (calendar), `present.html` (slides), `assets/`, `vendor/` |
 | `tests/` | Unit tests (`unittest`, no dependencies) |
+| `worker/` | Scheduling bot (Cloudflare Worker) |
 | `demo/` | Demo content and seeding script |
 | `.github/` | Issue form and workflows |
 

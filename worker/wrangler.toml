@@ -1,0 +1,16 @@
+# Cloudflare Worker for the Sprint Week scheduling bot. See worker/README.md.
+name = "sprintweek-scheduler"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+REPO = "jfcrenshaw/desc-sprint-website-demo"
+SITE_URL = "https://jfcrenshaw.github.io/desc-sprint-website-demo/"
+
+# Secrets are not stored here. Set each one with `npx wrangler secret put NAME`:
+#   GITHUB_APP_ID           numeric App ID (GitHub App settings page)
+#   GITHUB_APP_PRIVATE_KEY  contents of the downloaded .pem file
+#   GITHUB_CLIENT_ID        "Client ID" of the GitHub App
+#   GITHUB_CLIENT_SECRET    a client secret generated on the App settings page
+#   SESSION_SECRET          any long random string, e.g. `openssl rand -base64 32`

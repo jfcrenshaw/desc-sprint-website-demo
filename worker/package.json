@@ -1,0 +1,11 @@
+{
+  "name": "sprintweek-scheduler",
+  "private": true,
+  "type": "module",
+  "description": "Scheduling bot for the Sprint Week calendar (Cloudflare Worker)",
+  "scripts": {
+    "test": "node --test",
+    "dev": "npx wrangler@4 dev",
+    "deploy": "npx wrangler@4 deploy"
+  }
+}
