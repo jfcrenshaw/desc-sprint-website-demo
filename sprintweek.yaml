@@ -45,14 +45,13 @@ sites:
   - name: SLAC
     timezone: America/Los_Angeles
     rooms:
-      - Redwood B
-      - Redwood C-D
       - name: Redwood A
         available:
-          - days: [Mon, Wed, Thu, Fri]
-          - days: [Tue]
-            start: 13:00
-            end: 17:00
+          - days: [Wed, Thu, Fri]
+      - name: Redwood B
+        available:
+          - days: [Wed, Thu, Fri]
+      - Redwood C-D
       - name: FKB 2nd floor conference room
         available:
           - days: [Mon, Wed, Thu]

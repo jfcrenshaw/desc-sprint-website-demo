@@ -190,7 +190,13 @@ class TestNotices(unittest.TestCase):
 
         # Already posted: nothing to do.
         snap = snapshot(self.bad, [bot_comment(body)])
-        self.assertEqual(plan_notices(build_data(snap, self.config), snap["comments"], ""), ([], []))
+        url = self.config.scheduler_url
+        self.assertEqual(plan_notices(build_data(snap, self.config), snap["comments"], url), ([], []))
+
+        # Same conflict, but the room's availability (and so the text) changed: refresh in place.
+        stale = bot_comment(body.replace("Tue 27 13:00–17:00", "Tue 27 14:00–17:00"))
+        snap = snapshot(self.bad, [stale])
+        self.assertEqual(plan_notices(build_data(snap, self.config), snap["comments"], url), ([], [(500, body)]))
 
         # Session moved to an open time: the notice is resolved.
         moved = {**self.bad, "start": "13:00", "end": "15:00"}

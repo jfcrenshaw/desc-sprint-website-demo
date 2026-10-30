@@ -12,7 +12,7 @@ from .build import _is_excluded
 from .config import Config
 from .github import GitHub
 from .parse import parse_issue_body
-from .rooms import plan_notices
+from .rooms import RESOLVED_MARKER, plan_notices
 
 GREETING_MARKER = "<!-- sprintweek:greeting -->"
 
@@ -98,7 +98,7 @@ def triage(gh: GitHub, config: Config, number: int, greet: bool) -> list[str]:
 
 
 def notify_rooms(gh: GitHub, config: Config, data: dict, snapshot: dict) -> list[str]:
-    """Post room-change notices for new conflicts and resolve notices for fixed ones.
+    """Post room-change notices for new conflicts, refresh outdated ones, and resolve fixed ones.
 
     Parameters
     ----------
@@ -116,12 +116,14 @@ def notify_rooms(gh: GitHub, config: Config, data: dict, snapshot: dict) -> list
     list of str
         Human-readable log of what was done.
     """
-    to_post, to_resolve = plan_notices(data, snapshot["comments"], config.scheduler_url)
+    to_post, to_edit = plan_notices(data, snapshot["comments"], config.scheduler_url)
     log = []
     for number, body in to_post:
         gh.request("POST", f"/repos/{config.repo}/issues/{number}/comments", {"body": body})
         log.append(f"#{number}: posted a room-change notice")
-    for comment_id, body in to_resolve:
+    for comment_id, body in to_edit:
         gh.request("PATCH", f"/repos/{config.repo}/issues/comments/{comment_id}", {"body": body})
-        log.append(f"comment {comment_id}: marked its room notice resolved")
-    return log or ["no room notices to post or resolve"]
+        log.append(
+            f"comment {comment_id}: {'marked its room notice resolved' if RESOLVED_MARKER in body else 'updated its room notice'}"
+        )
+    return log or ["no room notices to post or update"]

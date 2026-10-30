@@ -98,7 +98,7 @@ def resolved_body(old_body: str, key: str) -> str:
 def plan_notices(
     data: dict, comments: list[dict], scheduler_url: str
 ) -> tuple[list[tuple[int, str]], list[tuple[int, str]]]:
-    """Work out which room notices to post and which to mark resolved.
+    """Work out which room notices to post, refresh or mark resolved.
 
     Parameters
     ----------
@@ -113,8 +113,9 @@ def plan_notices(
     -------
     to_post : list of (int, str)
         ``(issue number, comment body)`` for new conflicts.
-    to_resolve : list of (int, str)
-        ``(comment id, new body)`` for notices whose conflict is gone.
+    to_edit : list of (int, str)
+        ``(comment id, new body)`` for open notices whose conflict is gone (marked
+        resolved) or whose text is out of date, e.g. after availability changed again.
     """
     current = {}
     for sp in data["sprints"]:
@@ -131,5 +132,10 @@ def plan_notices(
     to_post = [
         (sp["number"], notice_body(sp, s, scheduler_url)) for key, (sp, s) in current.items() if key not in open_notices
     ]
-    to_resolve = [(c["id"], resolved_body(c["body"], key)) for key, c in open_notices.items() if key not in current]
-    return to_post, to_resolve
+    to_edit = []
+    for key, c in open_notices.items():
+        if key not in current:
+            to_edit.append((c["id"], resolved_body(c["body"], key)))
+        elif c["body"].strip() != (body := notice_body(*current[key], scheduler_url)).strip():
+            to_edit.append((c["id"], body))
+    return to_post, to_edit
