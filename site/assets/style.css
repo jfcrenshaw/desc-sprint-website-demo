@@ -254,7 +254,8 @@ dialog::backdrop { background: rgb(15 18 22 / 55%); }
 .md pre { overflow-x: auto; background: var(--surface-2); padding: 10px; border-radius: 6px; }
 .md code { font-size: 0.9em; background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
 .md pre code { padding: 0; background: none; }
-.md table { border-collapse: collapse; display: block; overflow-x: auto; }
+.md table { border-collapse: collapse; display: block; overflow-x: auto; margin: 0 0 1em; }
+.md th { white-space: nowrap; text-align: left; }
 .md th, .md td { border: 1px solid var(--border); padding: 4px 8px; }
 .md blockquote { margin: 0 0 1em; padding: 2px 12px; border-left: 3px solid var(--border); color: var(--muted); }
 .md ul, .md ol { padding-left: 1.4em; }
