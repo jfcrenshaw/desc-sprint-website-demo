@@ -89,22 +89,59 @@ class TestBuildSprint(unittest.TestCase):
         sp, warnings = build_sprint(issue(), [comment(body, "jf", "OWNER")], CONFIG)
         self.assertEqual((sp["sessions"], warnings), ([], []))
 
-    def test_wrapup_from_body_wins(self):
-        body = "### Short pitch\n\nHi\n\n### Wrap-up\n\nDone in the body."
-        sp, _ = build_sprint(issue(body=body), [comment("## Wrap-up\n\nIn a comment", "author")], CONFIG)
-        self.assertEqual(sp["wrapup"], "Done in the body.")
-
-    def test_wrapup_comments_from_sprint_people(self):
+    def test_each_wrapup_comment_is_separate_and_ordered(self):
         comments = [
-            comment("## Wrap-up\n\nFrom the author", "author", cid=1, created="2026-10-30T01:00:00Z"),
+            comment(
+                "## Wrap-up\n2026-10-29\n\nSecond, written for Thursday",
+                "helper",
+                cid=3,
+                created="2026-10-30T02:00:00Z",
+            ),
+            comment("## Wrap-up\n2026-10-29\n\nFirst", "author", cid=1, created="2026-10-29T20:00:00Z"),
             comment("## Wrap-up\n\nFrom a stranger", "stranger", cid=2),
-            comment("## Wrap-up\n\nFrom an assignee", "helper", cid=3, created="2026-10-30T02:00:00Z"),
+            comment("## Wrap-up\n2026-10-30\n", "author", cid=4),  # template pasted, nothing written yet
         ]
-        sp, _ = build_sprint(issue(), comments, CONFIG)
-        self.assertIn("From the author", sp["wrapup"])
-        self.assertIn("From an assignee", sp["wrapup"])
-        self.assertNotIn("stranger", sp["wrapup"])
-        self.assertTrue(sp["wrapup_url"].endswith("issuecomment-3"))
+        sp, warnings = build_sprint(issue(), sorted(comments, key=lambda c: c["created_at"]), CONFIG)
+        self.assertEqual([w["text"] for w in sp["wrapups"]], ["First", "Second, written for Thursday"])
+        self.assertEqual([w["date"] for w in sp["wrapups"]], ["2026-10-29", "2026-10-29"])
+        self.assertEqual(
+            [(w["author"], w["id"], w["source"]) for w in sp["wrapups"]],
+            [("author", "1", "comment"), ("helper", "3", "comment")],
+        )
+        self.assertEqual(warnings, [])
+
+    def test_undated_wrapups_use_the_posting_day_in_the_sprint_time_zone(self):
+        paris = encode_session_data({**SESSION, "tz": "Europe/Paris", "location": ""})
+        late = comment("## Wrap-up\n\nPosted at 23:30 UTC", "author", cid=2, created="2026-10-28T23:30:00Z")
+        sp, _ = build_sprint(issue(), [comment(paris, "jf", "OWNER", 1), late], CONFIG)
+        self.assertEqual(sp["wrapups"][0]["date"], "2026-10-29")  # already Thursday in Paris
+        sp, _ = build_sprint(issue(), [late], CONFIG)
+        self.assertEqual(sp["wrapups"][0]["date"], "2026-10-28")  # no sessions: first site (SLAC)
+
+    def test_wrapup_dates_in_the_heading_and_weekday_names(self):
+        sp, _ = build_sprint(issue(), [comment("## Wrap-up: Thursday\n\nDone", "author")], CONFIG)
+        self.assertEqual(sp["wrapups"][0]["date"], "2026-10-29")
+
+    def test_unreadable_wrapup_dates_fall_back_with_a_warning(self):
+        for line, expected in (("2026-10-32", "not a valid date"), ("Saturday", "no Saturday")):
+            c = comment(f"## Wrap-up\n{line}\n\nDone", "author", created="2026-10-27T18:00:00Z")
+            sp, warnings = build_sprint(issue(), [c], CONFIG)
+            self.assertEqual(sp["wrapups"][0]["date"], "2026-10-27")
+            self.assertIn(expected, warnings[0])
+            self.assertEqual(sp["warnings"], [], "only session problems count as unreadable sessions")
+
+    def test_wrapup_in_the_issue_body_is_dated_to_the_last_session(self):
+        body = "### Short pitch\n\nHi\n\n### Wrap-up\n\nDone in the body."
+        later = encode_session_data({**SESSION, "date": "2026-10-29"})
+        sp, _ = build_sprint(
+            issue(body=body),
+            [comment(later, "jf", "OWNER"), comment("## Wrap-up\n\nAnd a comment", "author", cid=2)],
+            CONFIG,
+        )
+        by_source = {w["source"]: w for w in sp["wrapups"]}
+        self.assertEqual(by_source["issue"]["text"], "Done in the body.")
+        self.assertEqual(by_source["issue"]["date"], "2026-10-29")
+        self.assertEqual(by_source["comment"]["text"], "And a comment")
 
     def test_tags_merge_form_and_labels(self):
         body = "### Sprint type\n\nPaper Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)"
@@ -144,7 +181,7 @@ class TestBuildData(unittest.TestCase):
         self.assertGreater(max(counts), 1)
         modes = {x["mode"] for s in data["sprints"] for x in s["sessions"]}
         self.assertTrue({"online", "hybrid", "in person"} <= modes)
-        self.assertTrue(any(s["wrapup"] for s in data["sprints"]))
+        self.assertTrue(any(s["wrapups"] for s in data["sprints"]))
 
     def test_write_site(self):
         snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())

@@ -222,7 +222,11 @@ dialog::backdrop { background: rgb(15 18 22 / 55%); }
 .ec-event.room-issue { box-shadow: inset 0 0 0 2px #f2b600; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
 .footer-row { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
-.wrapup { background: var(--accent-soft); border-radius: 10px; padding: 2px 16px 10px; margin-top: 18px; }
+.wrapup { background: var(--accent-soft); border-radius: 10px; padding: 10px 16px 12px; margin-top: 10px; }
+.wrapup-meta { margin: 0 0 6px; font-size: 0.9rem; color: var(--muted); }
+textarea.template { width: 100%; font: 0.95rem ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); resize: none; }
+.field { display: flex; gap: 8px; align-items: center; margin: 12px 0 8px; font-weight: 550; }
+.field input { font: inherit; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
 .stack { display: grid; gap: 8px; margin: 14px 0; }
 .copy-row { display: flex; gap: 8px; }
 .copy-row input { flex: 1; min-width: 0; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: 0.85rem; }
@@ -286,6 +290,7 @@ kbd { border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 
 .slide .goals h2 { font-size: calc(2.6vmin * var(--scale)); text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 3vmin 0 1vmin; }
 .slide .md img { max-height: 45vh; }
 .slide .wrapup-md { font-size: calc(3.6vmin * var(--scale)); }
+.slide .wrapup-by { margin: 0; color: var(--muted); font-size: calc(2.6vmin * var(--scale)); }
 .slide-sessions { display: grid; gap: 0.8vmin; padding: 1.6vmin 2vmin; background: var(--surface-2); border-radius: 1.2vmin; font-size: 2.9vmin; }
 .slide-foot { display: flex; justify-content: space-between; gap: 2vmin; color: var(--muted); font-size: 2.2vmin; padding-top: 1vmin; }
 .title-slide { justify-content: center; align-items: center; text-align: center; }

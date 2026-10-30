@@ -35,8 +35,10 @@ def greeting(number: int, config: Config) -> str:
         lines.append("📅 **Sessions:** the organizers will add your sessions here once you know when you will meet.")
     lines += [
         "",
-        "📝 **After the sprint**, add a wrap-up for the closing plenary: edit this issue and fill in the *Wrap-up* "
-        "section, or post a comment that starts with `## Wrap-up`.",
+        f"📝 **[Add a wrap-up]({config.site_url}#wrapup/{number})** for the plenary: it copies a template "
+        "(`## Wrap-up` and today's date) and opens the comment box here. Paste it, then write what you did; "
+        "plots and links are welcome. Post one whenever you have something to report; each is its own slide in "
+        "the wrap-up presentation for its date.",
         "",
         "<sub>Edit the issue at any time to update the description; the calendar refreshes within a few minutes.</sub>",
     ]
@@ -124,6 +126,7 @@ def notify_rooms(gh: GitHub, config: Config, data: dict, snapshot: dict) -> list
     for comment_id, body in to_edit:
         gh.request("PATCH", f"/repos/{config.repo}/issues/comments/{comment_id}", {"body": body})
         log.append(
-            f"comment {comment_id}: {'marked its room notice resolved' if RESOLVED_MARKER in body else 'updated its room notice'}"
+            f"comment {comment_id}: "
+            + ("marked its room notice resolved" if RESOLVED_MARKER in body else "updated its room notice")
         )
     return log or ["no room notices to post or update"]

@@ -7,10 +7,11 @@ import json
 import shutil
 from collections import defaultdict
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from . import ics
-from .config import Config
-from .parse import parse_contacts, parse_issue_body, plain_text, wrapup_from_comment
+from .config import WEEKDAYS, Config
+from .parse import parse_contacts, parse_issue_body, parse_wrapup_comment, plain_text
 from .rooms import room_problem
 from .sessions import SessionError, extract_session_data, normalize_session
 
@@ -48,6 +49,26 @@ def _tags(fields: dict, labels: list[dict], config: Config) -> list[dict]:
     return list(tags.values())
 
 
+def _wrapup_date(hint: str | None, created_at: str, tz: str, config: Config) -> tuple[str, str]:
+    """Resolve a wrap-up's date: its own date line if valid, else the day it was posted (in ``tz``).
+
+    Returns ``(YYYY-MM-DD, warning or "")``.
+    """
+    posted = dt.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(ZoneInfo(tz)).date()
+    if not hint:
+        return posted.isoformat(), ""
+    key = hint.lower().rstrip(".")
+    if key in WEEKDAYS:
+        days = [d for d in config.days if d.weekday() == WEEKDAYS[key]]
+        if days:
+            return days[0].isoformat(), ""
+        return posted.isoformat(), f"there is no {hint} during the Sprint Week, so the posting date was used"
+    try:
+        return dt.date.fromisoformat("-".join(f"{int(x):02d}" for x in hint.split("-"))).isoformat(), ""
+    except ValueError:
+        return posted.isoformat(), f"{hint!r} is not a valid date, so the posting date was used"
+
+
 def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dict, list[str]]:
     """Combine one sprint issue and its comments into the record used by the website.
 
@@ -65,14 +86,15 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
     sprint : dict
         Website record, including its sorted ``sessions``.
     warnings : list of str
-        Problems worth showing to organizers (malformed or untrusted session comments).
+        Problems worth showing to organizers (malformed or untrusted session comments,
+        wrap-up dates that could not be read).
     """
     fields = parse_issue_body(issue["body"], issue["title"])
     contacts = parse_contacts(fields["contacts"]) or [{"login": issue["user"], "name": None}]
     people = {issue["user"].lower(), *(a.lower() for a in issue["assignees"])}
     people |= {c["login"].lower() for c in contacts if c["login"]}
 
-    sessions, wrapups, warnings = [], [], []
+    sessions, wrapup_comments, warnings, notes = [], [], [], []
     for c in comments:
         trusted = (config.bot_login and c["user"] == config.bot_login) or c[
             "author_association"
@@ -100,18 +122,31 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
             session["room_issue"] = room_problem(session, config.rooms_by_site)
             sessions.append(session)
             continue
-        text = wrapup_from_comment(c["body"])
-        if text and (c["user"].lower() in people or c["author_association"] in TRUSTED_ASSOCIATIONS):
-            wrapups.append({"author": c["user"], "body": text, "url": c["html_url"], "date": c["created_at"][:10]})
+        parsed = parse_wrapup_comment(c["body"])
+        if parsed and (c["user"].lower() in people or c["author_association"] in TRUSTED_ASSOCIATIONS):
+            wrapup_comments.append((c, parsed))
     sessions.sort(key=lambda s: (s["start_utc"], s["end_utc"]))
 
-    wrapup, wrapup_url = fields["wrapup"], issue["html_url"] if fields["wrapup"] else ""
-    if not wrapup and wrapups:
-        if len(wrapups) == 1:
-            wrapup = wrapups[0]["body"]
-        else:
-            wrapup = "\n\n---\n\n".join(f"*From {w['author']}, {w['date']}:*\n\n{w['body']}" for w in wrapups)
-        wrapup_url = wrapups[-1]["url"]
+    # Each wrap-up comment is a separate wrap-up. Undated ones get the day they were posted,
+    # in the time zone of the sprint's sessions (or of the first site).
+    home_tz = sessions[0]["tz"] if sessions else (config.sites[0].timezone if config.sites else "UTC")
+    wrapups = []
+    for c, parsed in wrapup_comments:
+        date, problem = _wrapup_date(parsed["date_hint"], c["created_at"], home_tz, config)
+        if problem:
+            notes.append(f"Wrap-up {c['html_url']}: {problem}.")
+        wrapups.append(
+            {"id": str(c["id"]), "date": date, "author": c["user"], "created_at": c["created_at"],
+             "url": c["html_url"], "text": parsed["text"], "source": "comment"}  # fmt: skip
+        )
+    if fields["wrapup"]:  # the "Wrap-up" section of older issue forms
+        last_day = sessions[-1]["date"] if sessions else config.end_date.isoformat()
+        wrapups.append(
+            {"id": f"issue-{issue['number']}", "date": last_day, "author": issue["user"],
+             "created_at": issue["updated_at"], "url": issue["html_url"], "text": fields["wrapup"],
+             "source": "issue"}  # fmt: skip
+        )
+    wrapups.sort(key=lambda w: w["created_at"])
 
     sprint = {
         "number": issue["number"],
@@ -127,8 +162,7 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
         "prerequisites": fields["prerequisites"],
         "links": fields["links"],
         "details": fields["details"],
-        "wrapup": wrapup,
-        "wrapup_url": wrapup_url,
+        "wrapups": wrapups,
         "schedule_note": fields["schedule_note"],
         "type": fields["type"],
         "working_groups": fields["working_groups"],
@@ -139,7 +173,7 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
         "created_at": issue["created_at"],
         "updated_at": issue["updated_at"],
     }
-    return sprint, warnings
+    return sprint, warnings + notes
 
 
 def build_data(snapshot: dict, config: Config) -> dict:

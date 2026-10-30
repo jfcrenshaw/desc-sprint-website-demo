@@ -19,25 +19,43 @@ function buildSlides() {
   const { mode, day, zone, unscheduled } = settings();
   const tz = zone.tz;
   const byStart = (a, b) => firstOnDay(a, day, tz).start_utc.localeCompare(firstOnDay(b, day, tz).start_utc);
-  let sprints;
+  let sprints, wrapups = [];
   if (mode === 'pitch') {
     sprints = state.sprints.filter(sp => firstOnDay(sp, day, tz)).sort(byStart);
     if (unscheduled) sprints = sprints.concat(state.sprints.filter(sp => !sp.sessions.length));
   } else {
-    const done = state.sprints.filter(sp => sp.wrapup);
-    sprints = done.filter(sp => firstOnDay(sp, day, tz)).sort(byStart).concat(day === 'all' ? done.filter(sp => !sp.sessions.length) : []);
+    // One slide per wrap-up dated that day: sprints in the order their first wrap-up was
+    // posted, and each sprint's wrap-ups oldest first.
+    wrapups = state.sprints.flatMap(sp => sp.wrapups.filter(w => day === 'all' || w.date === day).map(w => ({ sp, w })))
+      .sort((a, b) => a.w.created_at.localeCompare(b.w.created_at));
+    const rank = new Map();
+    for (const { sp } of wrapups) if (!rank.has(sp.number)) rank.set(sp.number, rank.size);
+    wrapups.sort((a, b) => rank.get(a.sp.number) - rank.get(b.sp.number));
+    sprints = [...rank.keys()].map(n => state.sprints.find(sp => sp.number === n));
   }
-  const slides = [{ kind: 'title', mode, day, count: sprints.length }];
+  const slides = [{ kind: 'title', mode, day, count: sprints.length, wrapups: wrapups.length }];
   if (mode === 'pitch' && day !== 'all') {
     const rows = sprints.flatMap(sp => sp.sessions.filter(s => wall(s.start_utc, tz).date === day).map(s => ({ sp, s })))
       .sort((a, b) => a.s.start_utc.localeCompare(b.s.start_utc));
     for (let i = 0; i < rows.length; i += 12) slides.push({ kind: 'agenda', rows: rows.slice(i, i + 12), day });
   }
-  for (const sp of sprints) slides.push({ kind: mode, sp });
+  if (mode === 'pitch') {
+    for (const sp of sprints) slides.push({ kind: 'pitch', sp });
+  } else {
+    for (const { sp, w } of wrapups) {
+      const own = wrapups.filter(x => x.sp === sp);
+      slides.push({ kind: 'wrapup', sp, w, part: own.indexOf(own.find(x => x.w === w)) + 1, parts: own.length });
+    }
+  }
   slides.push({ kind: 'end', mode });
   state.slides = slides;
-  $('slide-count').textContent = `${sprints.length} sprint${sprints.length === 1 ? '' : 's'}, ${slides.length} slides`;
-  $('setup-list').replaceChildren(...sprints.map(sp => h('li', { text: sp.title })));
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  $('slide-count').textContent = mode === 'pitch'
+    ? `${plural(sprints.length, 'sprint')}, ${plural(slides.length, 'slide')}`
+    : `${plural(wrapups.length, 'wrap-up')} from ${plural(sprints.length, 'sprint')}, ${plural(slides.length, 'slide')}`;
+  $('setup-list').replaceChildren(...(mode === 'pitch'
+    ? sprints.map(sp => h('li', { text: sp.title }))
+    : wrapups.map(({ sp, w }) => h('li', { text: `${sp.title} (by @${w.author})` }))));
   $('unscheduled-row').hidden = mode !== 'pitch';
   return slides;
 }
@@ -54,14 +72,14 @@ function times(s) {
 
 const siteUrl = () => (state.config.site_url || new URL('./', location.href).href).replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-function titleSlide({ mode, day, count }) {
+function titleSlide({ mode, day, count, wrapups }) {
   const what = mode === 'pitch' ? 'Sprint pitches' : 'Sprint wrap-ups';
   const when = day === 'all' ? `${fmtDay(state.config.start_date)} – ${fmtDay(state.config.end_date)}` : fmtDay(day, 'long');
   return h('div', { class: 'slide title-slide' },
     h('p', { class: 'kicker', text: state.config.title }),
     h('h1', { text: what }),
     h('p', { class: 'big', text: when }),
-    h('p', { class: 'muted', text: `${count} sprint${count === 1 ? '' : 's'}` }),
+    h('p', { class: 'muted', text: mode === 'pitch' ? `${count} sprint${count === 1 ? '' : 's'}` : `${wrapups} wrap-up${wrapups === 1 ? '' : 's'} from ${count} sprint${count === 1 ? '' : 's'}` }),
     h('p', { class: 'url' }, 'Schedule, rooms and Zoom links: ', h('strong', { text: siteUrl() })));
 }
 
@@ -113,10 +131,12 @@ function pitchSlide({ sp }) {
     sprintFoot(sp));
 }
 
-function wrapupSlide({ sp }) {
+function wrapupSlide({ sp, w, part, parts }) {
+  const posted = new Date(w.created_at).toLocaleString('en-US', { timeZone: settings().zone.tz, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
   return h('div', { class: 'slide sprint-slide', style: `--sprint:${typeColor(sp, state.config)}` },
     sprintHead(sp),
-    h('div', { class: 'slide-body fit' }, markdown(sp.wrapup, state.config, 'md wrapup-md')),
+    h('p', { class: 'wrapup-by' }, `📝 Wrap-up by @${w.author} · posted ${posted}`, parts > 1 ? ` · ${part} of ${parts}` : ''),
+    h('div', { class: 'slide-body fit' }, markdown(w.text, state.config, 'md wrapup-md')),
     sprintFoot(sp));
 }
 
@@ -197,10 +217,8 @@ async function main() {
   daySel.value = params.get('day') || (state.config.days.includes(today) ? today : state.config.days[0]);
   if (params.get('mode')) $('setup-form').mode.value = params.get('mode');
   if (params.get('unscheduled') === '0') $('setup-form').unscheduled.checked = false;
-  if (!params.get('day') && $('setup-form').mode.value === 'wrapup') daySel.value = 'all';
 
   $('setup-form').addEventListener('change', e => {
-    if (e.target.name === 'mode') daySel.value = e.target.value === 'wrapup' ? 'all' : daySel.value === 'all' ? (state.config.days.includes(today) ? today : state.config.days[0]) : daySel.value;
     buildSlides();
   });
   $('setup-form').addEventListener('submit', e => { e.preventDefault(); start(); });

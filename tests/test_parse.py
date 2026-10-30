@@ -1,6 +1,13 @@
 import unittest
 
-from sprintweek.parse import parse_contacts, parse_issue_body, plain_text, split_sections, wrapup_from_comment
+from sprintweek.parse import (
+    parse_contacts,
+    parse_issue_body,
+    parse_wrapup_comment,
+    plain_text,
+    split_sections,
+    wrapup_from_comment,
+)
 
 FORM_BODY = """### Short pitch
 
@@ -186,6 +193,23 @@ class TestWrapupComments(unittest.TestCase):
         self.assertIsNone(wrapup_from_comment("Great sprint! Here is my wrap-up: ..."))
         self.assertIsNone(wrapup_from_comment("## Day 1 notes\n\nwrap-up tomorrow"))
         self.assertIsNone(wrapup_from_comment("## Wrap-up\n\n"))
+
+    def test_dates(self):
+        cases = {
+            "## Wrap-up\n2026-10-30\n\nWe did it.": ("2026-10-30", "We did it."),
+            "## Wrap-up\n**2026-10-29**\nx": ("2026-10-29", "x"),
+            "## Wrap-up: Thursday\nDone.": ("Thursday", "Done."),
+            "**Wrap-up** (Fri)\nDone": ("Fri", "Done"),
+            "## Wrap-up of the Monster sprint\nok": (None, "ok"),
+            "## Wrap-up\nWednesday was fun\nok": (None, "Wednesday was fun\nok"),
+            "## Wrap-up: day 5\nok": (None, "ok"),
+        }
+        for body, (hint, text) in cases.items():
+            with self.subTest(body=body):
+                self.assertEqual(parse_wrapup_comment(body), {"date_hint": hint, "text": text})
+
+    def test_template_without_text_is_ignored(self):
+        self.assertIsNone(parse_wrapup_comment("## Wrap-up\n2026-10-30\n"))
 
 
 class TestPlainText(unittest.TestCase):

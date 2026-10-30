@@ -6,7 +6,7 @@ body:
       value: |
         Thanks for proposing a sprint! Only the **title** and **short pitch** are required. You can fill in everything else now or later by editing the issue.
 
-        **You don't need to know when you will meet yet.** After you submit, a bot replies with a link for scheduling one or more sessions.
+        **You don't need to know when you will meet yet.** After you submit, a bot replies with links for scheduling sessions and, later, for adding wrap-ups.
 
   - type: textarea
     id: pitch
@@ -90,11 +90,3 @@ body:
       label: Options
       options:
         - label: New contributor friendly
-
-  - type: textarea
-    id: wrapup
-    attributes:
-      label: Wrap-up
-      description: >
-        Leave this blank for now. After the sprint, edit the issue and summarize what you accomplished
-        (bullet points, plots and links are all welcome). It is shown at the closing plenary.

@@ -27,7 +27,7 @@ const FACETS = [
     values: sp => [
       sp.new_contributor_friendly || sp.tags.some(t => /^new contributor friendly$/i.test(t.name)) ? 'New contributor friendly' : null,
       sp.sessions.length ? null : 'Not yet scheduled',
-      sp.wrapup ? 'Has a wrap-up' : null,
+      sp.wrapups.length ? 'Has a wrap-up' : null,
     ].filter(Boolean),
   },
 ];
@@ -305,7 +305,7 @@ function sprintCard(sp) {
     h('div', { class: 'card-top' },
       h('span', { class: 'type', text: sp.type || 'Sprint' }),
       sp.state === 'closed' ? h('span', { class: 'badge', text: 'Closed' }) : null,
-      sp.wrapup ? h('span', { class: 'badge good', text: 'Wrap-up' }) : null),
+      sp.wrapups.length ? h('span', { class: 'badge good', text: sp.wrapups.length > 1 ? `${sp.wrapups.length} wrap-ups` : 'Wrap-up' }) : null),
     h('h3', {}, h('a', { href: `#sprint/${sp.number}`, text: sp.title })),
     h('p', { class: 'pitch', text: preview(sp.pitch) }),
     h('p', { class: 'people' }, '👤 ', contactList(sp)),
@@ -379,6 +379,44 @@ function openProgram(id) {
   if (!dlg.open) dlg.showModal();
 }
 
+/**
+ * "Add a wrap-up": GitHub cannot pre-fill a comment from a link, so copy the template
+ * ("## Wrap-up" + date) to the clipboard and open the issue at its comment box.
+ */
+function openAddWrapup(number) {
+  const sp = state.byNumber.get(number);
+  const dlg = $('sprint-dialog');
+  if (!sp) return;
+  const template = date => `## Wrap-up\n${date}\n\n`;
+  const box = h('textarea', { class: 'template', rows: 3, readonly: true, 'aria-label': 'Wrap-up template' });
+  const date = h('input', { type: 'date', value: todayIn(state.zone.tz), required: true });
+  const status = h('p', { class: 'muted small', 'aria-live': 'polite' });
+  const update = () => { box.value = template(date.value || todayIn(state.zone.tz)); };
+  date.addEventListener('input', update);
+  update();
+  const go = h('a', { class: 'btn primary', href: `${sp.url}#new_comment_field`, target: '_blank', rel: 'noopener' }, 'Copy template and open the comment box');
+  go.addEventListener('click', () => {
+    // Started during the click, so browsers allow it; the new tab opens right after.
+    navigator.clipboard?.writeText(box.value).then(
+      () => { status.textContent = 'Copied! In the comment box, paste it (⌘V or Ctrl+V), write your wrap-up and click Comment.'; },
+      () => { box.select(); status.textContent = 'Could not copy automatically: copy the selected template above, then paste it into the comment box.'; },
+    );
+  });
+  dlg.replaceChildren(h('div', { class: 'dialog-body', style: `--sprint:${typeColor(sp, state.config)}` },
+    h('button', { class: 'close', 'aria-label': 'Close', onclick: () => dlg.close() }, '×'),
+    h('div', { class: 'card-top' }, h('span', { class: 'type', text: 'Add a wrap-up' })),
+    h('h2', { id: 'sprint-dialog-title', text: sp.title }),
+    h('p', {}, 'A wrap-up is a comment on the sprint’s GitHub issue that starts with ', h('code', { text: '## Wrap-up' }),
+      ' and the date of the plenary it is for. Post as many as you like: each becomes its own slide in the wrap-up presentation for that date.'),
+    h('label', { class: 'field' }, 'Date of the wrap-up ', date),
+    box,
+    h('div', { class: 'row' }, go, h('a', { class: 'btn', href: `#sprint/${sp.number}` }, 'Back to the sprint')),
+    status,
+    h('p', { class: 'muted small', text: 'Tip: drag plots straight into GitHub’s comment box. You can edit your comment later; the website updates a minute after each change.' }),
+  ));
+  if (!dlg.open) dlg.showModal();
+}
+
 function openSprint(number) {
   const sp = state.byNumber.get(number);
   const dlg = $('sprint-dialog');
@@ -402,9 +440,13 @@ function openSprint(number) {
       h('div', { class: 'row' },
         sched ? h('a', { class: 'btn small primary', href: sched, target: '_blank', rel: 'noopener' }, sp.sessions.length ? '＋ Add a session' : '📅 Schedule a session') : null,
         sp.sessions.length ? h('a', { class: 'btn small', href: `ics/sprint-${sp.number}.ics`, download: '' }, '🗓️ Add to my calendar') : null)),
-    sp.wrapup ? h('section', { class: 'wrapup' }, h('h3', {}, '📝 Wrap-up ',
-      sp.wrapup_url ? h('a', { class: 'link small', href: sp.wrapup_url, target: '_blank', rel: 'noopener' }, 'source') : null),
-    markdown(sp.wrapup, state.config)) : null,
+    h('section', { class: 'wrapups' },
+      h('h3', { text: sp.wrapups.length > 1 ? `Wrap-ups (${sp.wrapups.length})` : 'Wrap-up' }),
+      sp.wrapups.length ? sp.wrapups.map(w => h('article', { class: 'wrapup' },
+        h('p', { class: 'wrapup-meta' }, h('strong', { text: fmtDay(w.date, 'long') }), ` · by @${w.author} · `,
+          h('a', { class: 'link small', href: w.url, target: '_blank', rel: 'noopener' }, 'view on GitHub')),
+        markdown(w.text, state.config))) : h('p', { class: 'muted', text: 'No wrap-up yet.' }),
+      h('div', { class: 'row' }, h('a', { class: 'btn small', href: `#wrapup/${sp.number}` }, '📝 Add a wrap-up'))),
     md('Goals and deliverables', sp.goals),
     md('Prerequisites', sp.prerequisites),
     md('Communication channel and links', sp.links),
@@ -443,6 +485,11 @@ function route() {
   const m = hash.match(/^sprint\/(\d+)$/);
   if (m) {
     openSprint(Number(m[1]));
+    return;
+  }
+  const w = hash.match(/^wrapup\/(\d+)$/);
+  if (w) {
+    openAddWrapup(Number(w[1]));
     return;
   }
   if ($('sprint-dialog').open) $('sprint-dialog').close();
@@ -504,7 +551,7 @@ async function main() {
   });
 
   $('sprint-dialog').addEventListener('close', () => {
-    if (location.hash.startsWith('#sprint/')) history.replaceState(null, '', `#${state.view}`);
+    if (/^#(sprint|wrapup)\//.test(location.hash)) history.replaceState(null, '', `#${state.view}`);
   });
   $('sprint-dialog').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
   $('subscribe-dialog').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
@@ -524,7 +571,7 @@ async function main() {
   window.addEventListener('hashchange', route);
   const saved = ['today', 'week', 'sprints'].includes(location.hash.slice(1)) ? location.hash.slice(1) : null;
   state.view = saved || 'today';
-  if (location.hash.startsWith('#sprint/')) {
+  if (/^#(sprint|wrapup)\//.test(location.hash)) {
     state.view = 'week';
     render();
   }

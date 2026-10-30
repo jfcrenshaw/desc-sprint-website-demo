@@ -67,14 +67,25 @@ Malformed entries are skipped and reported as warnings in the build log; they ne
 
 ### Add a wrap-up
 
-After the sprint, either:
+A wrap-up is a comment on the sprint's issue that starts with a `## Wrap-up` heading and, on the next line, the date of the plenary it is for:
 
-- edit the issue and fill in the **Wrap-up** section of the form, or
-- post a comment that starts with a `## Wrap-up` heading.
+```markdown
+## Wrap-up
+2026-10-30
 
-Bullet points, links and plots are all welcome.
-Wrap-ups are shown on the sprint's page and in the wrap-up slides.
-Comment wrap-ups are accepted from the sprint's author, assignees and listed contacts, and from repository collaborators.
+What we did, with plots and links...
+```
+
+1. Click **📝 Add a wrap-up** (in the bot's welcome comment, or on the sprint's page on the website).
+   It shows the template with today's date, which you can change, for example to present yesterday's work.
+2. Click **Copy template and open the comment box**.
+   GitHub cannot pre-fill a comment from a link, so the template is copied for you: paste it into the comment box (⌘V or Ctrl+V).
+3. Write the wrap-up below the date, drag in plots, and click *Comment*.
+
+Post as many wrap-ups as you like, even several for the same day: each is shown separately on the sprint's page and becomes its own slide in the wrap-up presentation for its date.
+The date may also be a weekday name, or go in the heading (`## Wrap-up: Thursday`); without a date, the wrap-up counts for the day it was posted.
+Wrap-ups are accepted from the sprint's author, assignees and listed contacts, and from repository collaborators (or members of the organization that owns the repository).
+You can edit your comment at any time; the website updates a minute later.
 
 ### Follow the schedule
 
@@ -92,7 +103,7 @@ Comment wrap-ups are accepted from the sprint's author, assignees and listed con
 **Present** (top right) builds slides straight from the issues: one per sprint.
 For *morning pitches* choose a day: you get an agenda slide and then a slide per sprint meeting that day (pitch, contacts, goals, sessions in every site's time).
 Not-yet-scheduled sprints can be appended.
-For *wrap-ups* you get one slide per sprint with a wrap-up.
+For *wrap-ups* choose a day: you get one slide per wrap-up dated that day, grouped by sprint (in the order their first wrap-up was posted), each showing who wrote it and when.
 Use the arrow keys, space or a clicker to move; `F` toggles full screen.
 Nobody needs to make Google Slides.
 

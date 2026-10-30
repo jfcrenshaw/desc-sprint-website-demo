@@ -60,7 +60,14 @@ _FENCE_RE = re.compile(r"^\s*(```|~~~)")
 _COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 _LEGACY_RE = re.compile(r"^\s*[*_]*\s*([A-Za-z][A-Za-z /]{1,40}?)\s*[*_]*\s*:\s*[*_]*\s*(.*)$")
 _CHECKBOX_RE = re.compile(r"^\s*[-*]\s*\[([ xX])\]\s*(.+)$")
-_WRAPUP_RE = re.compile(r"^\s*(?:#{1,6}\s*|\*\*\s*)(?:\W\s*)?wrap[\s-]?up\b[^\n]*(?:\n|$)", re.I)
+_WRAPUP_RE = re.compile(r"^\s*(?:#{1,6}\s*|\*\*\s*)(?:\W\s*)?wrap[\s-]?up\b([^\n]*)(?:\n|$)", re.I)
+# A wrap-up's date: an ISO date or a weekday name, on the line under the heading or in it.
+_DATE_WORD = (
+    r"\d{4}-\d{1,2}-\d{1,2}|monday|mon|tuesday|tues|tue|wednesday|weds|wed|"
+    r"thursday|thurs|thur|thu|friday|fri|saturday|sat|sunday|sun"
+)
+_DATE_LINE_RE = re.compile(rf"^[\s*_(\[]*({_DATE_WORD})\.?[\s*_)\]]*$", re.I)
+_DATE_IN_HEADING_RE = re.compile(rf"(?<![\w-])({_DATE_WORD})(?![\w-])", re.I)
 
 
 def _norm(text: str) -> str:
@@ -197,25 +204,47 @@ def parse_contacts(text: str) -> list[dict]:
     return people
 
 
-def wrapup_from_comment(body: str) -> str | None:
-    """Return the wrap-up text of a comment that starts with a "Wrap-up" heading.
+def parse_wrapup_comment(body: str) -> dict | None:
+    """Parse a comment that starts with a "Wrap-up" heading.
+
+    The website's "Add a wrap-up" template is::
+
+        ## Wrap-up
+        2026-10-30
+
+        What we did...
 
     Parameters
     ----------
     body : str
         Comment body. Accepted openings include ``## Wrap-up``, ``# 📝 Wrap up`` and
-        ``**Wrap-up**``.
+        ``**Wrap-up**``. The date may be on the first line under the heading or in the
+        heading itself (``## Wrap-up: Thursday``), as an ISO date or a weekday name.
 
     Returns
     -------
-    str or None
-        The text after the heading line, or None if the comment is not a wrap-up.
+    dict or None
+        ``{"date_hint": str or None, "text": str}``, where ``text`` excludes the date
+        line; None if the comment is not a wrap-up or has nothing written yet.
     """
     body = (body or "").replace("\r\n", "\n")
     m = _WRAPUP_RE.match(body)
     if not m:
         return None
-    return body[m.end() :].strip() or None
+    rest = body[m.end() :].strip()
+    first, _, remainder = rest.partition("\n")
+    hint = None
+    if dm := _DATE_LINE_RE.match(first.strip()):
+        hint, rest = dm.group(1), remainder.strip()
+    elif hm := _DATE_IN_HEADING_RE.search(m.group(1)):
+        hint = hm.group(1)
+    return {"date_hint": hint, "text": rest} if rest else None
+
+
+def wrapup_from_comment(body: str) -> str | None:
+    """Return just the text of a wrap-up comment (see `parse_wrapup_comment`), or None."""
+    parsed = parse_wrapup_comment(body)
+    return parsed["text"] if parsed else None
 
 
 def parse_issue_body(body: str, title: str = "") -> dict:
