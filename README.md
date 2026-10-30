@@ -164,7 +164,7 @@ A plain name is available all week; a room can also be limited to some days and 
 
 ```yaml
     rooms:
-      - Redwood C-D                # all week
+      - Redwoods C-D               # all week
       - name: Redwood A
         available:
           - days: [Mon, Wed]       # weekday names or dates (2026-10-28)

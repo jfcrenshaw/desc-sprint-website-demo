@@ -48,7 +48,7 @@ sites:
       - name: Redwoods A-B
         available:
           - days: [Wed, Thu, Fri]
-      - Redwood C-D
+      - Redwoods C-D
       - name: FKB 2nd floor conference room
         available:
           - days: [Mon, Wed, Thu]

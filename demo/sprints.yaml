@@ -32,7 +32,7 @@ sprints:
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: KFB 2nd floor conference room
+    location: FKB 2nd floor conference room
 
 - source: 14
   title: PZ Data Challenge Hacking
@@ -57,7 +57,7 @@ sprints:
     end: '15:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood C-D
+    location: Redwoods C-D
     online: zoom
 
 - source: 33
@@ -239,7 +239,7 @@ sprints:
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood C-D
+    location: Redwoods C-D
 
 - source: 11
   title: DP2 n(z) SOM + WZ coordination
@@ -372,14 +372,14 @@ sprints:
     end: '16:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood C-D
+    location: Redwoods C-D
     online: zoom
   - date: '2026-10-30'
     start: 09:00
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood C-D
+    location: Redwoods C-D
     online: zoom
 
 - source: 18

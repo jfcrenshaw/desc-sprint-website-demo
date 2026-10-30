@@ -181,7 +181,7 @@ export function formPage({ config, issue, user, values, errors = {}, mode, actio
       <p class="muted small" id="preview"></p>
     </fieldset>
     <fieldset><legend>Where</legend><div class="picks">${whereOptions}</div>${err('where')}
-      <label id="room-row">Room <input name="location" list="rooms" maxlength="200" value="${esc(values.location || '')}" placeholder="e.g. Redwood C-D (leave blank if not known yet)"></label>
+      <label id="room-row">Room <input name="location" list="rooms" maxlength="200" value="${esc(values.location || '')}" placeholder="e.g. Redwoods C-D (leave blank if not known yet)"></label>
       <datalist id="rooms"></datalist>
       <p class="error" id="room-hint" hidden></p>${err('location')}
       <label>Online link <input type="url" name="online" maxlength="500" value="${esc(values.online || '')}" placeholder="https://…zoom.us/j/… (optional for in-person sessions)"></label>${err('online')}
