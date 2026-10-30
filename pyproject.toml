@@ -1,0 +1,15 @@
+[project]
+name = "sprintweek"
+version = "0.1.0"
+description = "Build the DESC Sprint Week calendar from GitHub Issues"
+requires-python = ">=3.11"
+dependencies = []  # standard library only
+
+[tool.ruff]
+line-length = 120
+
+[tool.pycodestyle]
+max-line-length = 120
+
+[tool.black]
+line-length = 120

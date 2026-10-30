@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprint Week Presenter</title>
+  <meta name="description" content="Pitch and wrap-up slides generated from the Sprint Week GitHub issues.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎤%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="vendor/marked.umd.js" defer></script>
+  <script src="vendor/purify.min.js" defer></script>
+  <script type="module" src="assets/present.js"></script>
+</head>
+<body class="present-page">
+  <div id="setup" class="setup">
+    <p><a href="./">← Back to the calendar</a></p>
+    <h1 id="setup-title">Present</h1>
+    <form id="setup-form" class="setup-form">
+      <fieldset>
+        <legend>What are you presenting?</legend>
+        <label class="choice"><input type="radio" name="mode" value="pitch" checked> <span><strong>Morning pitches</strong><br><span class="muted">One slide per sprint meeting that day: pitch, contacts, sessions.</span></span></label>
+        <label class="choice"><input type="radio" name="mode" value="wrapup"> <span><strong>Wrap-ups</strong><br><span class="muted">One slide per sprint with a wrap-up in its GitHub issue.</span></span></label>
+      </fieldset>
+      <div class="setup-row">
+        <label>Day <select name="day" id="day"></select></label>
+        <label>Times in <select name="tz" id="tz"></select></label>
+      </div>
+      <label class="check" id="unscheduled-row"><input type="checkbox" name="unscheduled" checked> Also show sprints that are not scheduled yet (at the end)</label>
+      <div class="setup-row">
+        <button class="btn primary big" type="submit">▶ Start presenting</button>
+        <span class="muted" id="slide-count"></span>
+      </div>
+    </form>
+    <p class="muted keys">Keys: <kbd>→</kbd> or <kbd>Space</kbd> next · <kbd>←</kbd> back · <kbd>F</kbd> full screen · <kbd>Esc</kbd> back to this page. Clickers work too.</p>
+    <ol id="setup-list" class="setup-list"></ol>
+  </div>
+
+  <div id="deck" class="deck" hidden>
+    <div id="slide" class="slide-frame" aria-live="polite"></div>
+    <div class="deck-bar">
+      <button type="button" class="btn small ghost" id="prev" aria-label="Previous slide">←</button>
+      <span id="counter"></span>
+      <button type="button" class="btn small ghost" id="next" aria-label="Next slide">→</button>
+      <button type="button" class="btn small ghost" id="full" aria-label="Full screen">⛶</button>
+      <button type="button" class="btn small ghost" id="exit" aria-label="Exit">✕</button>
+    </div>
+  </div>
+</body>
+</html>

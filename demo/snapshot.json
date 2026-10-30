@@ -1,0 +1,818 @@
+{
+ "repo": "jfcrenshaw/desc-sprint-website-demo",
+ "fetched_at": "2026-10-30T15:00:00Z",
+ "issues": [
+  {
+   "number": 1,
+   "title": "LBG selection sprint",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 55 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nCreating a pipeline for performing a DP2 LBG selection.\n\n### Contact person(s)\n\nJohn Franklin Crenshaw (@jfcrenshaw)\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\n_No response_\n\n### Goals and deliverables\n\nLyman-break Galaxies (LBGs) are high-z star-forming galaxies typically selected from their lack of flux at short wavelengths. I have an ad-hoc selection I developed on a pre-release version of DP2. My goal is to build a real pipeline for this using the official DP2 object catalog, and then to try to optimize the selection in a more principled manner.\n\n### Prerequisites\n\nProficiency with Python and enthusiasm.\n\n### Communication channel and links\n\nSlack: #desc-lbg\nRepo: https://github.com/LSSTDESC/lbg-pipelines\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/1",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "LBG",
+     "color": "c20936",
+     "description": "Lyman Break Galaxies Topical Team"
+    }
+   ],
+   "created_at": "2026-10-20T16:01:00Z",
+   "updated_at": "2026-10-20T16:01:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 2,
+   "title": "PZ Data Challenge Hacking",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 14 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nHacking for the PZ Data Challenge.\n\n### Contact person(s)\n\n`@ztq1996` `@eacharles` `@jtmyles` @jfcrenshaw\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)\n\n### Goals and deliverables\n\nIn this sprint we will discuss:\n1. summarizing results of the p(z) data challenge into a paper\n2. progress on pushing forward the n(z) data challenge\n3. which n(z) algorithms we need to run as entrants to the challenge\n4. and more\n\n### Prerequisites\n\nNewcomers who would be interested in running an algorithm for the challenge should come by.\n\n### Communication channel and links\n\nSlack: #desc-pz_data_challenge\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/2",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "PZ",
+     "color": "2b9628",
+     "description": "Photometric redshifts"
+    },
+    {
+     "name": "PZ Data Challenge + RAIL",
+     "color": "708c9d",
+     "description": "PZ Data Challenge and RAIL Development Topical Team"
+    }
+   ],
+   "created_at": "2026-10-21T16:02:00Z",
+   "updated_at": "2026-10-21T16:02:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 3,
+   "title": "CCL-Palooza",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 33 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nLet's use and have fun with CCL! Join us for a little CCL tutorial followed by a triage session of CCL open issues and pull requests.\n\n### Contact person(s)\n\n`@aferte` `@carlosggarcia`\n\n### Sprint type\n\nInfrastructure Sprint\n\n### Working groups\n\nMCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\nAt the end of the session:\n1. All attendees will be able to run CCL\n2. Aggressively go through CCL issues and PR (either fix on the spot or defer)\n3. We will have produced a document prioritizing issues and PRs that can be used as a starting place for the CCL task force\n\n### Prerequisites\n\nAccess to NERSC.\n\n### Communication channel and links\n\nSlack: #desc-ccl\nRepo: https://github.com/LSSTDESC/CCL\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/3",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Infrastructure Sprint",
+     "color": "06f6ed",
+     "description": ""
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "CCL + Firecrown",
+     "color": "08f737",
+     "description": "Core Cosmology Library (CCL) + Firecrown Topical Team"
+    }
+   ],
+   "created_at": "2026-10-22T16:03:00Z",
+   "updated_at": "2026-10-22T16:03:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 4,
+   "title": "Preparing training resources for Meeting Contact Persons (MCPs)",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 51 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nWe aim to create a set of resources that prepare MCPs for their very important roles at DESC meetings.\n\n### Contact person(s)\n\nJohn Franklin Crenshaw (@jfcrenshaw), Yuanyuan Zhang\n\n### Sprint type\n\nService Sprint\n\n### Working groups\n\n_No response_\n\n### Goals and deliverables\n\nMCPs are given the important role of helping DESC members with conflicts and abuse that may arise at DESC meetings. They are not, however, usually provided with detailed information about the role and duties, nor are they provided with resources or trainings that equip them to do a good job. The goal of this sprint is to start developing some resources and training materials to fill this gap. This is the first step in a larger effort to revamp how MCPs are selected and trained.\n\nSprint deliverables:\n1. A slide deck with resources, clarifying the role of an MCP, and providing resources that help them do their job.\n2. A proposal document for how DESC should select and prepare MCPs in the future\n\n### Prerequisites\n\nAnyone is welcome to contribute to this sprint. Those with previous MCP experience or experience with similar roles are especially welcome!\n\n### Communication channel and links\n\nSlack: thread in #desc-edi; you can also message the contacts on Slack.\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [X] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/4",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Service Sprint",
+     "color": "02ac4f",
+     "description": ""
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-23T16:04:00Z",
+   "updated_at": "2026-10-23T16:04:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 5,
+   "title": "Add Smokescreen to TXPipe",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 49 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nAdd an option to blind TXPipe-generated sacc files with Smokescreen.\n\n### Contact person(s)\n\n`@arthurmloureiro`\n\n### Sprint type\n\nInfrastructure Sprint\n\n### Working groups\n\nMCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\nTXPipe can now blind sacc files using Smokescreen.\n\n### Prerequisites\n\nSomeone who knows TXPipe well.\n\n### Communication channel and links\n\nSlack: #desc-blinding\nRepos: https://github.com/LSSTDESC/Smokescreen, https://github.com/LSSTDESC/TXPipe\n\n### Detailed description\n\nSelf explanatory... Just gonna try to hack TXPipe to work with Smokescreen.\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/5",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Infrastructure Sprint",
+     "color": "06f6ed",
+     "description": ""
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "STAR",
+     "color": "7cc497",
+     "description": "Static Analysis Round Table"
+    }
+   ],
+   "created_at": "2026-10-24T16:05:00Z",
+   "updated_at": "2026-10-24T16:05:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 6,
+   "title": "CMB Lensing Cross-Correlations in Augur and Lightest Neutrino Mass Hack",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 41 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nSolve the PRs and push/review the code needed to do CMB lensing cross-correlations in augur/TJPCov and include the lightest neutrino mass infrastructure in firecrown & augur.\n\n### Contact person(s)\n\n`@arthurmloureiro` `@paulrogozenski` `@bruno-moraes` `@fjaviersanchez`\n\n### Sprint type\n\nInfrastructure Sprint\n\n### Working groups\n\nMCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\n_No response_\n\n### Prerequisites\n\nPatience :)\n\n### Communication channel and links\n\nSlack: #desc-forecasts (Zoom password is in the thread advertising this sprint)\nRepos: https://github.com/LSSTDESC/Project460_CMBLensing_6x2pt_neutrinos, https://github.com/LSSTDESC/augur\n\n### Detailed description\n\n`@bruno-moraes` and I had a 3 day sprint while I was visiting CBPF earlier this year and tried pushing Project 460 as far as we can. Some PRs were needed in Firecrown and Augur. Now it is time to clean code, and make these PRs into useful contributions to DESC :)\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Infrastructure Sprint",
+     "color": "06f6ed",
+     "description": ""
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "CCL + Firecrown",
+     "color": "08f737",
+     "description": "Core Cosmology Library (CCL) + Firecrown Topical Team"
+    },
+    {
+     "name": "Forecasting",
+     "color": "a5c278",
+     "description": "Forecasting Topical Team"
+    },
+    {
+     "name": "TJPCov",
+     "color": "e2c7ed",
+     "description": "TJPCov Topical Team"
+    }
+   ],
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 7,
+   "title": "HACC Hydro Sim Hackathon",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 6 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nExplore a new suite of hydro sims from the HACC team, with varying cosmological and hydrodynamic parameters.\n\n### Contact person(s)\n\n`@AstroPatty` `@patricialarsen`\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nCL (Clusters), SCS (Survey Computing & Simulation), MCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\nWhatever you want! Some possibilities:\n\n* Pretty pictures of nice clusters\n* Plots of scaling relations as a function of subgrid parameters and/or cosmology\n* Shape measurements of simulated halos or galaxies\n* Clustering measurements\n* Measurements of galaxy colors\n\nWhatever you want to explore in hydro sims, we can help you do it.\n\n### Prerequisites\n\n- Access to Perlmutter\n- Beginner Python knowledge\n\n### Communication channel and links\n\nSlack: #opencosmo\n\n### Detailed description\n\nThe SCIDAC 400 suite is a set of 110 hydrodynamic simulations with varying cosmologies and subgrid parameters. They serve as a great laboratory for exploring the effects of hydrodynamics on structure formation, building emulators, or just getting your feet wet working with simulation data. Simulations are 400 Mpc/h boxes.\n\nThis sprint is beginner-friendly. We will provide both scientific and technical support, and extensive software tooling for working with the data. This is a great way to prepare for the upcoming release of the [Frontier-E](https://arxiv.org/abs/2510.03557) simulation, the largest hydro sim ever performed.\n\n### Options\n\n- [X] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/7",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "CL",
+     "color": "7aa64a",
+     "description": "Clusters"
+    },
+    {
+     "name": "SCS",
+     "color": "a2f916",
+     "description": "Survey Computing & Simulation"
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-20T16:07:00Z",
+   "updated_at": "2026-10-20T16:07:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 8,
+   "title": "DP2 n(z) SOM + WZ coordination",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 11 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nProduce a SOM + WZ n(z) ensemble.\n\n### Contact person(s)\n\n`@jtmyles` `@ztq1996`\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)\n\n### Goals and deliverables\n\nProduce a SOM + WZ n(z) ensemble.\n\n### Prerequisites\n\n_No response_\n\n### Communication channel and links\n\nSlack: #desc-pz-dp2-nz-comb\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/8",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "PZ",
+     "color": "2b9628",
+     "description": "Photometric redshifts"
+    }
+   ],
+   "created_at": "2026-10-21T16:08:00Z",
+   "updated_at": "2026-10-21T16:08:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 9,
+   "title": "DP2 SN Ia simulations with skysurvey",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 43 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nDiscuss skysurvey development needed for DP2 simulations.\n\n### Contact person(s)\n\n`@mginolin`\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nTD (Time Domain)\n\n### Goals and deliverables\n\nThere are two main projects:\n- Design a way to test if a given SN will have templates (using co-adds as a proxy for now)\n- Investigate the impact of bandpass leakage on SN parameter recovery\n\nWe will also tackle a list of known issues in skysurvey and discuss new features to implement.\n\n### Prerequisites\n\nFamiliarity with [skysurvey](https://skysurvey.readthedocs.io/en/latest/) and NERSC access.\n\n### Communication channel and links\n\nSlack: #desc-sniacosmo-dp2-kp\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/9",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "TD",
+     "color": "69a2e6",
+     "description": "Time Domain"
+    }
+   ],
+   "created_at": "2026-10-22T16:09:00Z",
+   "updated_at": "2026-10-22T16:09:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 10,
+   "title": "DESC Agentic AI Technical Coordination",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 3 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nBring together DESC members who use or build agentic AI tools, agree on a plan for regular telecons, and identify follow-up activities to pursue during the rest of the sprint week and beyond.\n\n### Contact person(s)\n\nFrançois Lanusse (`@EiffL`)\n\n### Sprint type\n\nService Sprint\n\n### Working groups\n\n_No response_\n\n### Goals and deliverables\n\nSeveral DESC members are already experimenting with agentic AI, but there is no shared venue for their work. This session aims to connect them and decide how to coordinate going forward.\n\nDeliverables:\n- [ ] A plan for regular telecons, covering cadence, format (e.g. demos, office hours, open discussion), and hosts.\n- [ ] A list of follow-up activities, each with volunteers.\n\n### Prerequisites\n\nJust interest. Newcomers and skeptics are welcome as much as experienced users, since part of the goal is to understand the full range of needs in the collaboration.\n\n### Communication channel and links\n\nSlack: #desc-ai\nRepo: https://github.com/LSSTDESC/agentic-research\n\n### Detailed description\n\n**This session does not primarily focus on policy discussions, but on technical aspects.** If you have built skills, tools, or agentic workflows for your DESC work, consider bringing them for a short demo.\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/10",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Service Sprint",
+     "color": "02ac4f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-23T16:10:00Z",
+   "updated_at": "2026-10-23T16:10:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 11,
+   "title": "PZ Innovation Brainstorm",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 13 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nMuch of our WG activity is centered on implementing existing photometric redshift methods for LSST. In this sprint, we'd like to change things up and have a group discussion at the blackboard to think about how we can innovate in the field.\n\n### Contact person(s)\n\n@jfcrenshaw `@jtmyles`\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)\n\n### Goals and deliverables\n\nIdeally, our discussion would lead to a list of project ideas worth pursuing as individual publications.\n\n### Prerequisites\n\nFor this sprint, newcomers are especially welcome.\n\n### Communication channel and links\n\nSlack: #desc-pz\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [X] New contributor friendly\n\n### Wrap-up\n\n> ℹ️ Illustrative wrap-up written for the calendar demo.\n\n**What we did:** about a dozen people met at the blackboard (and on Zoom) to brainstorm directions for photo-z research beyond implementing existing methods.\n\n**Outcomes**\n- A shortlist of project ideas, each with a volunteer to write a one-page pitch.\n- Agreement to revisit the list at the next PZ working group telecon.\n\n**How to get involved:** join #desc-pz and reply in the brainstorm thread.\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/11",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "PZ",
+     "color": "2b9628",
+     "description": "Photometric redshifts"
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-24T16:11:00Z",
+   "updated_at": "2026-10-24T16:11:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 12,
+   "title": "Refining shear catalog cuts with PZ cuts",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 19 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nImplement cuts on the shear catalog motivated by the photo-z crossmatch, such as bad color regions for PZ and contamination.\n\n### Contact person(s)\n\n`@sidneymau` `@myamamoto26` `@ztq1996` `@jtmyles`\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nPO (Pixels to Objects), PZ (Photometric Redshifts)\n\n### Goals and deliverables\n\nIdentify magnitude-color space for the shear catalog with particularly bad photo-z or contamination from non-galaxies, such as stars and AGN, and include those cuts into the fiducial selection.\n\n### Prerequisites\n\nResources\n- TXPipe-ingested shear catalog in both wide and deep fields\n- Crossmatch of the shear catalog with the redshift reference catalog\n- SOM or other photo-z results\n\nRelevant skills: metadetect, anacal, photo-z, reference redshifts, TXPipe\n\n### Communication channel and links\n\nSlack: #desc-dp2-shear\n\n### Detailed description\n\nThis project needs the crossmatch of the reference catalog to each shear catalog, and preferably the SOM or other photo-z results on the shear catalog, so it is scheduled in later days.\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/12",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "PO",
+     "color": "fcdc65",
+     "description": "Pixels to Objects"
+    },
+    {
+     "name": "PZ",
+     "color": "2b9628",
+     "description": "Photometric redshifts"
+    }
+   ],
+   "created_at": "2026-10-19T16:12:00Z",
+   "updated_at": "2026-10-19T16:12:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 13,
+   "title": "Develop non-Gaia star masking for DP2",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 18 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nDevelop masking for relatively bright stars that goes beyond the Gaia catalog, since a Gaia-based selection will be incomplete in redder bands.\n\n### Contact person(s)\n\nTheo Schutt\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nPO (Pixels to Objects)\n\n### Goals and deliverables\n\n1. Produce a high-purity catalog of stars to mask beyond what is already in Gaia (likely using morphology/object classification already in the DP2 object catalog)\n2. Determine how dim of stars we need to mask for the shear catalog\n3. Determine the minimum radius for this masking\n4. Produce a mask suitable for TXPipe, etc.\n\n### Prerequisites\n\nAccessing DP2 catalogs, general exploratory analysis plotting, etc.\n\n### Communication channel and links\n\nSlack: #desc-dp2-shear\n\n### Detailed description\n\nRelated work on masking stars in the Gaia catalog down to G=20 is tracked in `LSSTDESC/dp2_static_catalog_production#29` and `LSSTDESC/dp2_static_catalog_production#31` Generally around all week at SLAC; remote contributions are also welcome!\n\n### Options\n\n- [X] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/13",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "PO",
+     "color": "fcdc65",
+     "description": "Pixels to Objects"
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-20T16:13:00Z",
+   "updated_at": "2026-10-20T16:13:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 14,
+   "title": "Prep for LSST Y1 dynamical dark energy",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 36 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nSet up initial simulated LSST Y1 data vectors for dynamical dark energy analyses.\n\n### Contact person(s)\n\n`@aferte`\n\n### Sprint type\n\nInfrastructure Sprint\n\n### Working groups\n\nMCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\nWe will set up the repo and scripts to produce data vectors for an initial set of observables and run forecasts for dynamical dark energy models (w0wa, maybe Padé-w?). We will aim at visualizing these on the dashboard.\n\n### Prerequisites\n\n_No response_\n\n### Communication channel and links\n\nSlack: #desc-y1sharpde\n\n### Detailed description\n\n_No response_\n\n### Options\n\n- [ ] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/14",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "Infrastructure Sprint",
+     "color": "06f6ed",
+     "description": ""
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "Beyond wCDM",
+     "color": "54374e",
+     "description": "Beyond wCDM Topical Team"
+    }
+   ],
+   "created_at": "2026-10-21T16:14:00Z",
+   "updated_at": "2026-10-21T16:14:00Z",
+   "is_pull_request": false
+  },
+  {
+   "number": 15,
+   "title": "Expand and improve Dark Energy Exploration Dashboard visualization aspect",
+   "body": "> 🧪 Demo copy of SprintWeek2026 issue 58 for the calendar prototype. Mentions are disabled so nobody is notified.\n\n### Short pitch\n\nDEED has a prototype implementation of its visualization aspect that we'd like to make usable for the larger community.\n\n### Contact person(s)\n\nLeo Sajkov\n\n### Sprint type\n\nGeneral Sprint\n\n### Working groups\n\nMCP (Modelling and Combined Probes)\n\n### Goals and deliverables\n\n- A stable visualization interface that can take a variety of inputs (data vectors, MCMC chains, etc.) and produce the appropriate plots\n- Overplot inputs from different data products\n- Reach goal: make the plots interactive, to allow for easily comparing between different data products\n\n### Prerequisites\n\nMost of this project is vibe-coding, so enthusiasm and creativity with regard to visualizing data products is most useful!\n\n### Communication channel and links\n\nSlack: #desc-de-dashboard\nRepo: https://github.com/LSSTDESC/DEED\n\n### Detailed description\n\nDEED's visualization aspect is built to flexibly plot different data products that are either stored in the Data Registry or passed as input by the user. This aspect becomes most powerful when it can overplot multiple data products so that they can be compared. Paired with good data provenance, this becomes a great way of understanding how choices in modeling, data, assumptions, etc., propagate into results.\n\n### Options\n\n- [X] New contributor friendly\n\n### Wrap-up\n\n_No response_\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/15",
+   "state": "open",
+   "state_reason": null,
+   "user": "jfcrenshaw",
+   "assignees": [],
+   "labels": [
+    {
+     "name": "General Sprint",
+     "color": "73c299",
+     "description": ""
+    },
+    {
+     "name": "MCP",
+     "color": "c0f6eb",
+     "description": "Modelling and Combined Probes"
+    },
+    {
+     "name": "New Contributor Friendly",
+     "color": "e72e3f",
+     "description": ""
+    }
+   ],
+   "created_at": "2026-10-22T16:15:00Z",
+   "updated_at": "2026-10-22T16:15:00Z",
+   "is_pull_request": false
+  }
+ ],
+ "comments": [
+  {
+   "id": 4000000001,
+   "issue": 1,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/1#issuecomment-4000000001",
+   "created_at": "2026-10-20T16:01:00Z",
+   "updated_at": "2026-10-20T16:01:00Z"
+  },
+  {
+   "id": 4000000002,
+   "issue": 1,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-26\",\"start\":\"10:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"KFB 2nd floor conference room\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Monday, October 26 · 10:00–12:00 PDT\n<sub>= 18:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – KFB 2nd floor conference room\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/1#issuecomment-4000000002",
+   "created_at": "2026-10-20T16:01:00Z",
+   "updated_at": "2026-10-20T16:01:00Z"
+  },
+  {
+   "id": 4000000003,
+   "issue": 2,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/2#issuecomment-4000000003",
+   "created_at": "2026-10-21T16:02:00Z",
+   "updated_at": "2026-10-21T16:02:00Z"
+  },
+  {
+   "id": 4000000004,
+   "issue": 2,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-26\",\"start\":\"13:00\",\"end\":\"15:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood C-D\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Monday, October 26 · 13:00–15:00 PDT\n<sub>= 21:00–23:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood C-D · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/2#issuecomment-4000000004",
+   "created_at": "2026-10-21T16:02:00Z",
+   "updated_at": "2026-10-21T16:02:00Z"
+  },
+  {
+   "id": 4000000005,
+   "issue": 3,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/3#issuecomment-4000000005",
+   "created_at": "2026-10-22T16:03:00Z",
+   "updated_at": "2026-10-22T16:03:00Z"
+  },
+  {
+   "id": 4000000006,
+   "issue": 3,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-26\",\"start\":\"14:00\",\"end\":\"17:30\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Monday, October 26 · 14:00–17:30 CET\n<sub>= 06:00–09:30 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/3#issuecomment-4000000006",
+   "created_at": "2026-10-22T16:03:00Z",
+   "updated_at": "2026-10-22T16:03:00Z"
+  },
+  {
+   "id": 4000000007,
+   "issue": 4,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/4#issuecomment-4000000007",
+   "created_at": "2026-10-23T16:04:00Z",
+   "updated_at": "2026-10-23T16:04:00Z"
+  },
+  {
+   "id": 4000000008,
+   "issue": 4,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-27\",\"start\":\"14:00\",\"end\":\"16:00\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"Paris sprint\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Paris sprint**\n\n**When:** Tuesday, October 27 · 14:00–16:00 CET\n<sub>= 06:00–08:00 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/4#issuecomment-4000000008",
+   "created_at": "2026-10-23T16:04:00Z",
+   "updated_at": "2026-10-23T16:04:00Z"
+  },
+  {
+   "id": 4000000009,
+   "issue": 4,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-27\",\"start\":\"16:00\",\"end\":\"16:45\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Joint Paris–SLAC Zoom\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Joint Paris–SLAC Zoom**\n\n**When:** Tuesday, October 27 · 16:00–16:45 CET\n<sub>= 08:00–08:45 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/4#issuecomment-4000000009",
+   "created_at": "2026-10-23T16:04:00Z",
+   "updated_at": "2026-10-23T16:04:00Z"
+  },
+  {
+   "id": 4000000010,
+   "issue": 4,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-27\",\"start\":\"10:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood A\",\"online\":\"\",\"label\":\"SLAC sprint\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: SLAC sprint**\n\n**When:** Tuesday, October 27 · 10:00–12:00 PDT\n<sub>= 18:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood A\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/4#issuecomment-4000000010",
+   "created_at": "2026-10-23T16:04:00Z",
+   "updated_at": "2026-10-23T16:04:00Z"
+  },
+  {
+   "id": 4000000011,
+   "issue": 5,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/5#issuecomment-4000000011",
+   "created_at": "2026-10-24T16:05:00Z",
+   "updated_at": "2026-10-24T16:05:00Z"
+  },
+  {
+   "id": 4000000012,
+   "issue": 5,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-27\",\"start\":\"15:00\",\"end\":\"17:00\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Tuesday, October 27 · 15:00–17:00 CET\n<sub>= 07:00–09:00 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/5#issuecomment-4000000012",
+   "created_at": "2026-10-24T16:05:00Z",
+   "updated_at": "2026-10-24T16:05:00Z"
+  },
+  {
+   "id": 4000000013,
+   "issue": 6,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000013",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000014,
+   "issue": 6,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-27\",\"start\":\"13:00\",\"end\":\"13:30\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Daily planning\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Daily planning**\n\n**When:** Tuesday, October 27 · 13:00–13:30 CET\n<sub>= 05:00–05:30 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000014",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000015,
+   "issue": 6,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"13:00\",\"end\":\"13:30\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Daily planning\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Daily planning**\n\n**When:** Wednesday, October 28 · 13:00–13:30 CET\n<sub>= 05:00–05:30 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000015",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000016,
+   "issue": 6,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-29\",\"start\":\"13:00\",\"end\":\"13:30\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Daily planning\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Daily planning**\n\n**When:** Thursday, October 29 · 13:00–13:30 CET\n<sub>= 05:00–05:30 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000016",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000017,
+   "issue": 6,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-30\",\"start\":\"13:00\",\"end\":\"13:30\",\"tz\":\"Europe/Paris\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Daily planning\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Daily planning**\n\n**When:** Friday, October 30 · 13:00–13:30 CET\n<sub>= 05:00–05:30 PDT (SLAC)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000017",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000018,
+   "issue": 6,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "## Wrap-up\n\n> ℹ️ Demo wrap-up: a summary of the daily notes posted on the original SprintWeek2026 issue.\n\n- **Augur PR0 merged.** Tests confirmed that the new SACC 2.4 ordering is respected (122 tests passing in a fresh environment).\n- **Neutrino masses:** augur now warns when CCL is asked for a negative neutrino mass in the equal-mass case, with a unit test.\n- **PR audit:** all open PRs are standalone and need rebasing. The plan is to bring `p460-integration` into `refactor` without losing author history.\n- **Still open:** PR10 is not finished yet, and PR g4 waits for the lightest-neutrino work to land in Firecrown.\n- **Next steps:** a summary of the Firecrown-related PRs, and a careful review of PR10.",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000018",
+   "created_at": "2026-10-19T16:06:00Z",
+   "updated_at": "2026-10-19T16:06:00Z"
+  },
+  {
+   "id": 4000000019,
+   "issue": 7,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/7#issuecomment-4000000019",
+   "created_at": "2026-10-20T16:07:00Z",
+   "updated_at": "2026-10-20T16:07:00Z"
+  },
+  {
+   "id": 4000000020,
+   "issue": 7,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"08:00\",\"end\":\"09:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"\",\"location\":\"\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"Zoom kickoff\",\"note\":\"Main Zoom, breakout room 6\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Zoom kickoff**\n\n**When:** Wednesday, October 28 · 08:00–09:00 PDT\n<sub>= 16:00–17:00 CET (Paris)</sub>\n**Where:** 💻 [Join online](https://zoom.us/j/0000000000)\n**Note:** Main Zoom, breakout room 6\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/7#issuecomment-4000000020",
+   "created_at": "2026-10-20T16:07:00Z",
+   "updated_at": "2026-10-20T16:07:00Z"
+  },
+  {
+   "id": 4000000021,
+   "issue": 7,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"10:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood C-D\",\"online\":\"\",\"label\":\"Hands-on at SLAC\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled: Hands-on at SLAC**\n\n**When:** Wednesday, October 28 · 10:00–12:00 PDT\n<sub>= 18:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood C-D\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/7#issuecomment-4000000021",
+   "created_at": "2026-10-20T16:07:00Z",
+   "updated_at": "2026-10-20T16:07:00Z"
+  },
+  {
+   "id": 4000000022,
+   "issue": 8,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/8#issuecomment-4000000022",
+   "created_at": "2026-10-21T16:08:00Z",
+   "updated_at": "2026-10-21T16:08:00Z"
+  },
+  {
+   "id": 4000000023,
+   "issue": 8,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"09:00\",\"end\":\"10:30\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood A\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Wednesday, October 28 · 09:00–10:30 PDT\n<sub>= 17:00–18:30 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood A · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/8#issuecomment-4000000023",
+   "created_at": "2026-10-21T16:08:00Z",
+   "updated_at": "2026-10-21T16:08:00Z"
+  },
+  {
+   "id": 4000000024,
+   "issue": 9,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/9#issuecomment-4000000024",
+   "created_at": "2026-10-22T16:09:00Z",
+   "updated_at": "2026-10-22T16:09:00Z"
+  },
+  {
+   "id": 4000000025,
+   "issue": 9,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"09:30\",\"end\":\"12:30\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Wednesday, October 28 · 09:30–12:30 CET\n<sub>= 01:30–04:30 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/9#issuecomment-4000000025",
+   "created_at": "2026-10-22T16:09:00Z",
+   "updated_at": "2026-10-22T16:09:00Z"
+  },
+  {
+   "id": 4000000026,
+   "issue": 9,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-29\",\"start\":\"09:30\",\"end\":\"12:30\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Thursday, October 29 · 09:30–12:30 CET\n<sub>= 01:30–04:30 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/9#issuecomment-4000000026",
+   "created_at": "2026-10-22T16:09:00Z",
+   "updated_at": "2026-10-22T16:09:00Z"
+  },
+  {
+   "id": 4000000027,
+   "issue": 9,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-30\",\"start\":\"09:30\",\"end\":\"12:00\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Friday, October 30 · 09:30–12:00 CET\n<sub>= 01:30–04:00 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/9#issuecomment-4000000027",
+   "created_at": "2026-10-22T16:09:00Z",
+   "updated_at": "2026-10-22T16:09:00Z"
+  },
+  {
+   "id": 4000000028,
+   "issue": 10,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/10#issuecomment-4000000028",
+   "created_at": "2026-10-23T16:10:00Z",
+   "updated_at": "2026-10-23T16:10:00Z"
+  },
+  {
+   "id": 4000000029,
+   "issue": 10,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-29\",\"start\":\"07:00\",\"end\":\"08:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood B\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Thursday, October 29 · 07:00–08:00 PDT\n<sub>= 15:00–16:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood B · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/10#issuecomment-4000000029",
+   "created_at": "2026-10-23T16:10:00Z",
+   "updated_at": "2026-10-23T16:10:00Z"
+  },
+  {
+   "id": 4000000030,
+   "issue": 11,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/11#issuecomment-4000000030",
+   "created_at": "2026-10-24T16:11:00Z",
+   "updated_at": "2026-10-24T16:11:00Z"
+  },
+  {
+   "id": 4000000031,
+   "issue": 11,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-29\",\"start\":\"10:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood B\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Thursday, October 29 · 10:00–12:00 PDT\n<sub>= 18:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood B · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/11#issuecomment-4000000031",
+   "created_at": "2026-10-24T16:11:00Z",
+   "updated_at": "2026-10-24T16:11:00Z"
+  },
+  {
+   "id": 4000000032,
+   "issue": 12,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/12#issuecomment-4000000032",
+   "created_at": "2026-10-19T16:12:00Z",
+   "updated_at": "2026-10-19T16:12:00Z"
+  },
+  {
+   "id": 4000000033,
+   "issue": 12,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-29\",\"start\":\"13:00\",\"end\":\"16:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood C-D\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Thursday, October 29 · 13:00–16:00 PDT\n<sub>= 21:00–00:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood C-D · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/12#issuecomment-4000000033",
+   "created_at": "2026-10-19T16:12:00Z",
+   "updated_at": "2026-10-19T16:12:00Z"
+  },
+  {
+   "id": 4000000034,
+   "issue": 12,
+   "user": "jfcrenshaw",
+   "author_association": "OWNER",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-30\",\"start\":\"09:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwood C-D\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Friday, October 30 · 09:00–12:00 PDT\n<sub>= 17:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwood C-D · 💻 [Join online](https://zoom.us/j/0000000000)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/12#issuecomment-4000000034",
+   "created_at": "2026-10-19T16:12:00Z",
+   "updated_at": "2026-10-19T16:12:00Z"
+  },
+  {
+   "id": 4000000035,
+   "issue": 13,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/13#issuecomment-4000000035",
+   "created_at": "2026-10-20T16:13:00Z",
+   "updated_at": "2026-10-20T16:13:00Z"
+  },
+  {
+   "id": 4000000036,
+   "issue": 14,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/14#issuecomment-4000000036",
+   "created_at": "2026-10-21T16:14:00Z",
+   "updated_at": "2026-10-21T16:14:00Z"
+  },
+  {
+   "id": 4000000037,
+   "issue": 15,
+   "user": "github-actions[bot]",
+   "author_association": "NONE",
+   "body": "<!-- sprintweek:greeting -->\n👋 Thanks for proposing a sprint!",
+   "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/15#issuecomment-4000000037",
+   "created_at": "2026-10-22T16:15:00Z",
+   "updated_at": "2026-10-22T16:15:00Z"
+  }
+ ]
+}

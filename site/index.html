@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprint Week Calendar</title>
+  <meta name="description" content="Schedule of the DESC Sprint Week, generated from GitHub Issues.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📅%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="vendor/event-calendar.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="vendor/event-calendar.min.js" defer></script>
+  <script src="vendor/marked.umd.js" defer></script>
+  <script src="vendor/purify.min.js" defer></script>
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a class="title" href="./" id="event-title">Sprint Week</a>
+      <span class="subtitle" id="event-dates"></span>
+    </div>
+    <nav class="actions" aria-label="Actions">
+      <a class="btn primary" id="new-sprint" href="#" target="_blank" rel="noopener">＋ Propose a sprint</a>
+      <button class="btn" id="subscribe-btn" type="button">Subscribe</button>
+      <a class="btn" href="present.html">Present</a>
+    </nav>
+  </header>
+
+  <nav class="tabs" aria-label="Views">
+    <a href="#today" data-view="today">Today</a>
+    <a href="#week" data-view="week">Week</a>
+    <a href="#sprints" data-view="sprints">All sprints <span class="count" id="sprint-count"></span></a>
+  </nav>
+
+  <section class="toolbar" aria-label="Search and filters">
+    <input type="search" id="q" placeholder="Search sprints, people, rooms…" aria-label="Search">
+    <label class="tz-picker">Times in <select id="tz"></select></label>
+    <details class="filters" id="filters">
+      <summary>Filter <span class="count" id="filter-count"></span></summary>
+      <div id="facets"></div>
+    </details>
+    <div class="active-filters" id="active-filters"></div>
+  </section>
+
+  <main>
+    <p class="notice" id="notice" hidden></p>
+    <section id="now-next" class="now-next" hidden></section>
+    <div id="calendar-wrap">
+      <div id="calendar" class="ec-auto-dark"></div>
+      <p class="legend" id="legend"></p>
+    </div>
+    <section id="directory" hidden></section>
+  </main>
+
+  <footer class="footer" id="footer"></footer>
+
+  <dialog id="sprint-dialog" aria-labelledby="sprint-dialog-title"></dialog>
+  <dialog id="subscribe-dialog" aria-labelledby="subscribe-title">
+    <form method="dialog" class="dialog-body">
+      <button class="close" aria-label="Close">×</button>
+      <h2 id="subscribe-title">Add the schedule to your calendar</h2>
+      <p>Subscribe once and your calendar app keeps itself up to date as sprints are scheduled or moved.</p>
+      <div class="stack">
+        <a class="btn primary" id="sub-webcal" href="#">Open in Apple Calendar / Outlook</a>
+        <a class="btn" id="sub-google" href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
+        <a class="btn" id="sub-download" href="calendar.ics" download>Download .ics file</a>
+      </div>
+      <p class="muted">Or copy the feed URL into any calendar app:</p>
+      <div class="copy-row"><input id="sub-url" readonly aria-label="Calendar feed URL"><button class="btn" type="button" id="sub-copy">Copy</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

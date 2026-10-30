@@ -1,0 +1,100 @@
+name: Propose a sprint
+description: Propose a Sprint Week project. Only the title and pitch are required, and you can schedule sessions later.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a sprint! Only the **title** and **short pitch** are required. You can fill in everything else now or later by editing the issue.
+
+        **You don't need to know when you will meet yet.** After you submit, a bot replies with a link for scheduling one or more sessions.
+
+  - type: textarea
+    id: pitch
+    attributes:
+      label: Short pitch
+      description: One or two sentences, as you would say them at the morning pitch session.
+      placeholder: Build a pipeline for selecting Lyman-break galaxies in DP2 and optimize the selection.
+    validations:
+      required: true
+
+  - type: input
+    id: contacts
+    attributes:
+      label: Contact person(s)
+      description: GitHub @handles and/or names. Leave blank to make yourself the contact.
+      placeholder: "@alice, Bob Smith (@bsmith)"
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Sprint type
+      options:
+        - General Sprint
+        - Infrastructure Sprint
+        - Service Sprint
+        - Paper Sprint
+        - Tutorial
+        - Other
+      default: 0
+
+  - type: dropdown
+    id: working-groups
+    attributes:
+      label: Working groups
+      description: Pick any that apply. Used for filtering the calendar.
+      multiple: true
+      options:
+        - CL (Clusters)
+        - CO (Computing)
+        - DKM (Dark Matter)
+        - MCP (Modelling and Combined Probes)
+        - PLC (Pixels to Light Curves)
+        - PO (Pixels to Objects)
+        - PZ (Photometric Redshifts)
+        - SC (Survey Coordination)
+        - SCS (Survey Computing & Simulation)
+        - SRV (Science Release Validation)
+        - TD (Time Domain)
+        - WLSS (Weak Lensing & Large-Scale Structure)
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals and deliverables
+      description: What do you hope to have at the end of the week?
+
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Skills, software, data or computing access that participants need (or "just enthusiasm").
+
+  - type: textarea
+    id: links
+    attributes:
+      label: Communication channel and links
+      description: Slack channel, GitHub repository, documents, etc.
+      placeholder: |
+        Slack: #desc-my-project
+        Repo: https://github.com/LSSTDESC/my-project
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Detailed description
+      description: Anything else participants should know.
+
+  - type: checkboxes
+    id: options
+    attributes:
+      label: Options
+      options:
+        - label: New contributor friendly
+
+  - type: textarea
+    id: wrapup
+    attributes:
+      label: Wrap-up
+      description: >
+        Leave this blank for now. After the sprint, edit the issue and summarize what you accomplished
+        (bullet points, plots and links are all welcome). It is shown at the closing plenary.

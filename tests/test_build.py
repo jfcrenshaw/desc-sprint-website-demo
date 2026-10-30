@@ -1,0 +1,188 @@
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from sprintweek import ics
+from sprintweek.build import build_data, build_sprint, write_site
+from sprintweek.config import load_config
+from sprintweek.sessions import encode_session_data
+
+ROOT = Path(__file__).resolve().parent.parent
+CONFIG = load_config(ROOT / "sprintweek.toml", repo="example/sprints")
+SESSION = {"date": "2026-10-27", "start": "09:00", "end": "10:00", "tz": "America/Los_Angeles", "location": "Redwood A"}
+
+
+def issue(**kw):
+    base = {
+        "number": 7,
+        "title": "A sprint",
+        "body": "### Short pitch\n\nHello",
+        "html_url": "https://github.com/example/sprints/issues/7",
+        "state": "open",
+        "state_reason": None,
+        "user": "author",
+        "assignees": ["helper"],
+        "labels": [],
+        "created_at": "2026-10-01T00:00:00Z",
+        "updated_at": "2026-10-01T00:00:00Z",
+        "is_pull_request": False,
+    }
+    return {**base, **kw}
+
+
+def comment(body, user="someone", assoc="NONE", cid=1, created="2026-10-02T00:00:00Z"):
+    return {
+        "id": cid,
+        "issue": 7,
+        "user": user,
+        "author_association": assoc,
+        "body": body,
+        "html_url": f"https://github.com/example/sprints/issues/7#issuecomment-{cid}",
+        "created_at": created,
+        "updated_at": created,
+    }
+
+
+class TestBuildSprint(unittest.TestCase):
+    def test_unscheduled_sprint_defaults_to_author_as_contact(self):
+        sp, warnings = build_sprint(issue(), [], CONFIG)
+        self.assertEqual(sp["sessions"], [])
+        self.assertEqual(sp["contacts"], [{"login": "author", "name": None}])
+        self.assertEqual(warnings, [])
+
+    def test_multiple_sessions_are_sorted(self):
+        later = encode_session_data({**SESSION, "date": "2026-10-29"})
+        earlier = encode_session_data(SESSION)
+        sp, _ = build_sprint(issue(), [comment(later, "jf", "OWNER", 1), comment(earlier, "jf", "OWNER", 2)], CONFIG)
+        self.assertEqual([s["date"] for s in sp["sessions"]], ["2026-10-27", "2026-10-29"])
+        self.assertEqual([s["id"] for s in sp["sessions"]], ["2", "1"])
+        self.assertEqual(sp["sessions"][0]["site"], "SLAC")  # inferred from the time zone
+
+    def test_only_trusted_authors_can_post_sessions(self):
+        data = encode_session_data(SESSION)
+        sp, warnings = build_sprint(issue(), [comment(data, "random", "NONE")], CONFIG)
+        self.assertEqual(sp["sessions"], [])
+        self.assertIn("ignored", warnings[0])
+        for user, assoc in (("x", "MEMBER"), ("x", "COLLABORATOR"), ("x", "OWNER")):
+            sp, _ = build_sprint(issue(), [comment(data, user, assoc)], CONFIG)
+            self.assertEqual(len(sp["sessions"]), 1, assoc)
+
+    def test_bot_is_trusted(self):
+        config = load_config(ROOT / "sprintweek.toml", repo="example/sprints")
+        config.bot_login = "sprint-bot[bot]"
+        sp, _ = build_sprint(issue(), [comment(encode_session_data(SESSION), "sprint-bot[bot]", "NONE")], config)
+        self.assertEqual(len(sp["sessions"]), 1)
+
+    def test_malformed_sessions_become_warnings(self):
+        bad = [
+            comment("<!-- sprintweek:session {oops} -->", "jf", "OWNER", 1),
+            comment(encode_session_data({**SESSION, "end": "08:00"}), "jf", "OWNER", 2),
+            comment(encode_session_data(SESSION), "jf", "OWNER", 3),
+        ]
+        sp, warnings = build_sprint(issue(), bad, CONFIG)
+        self.assertEqual(len(sp["sessions"]), 1)
+        self.assertEqual(len(warnings), 2)
+
+    def test_cancelled_sessions_are_ignored(self):
+        body = encode_session_data(SESSION).replace("sprintweek:session", "sprintweek:cancelled")
+        sp, warnings = build_sprint(issue(), [comment(body, "jf", "OWNER")], CONFIG)
+        self.assertEqual((sp["sessions"], warnings), ([], []))
+
+    def test_wrapup_from_body_wins(self):
+        body = "### Short pitch\n\nHi\n\n### Wrap-up\n\nDone in the body."
+        sp, _ = build_sprint(issue(body=body), [comment("## Wrap-up\n\nIn a comment", "author")], CONFIG)
+        self.assertEqual(sp["wrapup"], "Done in the body.")
+
+    def test_wrapup_comments_from_sprint_people(self):
+        comments = [
+            comment("## Wrap-up\n\nFrom the author", "author", cid=1, created="2026-10-30T01:00:00Z"),
+            comment("## Wrap-up\n\nFrom a stranger", "stranger", cid=2),
+            comment("## Wrap-up\n\nFrom an assignee", "helper", cid=3, created="2026-10-30T02:00:00Z"),
+        ]
+        sp, _ = build_sprint(issue(), comments, CONFIG)
+        self.assertIn("From the author", sp["wrapup"])
+        self.assertIn("From an assignee", sp["wrapup"])
+        self.assertNotIn("stranger", sp["wrapup"])
+        self.assertTrue(sp["wrapup_url"].endswith("issuecomment-3"))
+
+    def test_tags_merge_form_and_labels(self):
+        body = "### Sprint type\n\nPaper Sprint\n\n### Working groups\n\nPZ (Photometric Redshifts)"
+        labels = [{"name": "pz", "color": "2b9628"}, {"name": "Paris", "color": "c293b5"}]
+        sp, _ = build_sprint(issue(body=body, labels=labels), [], CONFIG)
+        self.assertEqual(
+            [(t["name"], t["kind"]) for t in sp["tags"]],
+            [("Paper Sprint", "type"), ("PZ", "group"), ("Paris", "label")],
+        )
+        self.assertEqual(sp["tags"][1]["color"], "#2b9628")
+
+
+class TestBuildData(unittest.TestCase):
+    def test_excluded_issues(self):
+        snapshot = {
+            "issues": [
+                issue(number=1),
+                issue(number=2, labels=[{"name": "Duplicate", "color": ""}]),
+                issue(number=3, state="closed", state_reason="not_planned"),
+                issue(number=4, is_pull_request=True),
+                issue(number=5, state="closed", state_reason="completed"),
+            ],
+            "comments": [],
+        }
+        data = build_data(snapshot, CONFIG)
+        self.assertEqual([s["number"] for s in data["sprints"]], [1, 5])
+
+    def test_demo_snapshot_builds_cleanly(self):
+        snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())
+        data = build_data(snapshot, CONFIG)
+        self.assertEqual(data["warnings"], [])
+        counts = [len(s["sessions"]) for s in data["sprints"]]
+        self.assertIn(0, counts)
+        self.assertIn(1, counts)
+        self.assertGreater(max(counts), 1)
+        modes = {x["mode"] for s in data["sprints"] for x in s["sessions"]}
+        self.assertTrue({"online", "hybrid", "in person"} <= modes)
+        self.assertTrue(any(s["wrapup"] for s in data["sprints"]))
+
+    def test_write_site(self):
+        snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())
+        data = build_data(snapshot, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            write_site(data, CONFIG, tmp)
+            out = Path(tmp)
+            self.assertTrue((out / "index.html").exists())
+            published = json.loads((out / "data" / "config.json").read_text())
+            self.assertNotIn("token", json.dumps(published).lower())
+            cal = (out / "calendar.ics").read_bytes()
+            n = sum(len(s["sessions"]) for s in data["sprints"])
+            self.assertEqual(cal.count(b"BEGIN:VEVENT"), n)
+            self.assertTrue(all(len(line) <= 75 for line in cal.split(b"\r\n")))
+            self.assertEqual(len(list((out / "ics").glob("*.ics"))), sum(1 for s in data["sprints"] if s["sessions"]))
+
+
+class TestIcs(unittest.TestCase):
+    def test_escape(self):
+        self.assertEqual(ics.escape("a,b;c\\d\ne"), "a\\,b\\;c\\\\d\\ne")
+
+    def test_fold_respects_utf8(self):
+        line = "SUMMARY:" + "é" * 100
+        folded = ics.fold(line)
+        parts = folded.split("\r\n ")
+        self.assertTrue(all(len(p.encode()) <= 75 for p in parts))
+        self.assertEqual("".join(parts), line)
+
+    def test_stamp(self):
+        self.assertEqual(ics.stamp("2026-10-27T13:00:00Z"), "20261027T130000Z")
+
+
+class TestConfig(unittest.TestCase):
+    def test_public_config(self):
+        pub = CONFIG.public()
+        self.assertEqual(pub["days"][0], "2026-10-26")
+        self.assertEqual(len(pub["days"]), 5)
+        self.assertEqual({s["name"]: s["abbr"] for s in pub["sites"]}, {"SLAC": "PDT", "Paris": "CET"})
+        self.assertEqual(pub["site_url"], "https://example.github.io/sprints/")
+
+
+if __name__ == "__main__":
+    unittest.main()

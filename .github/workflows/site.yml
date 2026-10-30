@@ -1,0 +1,59 @@
+# Rebuild and publish the calendar whenever a sprint issue (or one of its session or
+# wrap-up comments) changes. Each run fetches *all* issues, so the published site is
+# always a fresh copy of what is on GitHub; nothing is stored between runs.
+name: Build calendar
+
+on:
+  push:
+    branches: [main]
+  issues:
+    types: [opened, edited, deleted, transferred, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  issue_comment:
+    types: [created, edited, deleted]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pages: write
+  id-token: write
+
+# At most one build runs at a time; a burst of edits collapses into one pending run,
+# which always picks up the latest state.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Only comments that carry sessions or wrap-ups affect the site.
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (!github.event.issue.pull_request &&
+       (contains(github.event.comment.body, 'sprintweek:') || contains(github.event.comment.body, 'wrap')))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test the parser
+        run: python -m unittest discover -s tests -t .
+      - name: Build the site from the issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m sprintweek build --out _site
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
