@@ -24,11 +24,14 @@ The bot reads the published calendar configuration and sessions and refreshes th
 ## Security design
 
 - People sign in with GitHub only to prove who they are.
-  The Worker reads their login and immediately revokes their GitHub token; it never stores or uses it.
+  The Worker reads their login and discards their GitHub token: it is never stored or used for anything else, and it expires on its own after 8 hours.
+  (It is not revoked, because revoking a GitHub App's last user token also removes the approval, and people would have to approve the bot at every sign-in.)
+  People approve the bot once; they can withdraw that at any time in GitHub → Settings → Applications.
 - All writes are made with a short-lived GitHub App installation token that is restricted to the sprint repository.
   The App only needs *Issues: read and write*, so even a bug in the Worker could at worst edit issue comments in that one repository.
 - The Worker only ever creates or edits session comments; it never passes request data through to arbitrary API paths.
-- Sessions are kept in a signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie that expires after 8 hours.
+- Sessions are kept in a signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie that expires after 14 days, so people sign in about once per Sprint Week.
+  To sign everyone out at once, change `SESSION_SECRET`.
   Forms carry a CSRF token and the Worker checks the `Origin` header.
   The GitHub sign-in uses a `state` value and PKCE.
 - User text is length-limited, stripped of control characters, Markdown-escaped and @mention-defanged before it is posted, and links must be `https://`.

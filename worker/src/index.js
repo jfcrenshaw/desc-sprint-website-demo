@@ -4,8 +4,8 @@
 //   GET  /session/<comment>   form for an existing session  POST: save or cancel it
 //   GET  /login, /callback, /logout                         "Sign in with GitHub"
 //
-// People sign in with GitHub only so we know who they are; their GitHub token is
-// discarded immediately. All writes are made by the GitHub App ("the bot"), which is
+// People sign in with GitHub only so we know who they are; their GitHub token is never
+// stored or used for anything else. All writes are made by the GitHub App ("the bot"), which is
 // installed on the sprint repository with Issues: read & write.
 //
 // Configuration (wrangler.toml [vars]): REPO, SITE_URL.
@@ -20,7 +20,7 @@ import {
 
 const SESSION_COOKIE = '__Host-sw_session';
 const OAUTH_COOKIE = '__Host-sw_oauth';
-const SESSION_TTL = 8 * 3600;
+const SESSION_TTL = 14 * 24 * 3600; // stay signed in for the whole Sprint Week
 
 class HttpError extends Error {
   constructor(status, title, message) {
@@ -388,18 +388,11 @@ async function callback(request, env, url) {
   });
   const data = await res.json().catch(() => ({}));
   if (!data.access_token) throw new HttpError(400, 'Sign-in failed', 'GitHub did not confirm the sign-in. Please try again.');
+  // We only need the user's name. The token is not stored anywhere and expires on its own
+  // (8 hours for GitHub App user tokens). It is deliberately not revoked: revoking a GitHub
+  // App's last user token removes the app's authorization, so people would have to approve
+  // the bot again at every sign-in.
   const user = await githubJson('/user', data.access_token);
-  // We only needed the user's name: revoke their token right away (best effort).
-  await fetch(`https://api.github.com/applications/${env.GITHUB_CLIENT_ID}/token`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Basic ${btoa(`${env.GITHUB_CLIENT_ID}:${env.GITHUB_CLIENT_SECRET}`)}`,
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'sprintweek-scheduler',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ access_token: data.access_token }),
-  }).catch(() => {});
   const headers = new Headers({ Location: saved.next });
   headers.append('Set-Cookie', cookie(SESSION_COOKIE, await sign(env.SESSION_SECRET, user.login, SESSION_TTL), SESSION_TTL));
   headers.append('Set-Cookie', cookie(OAUTH_COOKIE, '', 0));
