@@ -223,3 +223,21 @@ test('the form page script survives being embedded in a template string', async 
   assert.ok(html.includes('split(/\\s+/)'), 'regex escapes must reach the browser intact');
   assert.ok(!/<script nonce[^>]*>[^<]*\bsplit\(\/s\+\//.test(html));
 });
+
+test('times from the hour and minute dropdowns', () => {
+  const { session, errors } = validateSession({ ...form, start: undefined, end: undefined, start_h: '09', start_m: '05', end_h: '10', end_m: '30' }, config);
+  assert.deepEqual(errors, {});
+  assert.equal(`${session.start}-${session.end}`, '09:05-10:30');
+  assert.ok(validateSession({ ...form, start: undefined, start_h: '', start_m: '00' }, config).errors.start, 'no hour chosen');
+});
+
+test('the form offers minutes in 5-minute steps and keeps an odd existing minute', async () => {
+  const { formPage } = await import('../src/index.js');
+  const render = async values => (await formPage({ config, issue: { number: 1, title: 'T', html_url: 'https://x' }, user: 'u', values, mode: 'edit', action: '/', csrf: 'c' }).text());
+  const minutesOf = html => [...html.match(/<select name="start_m"[^>]*>(.*?)<\/select>/)[1].matchAll(/value="(\d\d)"/g)].map(m => m[1]);
+  assert.deepEqual(minutesOf(await render({})), ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']);
+  const odd = await render({ start: '09:07', end: '10:00' });
+  assert.ok(minutesOf(odd).includes('07'));
+  assert.match(odd, /<option value="09" selected>09<\/option>/);
+  assert.match(odd, /<option value="07" selected>07<\/option>/);
+});

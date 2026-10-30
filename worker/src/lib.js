@@ -175,8 +175,10 @@ export function validateSession(form, config, extraDays = []) {
   const date = String(form.date || '');
   if (![...config.days, ...extraDays].includes(date)) errors.date = 'Pick one of the Sprint Week days.';
   const time = /^([01]\d|2[0-3]):[0-5]\d$/;
-  const start = String(form.start || '').slice(0, 5);
-  const end = String(form.end || '').slice(0, 5);
+  // The form sends hour and minute dropdowns (start_h, start_m); "start" itself is also accepted.
+  const hm = which => String(form[which] || (form[`${which}_h`] && form[`${which}_m`] ? `${form[`${which}_h`]}:${form[`${which}_m`]}` : '')).slice(0, 5);
+  const start = hm('start');
+  const end = hm('end');
   if (!time.test(start)) errors.start = 'Enter a start time.';
   if (!time.test(end)) errors.end = 'Enter an end time.';
   if (!errors.start && !errors.end && end <= start) errors.end = 'The session must end after it starts.';

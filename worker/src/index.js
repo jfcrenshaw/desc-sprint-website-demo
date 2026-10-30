@@ -157,6 +157,23 @@ function header(config, issue, user) {
     <h1><a class="plain" href="${esc(issue.html_url)}">${esc(issue.title)}</a></h1>`;
 }
 
+/**
+ * Hour and minute dropdowns (minutes in 5-minute steps). Browsers' own time pickers list
+ * every minute whatever their step, so they are not used. An existing time that is not a
+ * multiple of 5 (e.g. a hand-written session) keeps its minute as an extra option.
+ */
+function timeSelects(name, values) {
+  const [h, m] = String(values[name] || `${values[`${name}_h`] || ''}:${values[`${name}_m`] || ''}`).split(':');
+  const pad = n => String(n).padStart(2, '0');
+  const minutes = Array.from({ length: 12 }, (_, i) => pad(i * 5));
+  if (/^[0-5]\d$/.test(m || '') && !minutes.includes(m)) minutes.push(m), minutes.sort();
+  const option = (v, label, selected) => `<option value="${esc(v)}"${selected ? ' selected' : ''}>${esc(label)}</option>`;
+  const hours = ['<option value="">--</option>', ...Array.from({ length: 24 }, (_, i) => option(pad(i), pad(i), pad(i) === h))];
+  return `<select name="${name}_h" aria-label="${name} hour" required>${hours.join('')}</select>`
+    + `<span aria-hidden="true">:</span>`
+    + `<select name="${name}_m" aria-label="${name} minutes" required>${minutes.map(v => option(v, v, v === (m || '00'))).join('')}</select>`;
+}
+
 // Exported so the form can be rendered locally for previews.
 export function formPage({ config, issue, user, values, errors = {}, mode, action, csrf, status = 200, bookings = [] }) {
   const nonce = randomToken(16);
@@ -185,8 +202,8 @@ export function formPage({ config, issue, user, values, errors = {}, mode, actio
     <input type="hidden" name="csrf" value="${esc(csrf)}">
     <fieldset><legend>Day</legend><div class="picks">${dayOptions}</div>${err('date')}</fieldset>
     <fieldset><legend>Time</legend>
-      <div class="row"><label>Start <input type="time" name="start" value="${esc(values.start || '')}" step="300" required></label>
-      <label>End <input type="time" name="end" value="${esc(values.end || '')}" step="300" required></label>
+      <div class="row"><label>Start <span class="hm">${timeSelects('start', values)}</span></label>
+      <label>End <span class="hm">${timeSelects('end', values)}</span></label>
       <label>in <select name="tz" id="tz">${zoneOptions}</select></label></div>
       ${err('start')}${err('end')}${err('tz')}
       <p class="muted small" id="preview"></p>
@@ -233,7 +250,8 @@ function update(e) {
   const where = f.where.value, site = sites.find(s => s.name === where);
   if (e && e.target.name === 'where') f.tz.value = site ? site.timezone : (local && [...f.tz.options].some(o => o.value === local) ? local : f.tz.value);
   document.getElementById('room-row').hidden = !site;
-  const date = (f.querySelector('input[name=date]:checked') || {}).value, s = f.start.value, en = f.end.value, tz = f.tz.value;
+  const hm = n => (f[n + '_h'].value && f[n + '_m'].value ? f[n + '_h'].value + ':' + f[n + '_m'].value : '');
+  const date = (f.querySelector('input[name=date]:checked') || {}).value, s = hm('start'), en = hm('end'), tz = f.tz.value;
   const rooms = (site ? site.rooms : []).map(r => typeof r === 'string' ? { name: r, available: null } : r);
   // Suggest the rooms open on the chosen day, with their hours when they are not open all day.
   document.getElementById('rooms').replaceChildren(...rooms.flatMap(r => {
@@ -302,6 +320,7 @@ label { display: grid; gap: 4px; font-weight: 550; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .row label { flex: 1 1 140px; }
 input:not([type=radio]), select { font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); width: 100%; min-width: 0; }
+.hm { display: flex; align-items: center; gap: 4px; } .hm select { width: auto; flex: 1; }
 .picks { display: flex; flex-wrap: wrap; gap: 8px; }
 .pick { display: block; } .pick input { position: absolute; opacity: 0; }
 .pick span { display: inline-block; padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; background: var(--bg); font-weight: 550; }
