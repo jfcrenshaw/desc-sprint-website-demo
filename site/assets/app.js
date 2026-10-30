@@ -286,10 +286,10 @@ function renderNowNext() {
   h('span', { class: 'nn-time', text: sessionTimes(s, state.zone.tz, state.config).text }),
   h('span', { class: 'nn-title', text: sp ? sessionTitle(sp, s) : `${PROGRAM_ICONS[p.kind]} ${p.title}` }),
   h('span', { class: 'nn-place', text: sp ? sessionPlace(s) : [p.site, p.location].filter(Boolean).join(' – ') || (p.online ? 'Online' : '') }));
-  box.replaceChildren(
+  box.replaceChildren(...[ // (replaceChildren would turn null into the text "null")
     live.length ? h('div', {}, h('h2', { text: '🔴 Happening now' }), live.map(item)) : null,
     next.length ? h('div', {}, h('h2', { text: 'Up next today' }), next.map(item)) : null,
-  );
+  ].filter(Boolean));
 }
 
 // ---------------------------------------------------------------- directory
@@ -330,11 +330,11 @@ function renderDirectory() {
     ? h('section', { class: 'dir-section' }, h('h2', {}, title, h('span', { class: 'count', text: ` ${items.length}` })),
       hint ? h('p', { class: 'muted', text: hint }) : null, h('div', { class: 'cards' }, items.map(sprintCard)))
     : null;
-  box.replaceChildren(
+  box.replaceChildren(...[
     section('Not yet scheduled', unscheduled, 'Proposed sprints looking for a time (and for collaborators!).'),
     section('Scheduled', scheduled),
     list.length ? null : h('p', { class: 'empty', text: 'No sprints match your search or filters.' }),
-  );
+  ].filter(Boolean));
 }
 
 // ---------------------------------------------------------------- sprint dialog
