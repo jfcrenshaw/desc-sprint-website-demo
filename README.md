@@ -91,7 +91,8 @@ Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you 
 - **Today** shows today's sessions plus *Happening now* and *Up next*.
 - The organizers' program is on the calendar too: plenaries and socials as grey and amber entries, coffee and meals as shaded bands behind the sessions (in the time of the site they belong to).
 - **Week** is an hourly calendar (a list on phones).
-- **All sprints** is a directory, with unscheduled proposals first.
+- **Scheduled** and **Unscheduled** list the sprints as cards; *Unscheduled* holds proposals still looking for a time (and for collaborators).
+- **SLAC info** and **Paris info** (one tab per site) have practical information: getting there, access, Wi-Fi, food, contacts, plus each site's rooms and daily program.
 - **Times in** switches every time on the page between your own clock, each site's local time and UTC.
 - **Filter** narrows everything by sprint type, working group, label, site/online, or "new contributor friendly".
 - **Subscribe** adds the whole schedule to Google Calendar, Apple Calendar or Outlook, and it stays up to date.
@@ -190,6 +191,21 @@ A plain name is available all week; a room can also be limited to some days and 
   When the session is moved or cancelled (or the room's availability or name changes so it is no longer flagged), that comment is struck through and marked resolved.
 - Renaming a room in the config leaves older sessions with the old name, which then counts as a typed-in room and is not checked.
 
+### Site info pages
+
+Each site can have a Markdown page, shown as a "<site> info" tab:
+
+```yaml
+sites:
+  - name: SLAC
+    info: site-info/slac.md
+```
+
+Write anything there (access, Wi-Fi, food, contacts, maps); edit it on GitHub and the website updates a minute later.
+Keep the page in a folder such as `site-info/`: images and files next to it are published too and can be linked with relative paths (`![map](slac-map.png)`).
+Below the text, the website adds the site's local time, its rooms with their availability, and its daily program, all from `sprintweek.yaml`.
+The website is public, so do not put Wi-Fi passwords or door codes there.
+
 ### What counts as a sprint
 
 Every issue in the repository except pull requests, issues closed as *not planned*, and issues with one of the `exclude_labels` in [sprintweek.yaml](sprintweek.yaml) (by default `duplicate`, `invalid`, `wontfix`, `not a sprint`).
@@ -244,6 +260,7 @@ Repository layout:
 | `site/` | Static frontend: `index.html` (calendar), `present.html` (slides), `assets/`, `vendor/` |
 | `tests/` | Unit tests (`unittest`, no dependencies) |
 | `worker/` | Scheduling bot (Cloudflare Worker) |
+| `site-info/` | Markdown info pages for each site |
 | `demo/` | Demo content and seeding script |
 | `.github/` | Issue form and workflows |
 

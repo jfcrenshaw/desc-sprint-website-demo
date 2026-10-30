@@ -137,3 +137,56 @@ class TestValues(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSiteInfo(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        (self.root / "site-info").mkdir()
+        (self.root / "site-info" / "slac.md").write_text("## Wi-Fi\n\n![map](map.png)\n")
+        (self.root / "site-info" / "map.png").write_bytes(b"png")
+        (self.root / "top.md").write_text("x")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def config(self, info):
+        text = textwrap.dedent(BASE.format(program="      []")).replace(
+            "    timezone: America/Los_Angeles\n", f"    timezone: America/Los_Angeles\n    info: {info}\n"
+        )
+        (self.root / "sprintweek.yaml").write_text(text)
+        return load_config(self.root / "sprintweek.yaml")
+
+    def test_info_page_is_published_with_its_folder(self):
+        from sprintweek.build import build_data, write_site
+
+        c = self.config("site-info/slac.md")
+        self.assertEqual((c.sites[0].info, c.sites[0].slug), ("site-info/slac.md", "slac"))
+        data = build_data({"issues": [], "comments": []}, c)
+        self.assertEqual(
+            data["site_info"],
+            [
+                {
+                    "site": "SLAC",
+                    "slug": "slac",
+                    "path": "site-info/slac.md",
+                    "markdown": "## Wi-Fi\n\n![map](map.png)\n",
+                    "base": "site-info/",
+                }
+            ],
+        )
+        out = self.root / "_site"
+        write_site(data, c, out)
+        self.assertTrue((out / "site-info" / "map.png").exists())
+
+    def test_info_page_errors(self):
+        for info, expected in (
+            ("site-info/missing.md", "no file"),
+            ("top.md", "in a folder"),
+            ("../outside.md", "inside the repository"),
+            ("site-info/map.png", "Markdown"),
+        ):
+            with self.subTest(info=info), self.assertRaises(ConfigError) as ctx:
+                self.config(info)
+            self.assertIn(expected, str(ctx.exception))

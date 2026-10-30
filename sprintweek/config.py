@@ -52,6 +52,11 @@ class Site:
     name: str
     timezone: str
     rooms: list[Room] = field(default_factory=list)
+    info: str = ""  # repository path of the site's Markdown info page, e.g. "site-info/slac.md"
+
+    @property
+    def slug(self) -> str:
+        return re.sub(r"[^a-z0-9]+", "-", self.name.lower()).strip("-")
 
 
 @dataclass
@@ -73,6 +78,7 @@ class Config:
     site_url: str
     type_colors: dict[str, str]
     program: list[dict] = field(default_factory=list)
+    root: Path = DEFAULT_CONFIG.parent  # folder of the configuration file (the repository root)
 
     @property
     def days(self) -> list[dt.date]:
@@ -281,6 +287,27 @@ def _rooms(items, days: list[dt.date], where: str) -> list[Room]:
     return rooms
 
 
+def _info_page(value, root: Path, where: str) -> str:
+    """Check a site's Markdown info page and return its repository path (or "")."""
+    text = _text(value, where)
+    if not text:
+        return ""
+    page = (root / text).resolve()
+    try:
+        rel = page.relative_to(root.resolve())
+    except ValueError:
+        raise ConfigError(f"{where}: {text!r} must be inside the repository") from None
+    if page.suffix.lower() != ".md":
+        raise ConfigError(f"{where}: {text!r} must be a Markdown (.md) file")
+    if not page.is_file():
+        raise ConfigError(f"{where}: there is no file {text!r}")
+    if rel.parent == Path("."):
+        raise ConfigError(
+            f"{where}: put the page in a folder (e.g. site-info/{rel.name}) so its images are published with it"
+        )
+    return rel.as_posix()
+
+
 def _program(items, site: Site, days: list[dt.date], where: str) -> list[dict]:
     """Validate a site's program and expand it into one entry per day."""
     if items is None or items == "":
@@ -373,6 +400,7 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
             name,
             _timezone(s.get("timezone"), f"sites → {name}.timezone"),
             _rooms(s.get("rooms"), days, f"sites → {name}.rooms"),
+            _info_page(s.get("info"), path.parent, f"sites → {name}.info"),
         )
         sites.append(site)
         program += _program(s.get("program"), site, days, f"sites → {name}.program")
@@ -413,4 +441,5 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
         site_url=site_url,
         type_colors={k: v.strip() for k, v in colors.items()},
         program=program,
+        root=path.parent.resolve(),
     )

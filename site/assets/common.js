@@ -190,7 +190,7 @@ const FORBID_TAGS = ['style', 'form', 'button', 'textarea', 'select', 'iframe', 
  * Render untrusted GitHub-flavored Markdown into a sanitized <div>.
  * Links open in a new tab, @mentions and #123 become GitHub links, task-list boxes are inert.
  */
-export function markdown(md, config, className = 'md') {
+export function markdown(md, config, className = 'md', base = '') {
   const div = h('div', { class: className });
   if (!md) return div;
   const html = window.marked.parse(md, { gfm: true, breaks: true, async: false });
@@ -199,7 +199,16 @@ export function markdown(md, config, className = 'md') {
     FORBID_ATTR: ['style', 'class', 'id'],
     ALLOW_DATA_ATTR: false,
   });
+  if (base) {
+    // Relative links and images (e.g. "slac-map.png" next to site-info/slac.md) resolve from `base`.
+    const relative = u => u && !/^([a-z][a-z0-9+.-]*:|#|\/)/i.test(u);
+    for (const el of div.querySelectorAll('a[href], img[src]')) {
+      const attr = el.tagName === 'A' ? 'href' : 'src';
+      if (relative(el.getAttribute(attr))) el.setAttribute(attr, base + el.getAttribute(attr));
+    }
+  }
   for (const a of div.querySelectorAll('a[href]')) {
+    if (a.getAttribute('href').startsWith('#')) continue;
     a.target = '_blank';
     a.rel = 'noopener noreferrer nofollow';
   }

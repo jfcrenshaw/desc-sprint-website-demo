@@ -10,7 +10,8 @@ THU = dt.date(2026, 10, 29)
 class TestLooseDates(unittest.TestCase):
     def test_accepted_forms(self):
         for text in (
-            "2026-10-29", "2026-10-29 ", "**2026-10-29**", "Thursday", "thu.", "Thurs", "Thu Oct 29", "Thursday, October 29",
+            "2026-10-29", "2026-10-29 ", "**2026-10-29**", "Thursday", "thu.", "Thurs", "Thu Oct 29",
+            "Thursday, October 29",
             "October 29", "Oct 29th", "29 Oct", "29 October 2026", "Oct 29, 2026", "10/29", "29/10", "29.10.2026",
             "10/29/26",
         ):  # fmt: skip

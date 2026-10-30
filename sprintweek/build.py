@@ -204,6 +204,17 @@ def build_data(snapshot: dict, config: Config) -> dict:
         "source": {"repo": snapshot.get("repo", config.repo), "fetched_at": snapshot.get("fetched_at")},
         "config": config.public(),
         "sprints": sprints,
+        "site_info": [
+            {
+                "site": s.name,
+                "slug": s.slug,
+                "path": s.info,
+                "markdown": (config.root / s.info).read_text(encoding="utf-8"),
+                "base": s.info.rsplit("/", 1)[0] + "/",  # relative links and images resolve from here
+            }
+            for s in config.sites
+            if s.info
+        ],
         "warnings": warnings,
     }
 
@@ -281,6 +292,8 @@ def write_site(data: dict, config: Config, out_dir: str | Path, site_dir: str | 
         shutil.rmtree(out)
     shutil.copytree(site_dir, out)
     (out / ".nojekyll").write_text("")
+    for folder in sorted({s.info.rsplit("/", 1)[0] for s in config.sites if s.info}):
+        shutil.copytree(config.root / folder, out / folder, dirs_exist_ok=True)  # info pages and their images
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "sprints.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "data" / "config.json").write_text(

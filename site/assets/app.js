@@ -1,6 +1,6 @@
 // Calendar page: Today / Week / All sprints, filters, and the sprint details dialog.
 import {
-  h, loadData, remember, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes,
+  h, loadData, remember, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
   sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl,
   searchText, markdown, preview,
 } from './common.js';
@@ -320,20 +320,59 @@ function sprintCard(sp) {
   );
 }
 
-function renderDirectory() {
-  const box = $('directory');
-  const list = state.sprints.filter(matches);
-  const first = sp => sp.sessions[0]?.start_utc || '9999';
-  const unscheduled = list.filter(sp => !sp.sessions.length);
-  const scheduled = list.filter(sp => sp.sessions.length).sort((a, b) => first(a).localeCompare(first(b)));
-  const section = (title, items, hint) => items.length
-    ? h('section', { class: 'dir-section' }, h('h2', {}, title, h('span', { class: 'count', text: ` ${items.length}` })),
-      hint ? h('p', { class: 'muted', text: hint }) : null, h('div', { class: 'cards' }, items.map(sprintCard)))
-    : null;
+/** Sprints of the Scheduled or Unscheduled tab that match the search and filters. */
+function directoryList(kind) {
+  const first = sp => sp.sessions[0]?.start_utc || '';
+  const list = state.sprints.filter(matches).filter(sp => (kind === 'scheduled') === sp.sessions.length > 0);
+  return kind === 'scheduled' ? list.sort((a, b) => first(a).localeCompare(first(b))) : list;
+}
+
+function renderDirectory(kind) {
+  const list = directoryList(kind);
+  const hint = kind === 'scheduled'
+    ? 'Sprints with sessions on the calendar, in order of their first session.'
+    : 'Proposed sprints still looking for a time (and for collaborators!).';
+  $('directory').replaceChildren(
+    h('p', { class: 'muted', text: hint }),
+    list.length
+      ? h('div', { class: 'cards' }, list.map(sprintCard))
+      : h('p', { class: 'empty', text: state.q || [...state.active.values()].some(v => v.size) ? 'No sprints match your search or filters.' : 'None yet.' }),
+  );
+}
+
+// ---------------------------------------------------------------- site info pages
+
+function renderInfo(slug) {
+  const page = state.data.site_info.find(p => p.slug === slug);
+  const box = $('info');
+  if (!page) {
+    box.replaceChildren(h('p', { class: 'empty', text: 'There is no information page for this site.' }));
+    return;
+  }
+  const site = state.config.sites.find(s => s.name === page.site);
+  const now = new Date();
+  const clock = new Intl.DateTimeFormat('en-US', { timeZone: site.timezone, weekday: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now);
+  // The organizers' program at this site, one line per day, in the site's own time.
+  const days = state.config.days.map(day => [day, state.config.program.filter(p => p.site === site.name && p.date === day)])
+    .filter(([, items]) => items.length);
   box.replaceChildren(...[
-    section('Not yet scheduled', unscheduled, 'Proposed sprints looking for a time (and for collaborators!).'),
-    section('Scheduled', scheduled),
-    list.length ? null : h('p', { class: 'empty', text: 'No sprints match your search or filters.' }),
+    h('header', { class: 'info-head' },
+      h('h1', { text: `${site.name} info` }),
+      h('p', { class: 'muted', text: `Local time: ${clock} ${tzAbbr(site.timezone, now.toISOString(), state.config)} (${site.timezone.replace(/_/g, ' ')})` })),
+    markdown(page.markdown, state.config, 'md info-md', page.base),
+    site.rooms.length ? h('section', {},
+      h('h2', { text: 'Rooms' }),
+      h('ul', { class: 'room-list' }, site.rooms.map(r => h('li', {}, h('strong', { text: r.name }), ` · available ${r.summary}`)))) : null,
+    days.length ? h('section', {},
+      h('h2', { text: `Daily program at ${site.name}` }),
+      h('table', { class: 'program' }, h('tbody', {}, days.map(([day, items]) => h('tr', {},
+        h('th', { text: fmtDay(day) }),
+        h('td', {}, items.map(p => h('div', { class: 'program-item' },
+          h('span', { class: 'program-time', text: `${p.start}–${p.end}` }), ` ${PROGRAM_ICONS[p.kind]} ${p.title}`,
+          p.location ? h('span', { class: 'muted', text: ` · ${p.location}` }) : null)))))))) : null,
+    h('p', { class: 'muted small' }, 'This page is written in ',
+      h('a', { href: `${state.config.repo_url}/blob/HEAD/${page.path}`, target: '_blank', rel: 'noopener' }, 'Markdown on GitHub'),
+      '; rooms and the program come from sprintweek.yaml.'),
   ].filter(Boolean));
 }
 
@@ -429,20 +468,34 @@ function openSprint(number) {
 
 function render() {
   for (const a of document.querySelectorAll('.tabs a')) a.classList.toggle('active', a.dataset.view === state.view);
-  const isCal = state.view !== 'sprints';
+  const isCal = state.view === 'today' || state.view === 'week';
+  const isDir = state.view === 'scheduled' || state.view === 'unscheduled';
+  const isInfo = state.view.startsWith('info/');
   $('calendar-wrap').hidden = !isCal;
-  $('directory').hidden = isCal;
+  $('directory').hidden = !isDir;
+  $('info').hidden = !isInfo;
+  $('toolbar').hidden = isInfo;
   $('now-next').hidden = true;
   renderFacets();
   if (isCal) {
     renderCalendar();
     if (state.view === 'today') renderNowNext();
+  } else if (isDir) {
+    renderDirectory(state.view);
   } else {
-    renderDirectory();
+    renderInfo(state.view.slice(5));
   }
   state.viewChanged = false;
-  const n = state.sprints.filter(matches).length;
-  $('sprint-count').textContent = `(${n})`;
+  $('count-scheduled').textContent = `(${directoryList('scheduled').length})`;
+  $('count-unscheduled').textContent = `(${directoryList('unscheduled').length})`;
+}
+
+/** Hash -> view name: "today", "week", "scheduled", "unscheduled" or "info/<site>". */
+function viewFor(hash) {
+  if (hash === 'sprints') return 'scheduled'; // links from before the tabs were split
+  if (['today', 'week', 'scheduled', 'unscheduled'].includes(hash)) return hash;
+  const info = hash.match(/^info\/([\w-]+)$/);
+  return info && state.data.site_info.some(p => p.slug === info[1]) ? hash : null;
 }
 
 function route() {
@@ -453,7 +506,7 @@ function route() {
     return;
   }
   if ($('sprint-dialog').open) $('sprint-dialog').close();
-  const view = ['today', 'week', 'sprints'].includes(hash) ? hash : state.view;
+  const view = viewFor(hash) || state.view;
   state.viewChanged = view !== state.view || state.viewChanged;
   state.view = view;
   remember('view', view);
@@ -529,8 +582,11 @@ async function main() {
 
   narrow.addEventListener('change', () => { state.viewChanged = true; render(); });
   window.addEventListener('hashchange', route);
-  const saved = ['today', 'week', 'sprints'].includes(location.hash.slice(1)) ? location.hash.slice(1) : null;
-  state.view = saved || 'today';
+  state.data.site_info = state.data.site_info || [];
+  for (const p of state.data.site_info) {
+    $('tabs').append(h('a', { href: `#info/${p.slug}`, 'data-view': `info/${p.slug}` }, `${p.site} info`));
+  }
+  state.view = viewFor(location.hash.slice(1)) || 'today';
   if (location.hash.startsWith('#sprint/')) {
     state.view = 'week';
     render();

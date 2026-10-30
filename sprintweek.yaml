@@ -19,6 +19,10 @@ event:
 
 # Physical sites. Sessions and program items at a site use that site's time zone.
 #
+# info: optional Markdown page about the site (access, Wi-Fi, food, contacts), shown as
+#   a "<site> info" tab. Keep it in a folder such as site-info/; images and files next to
+#   it can be linked with relative paths, e.g. ![map](slac-map.png).
+#
 # rooms: suggestions in the scheduling form (people can still type their own room).
 #   A plain name is available all week. To restrict a room, give it "available" windows:
 #     days: all, weekday names (Mon, Tue, ...) or dates (2026-10-27), as a list
@@ -44,6 +48,7 @@ event:
 sites:
   - name: SLAC
     timezone: America/Los_Angeles
+    info: site-info/slac.md # Markdown page shown as the "SLAC info" tab
     rooms:
       - name: Redwoods A-B
         available:
@@ -120,6 +125,7 @@ sites:
 
   - name: Paris
     timezone: Europe/Paris
+    info: site-info/paris.md
     rooms: []
     program:
       - title: Coffee

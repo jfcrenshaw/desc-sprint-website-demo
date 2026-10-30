@@ -26,13 +26,15 @@
     </nav>
   </header>
 
-  <nav class="tabs" aria-label="Views">
+  <nav class="tabs" aria-label="Views" id="tabs">
     <a href="#today" data-view="today">Today</a>
     <a href="#week" data-view="week">Week</a>
-    <a href="#sprints" data-view="sprints">All sprints <span class="count" id="sprint-count"></span></a>
+    <a href="#scheduled" data-view="scheduled">Scheduled <span class="count" id="count-scheduled"></span></a>
+    <a href="#unscheduled" data-view="unscheduled">Unscheduled <span class="count" id="count-unscheduled"></span></a>
+    <!-- "<site> info" tabs are added from the configuration -->
   </nav>
 
-  <section class="toolbar" aria-label="Search and filters">
+  <section class="toolbar" id="toolbar" aria-label="Search and filters">
     <input type="search" id="q" placeholder="Search sprints, people, rooms…" aria-label="Search">
     <label class="tz-picker">Times in <select id="tz"></select></label>
     <details class="filters" id="filters">
@@ -50,6 +52,7 @@
       <p class="legend" id="legend"></p>
     </div>
     <section id="directory" hidden></section>
+    <article id="info" class="info-page" hidden></article>
   </main>
 
   <footer class="footer" id="footer"></footer>
