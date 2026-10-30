@@ -308,6 +308,8 @@ def write_site(data: dict, config: Config, out_dir: str | Path, site_dir: str | 
         shutil.copytree(config.root / folder, out / folder, dirs_exist_ok=True)  # info pages and their images
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "sprints.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    # Tiny file that open pages poll to notice a new build (see keepFresh in site/assets/app.js).
+    (out / "data" / "version.json").write_text(json.dumps({"generated_at": data["generated_at"]}), encoding="utf-8")
     (out / "data" / "config.json").write_text(
         json.dumps(data["config"], ensure_ascii=False, indent=1), encoding="utf-8"
     )

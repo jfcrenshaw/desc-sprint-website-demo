@@ -1,6 +1,6 @@
 // Calendar page: Today / Week / All sprints, filters, and the sprint details dialog.
 import {
-  h, setupThemeToggle, loadData, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
+  h, setupThemeToggle, loadData, latestBuild, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
   sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl, addToCalendar,
   searchText, markdown, preview,
 } from './common.js';
@@ -705,6 +705,48 @@ function setupSubscribe() {
   });
 }
 
+/** Make `data` (from data/sprints.json) the current schedule. */
+function useData(data) {
+  state.data = data;
+  state.config = data.config;
+  state.config.program = state.config.program || [];
+  state.data.site_info = state.data.site_info || [];
+  state.sprints = data.sprints;
+  state.byNumber = new Map(state.sprints.map(sp => [sp.number, sp]));
+  state.programById = new Map(state.config.program.map(p => [p.id, p]));
+}
+
+function renderFooter() {
+  const { config } = state;
+  const updated = new Date(state.data.generated_at);
+  $('footer').replaceChildren(
+    'Generated from the ', h('a', { href: `${config.repo_url}/issues`, target: '_blank', rel: 'noopener', text: 'GitHub issues' }),
+    ` of ${config.repo} · updated ${updated.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} · `,
+    h('a', { href: config.new_sprint_url, target: '_blank', rel: 'noopener', text: 'Propose a sprint' }));
+}
+
+/**
+ * Pages left open (a laptop, a screen in a room) pick up new sprints and sessions on their
+ * own: every 2 minutes, while the tab is visible, compare the tiny data/version.json with
+ * the build being shown, and reload the schedule in place if it changed.
+ */
+function keepFresh() {
+  const check = async () => {
+    if (document.visibilityState !== 'visible') return;
+    const latest = await latestBuild();
+    if (!latest || latest === state.data.generated_at) return;
+    try {
+      useData(await loadData());
+    } catch {
+      return;
+    }
+    render(); // keeps the view, the day shown, the time zone, the search and the filters
+    renderFooter();
+  };
+  setInterval(check, 2 * 60 * 1000);
+  document.addEventListener('visibilitychange', check); // e.g. back to a laptop after lunch
+}
+
 async function main() {
   setupThemeToggle(document.getElementById('theme-toggle'));
   try {
@@ -714,12 +756,8 @@ async function main() {
     $('notice').textContent = `Could not load the schedule: ${err.message}`;
     return;
   }
-  const { config } = state.data;
-  state.config = config;
-  state.sprints = state.data.sprints;
-  state.byNumber = new Map(state.sprints.map(sp => [sp.number, sp]));
-  config.program = config.program || [];
-  state.programById = new Map(config.program.map(p => [p.id, p]));
+  useData(state.data);
+  const { config } = state;
   state.zone = initialZone(config);
   state.roomsSite = recall('rooms-site');
 
@@ -760,15 +798,11 @@ async function main() {
     h('span', { class: 'key key-solid' }), ' in person or hybrid  ', h('span', { class: 'key key-online' }), ' online only  ',
     h('span', { class: 'key key-band' }), ' breaks and meals (shown in their site\'s time)  ',
     h('span', { class: 'key key-plenary' }), ' plenaries and socials');
-  const updated = new Date(state.data.generated_at);
-  $('footer').replaceChildren(
-    'Generated from the ', h('a', { href: `${config.repo_url}/issues`, target: '_blank', rel: 'noopener', text: 'GitHub issues' }),
-    ` of ${config.repo} · updated ${updated.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} · `,
-    h('a', { href: config.new_sprint_url, target: '_blank', rel: 'noopener', text: 'Propose a sprint' }));
+  renderFooter();
+  keepFresh();
 
   narrow.addEventListener('change', () => { state.viewChanged = true; render(); });
   window.addEventListener('hashchange', route);
-  state.data.site_info = state.data.site_info || [];
   for (const p of state.data.site_info) {
     $('tabs').append(h('a', { href: `#info/${p.slug}`, 'data-view': `info/${p.slug}` }, `${p.site} info`));
   }

@@ -251,6 +251,9 @@ class TestBuildData(unittest.TestCase):
             write_site(data, CONFIG, tmp)
             out = Path(tmp)
             self.assertTrue((out / "index.html").exists())
+            self.assertEqual(
+                json.loads((out / "data" / "version.json").read_text()), {"generated_at": data["generated_at"]}
+            )
             published = json.loads((out / "data" / "config.json").read_text())
             self.assertNotIn("token", json.dumps(published).lower())
             cal = (out / "calendar.ics").read_bytes()

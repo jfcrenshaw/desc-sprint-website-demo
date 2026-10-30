@@ -19,10 +19,24 @@ export function h(tag, attrs = {}, ...children) {
   return el;
 }
 
+// GitHub Pages' servers keep files for up to 10 minutes; a unique address per request
+// always returns the latest build (the data file is small, so this costs little).
+const fresh = path => `${path}?t=${Date.now()}`;
+
 export async function loadData() {
-  const res = await fetch('data/sprints.json', { cache: 'no-cache' });
+  const res = await fetch(fresh('data/sprints.json'), { cache: 'no-store' });
   if (!res.ok) throw new Error(`Could not load data/sprints.json (${res.status})`);
   return res.json();
+}
+
+/** When the published data was built (from the tiny data/version.json), or null if unknown. */
+export async function latestBuild() {
+  try {
+    const res = await fetch(fresh('data/version.json'), { cache: 'no-store' });
+    return res.ok ? (await res.json()).generated_at : null;
+  } catch {
+    return null; // offline for a moment: try again next time
+  }
 }
 
 // ---------------------------------------------------------------- storage

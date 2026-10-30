@@ -31,6 +31,7 @@ The sprint type, working groups and "new contributor friendly" become labels (th
 This happens only once, so it never touches your later edits.
 Everything can be changed later by editing the issue (the "…" menu → *Edit*).
 The website updates within a few minutes.
+Pages that are already open pick up the change on their own within two more minutes, with no reload needed (the slides in *Present* mode stay as they are until you reload them).
 
 ### Schedule, move or cancel a session
 
