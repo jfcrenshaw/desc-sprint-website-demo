@@ -118,16 +118,40 @@ class TestBuildSprint(unittest.TestCase):
         sp, _ = build_sprint(issue(), [late], CONFIG)
         self.assertEqual(sp["wrapups"][0]["date"], "2026-10-28")  # no sessions: first site (SLAC)
 
-    def test_wrapup_dates_in_the_heading_and_weekday_names(self):
+    def test_forgiving_wrapup_dates(self):
+        for line in (
+            "date: Thursday",
+            "Date - Oct 29",
+            "date: 29/10",
+            "date: 10/29/2026",
+            "Thu Oct 29",
+            "date:2026-10-29",
+        ):
+            with self.subTest(line=line):
+                sp, warnings = build_sprint(issue(), [comment(f"### Wrap up\n{line}\n\nDone", "author")], CONFIG)
+                self.assertEqual(
+                    (sp["wrapups"][0]["date"], sp["wrapups"][0]["date_note"], warnings), ("2026-10-29", "", [])
+                )
         sp, _ = build_sprint(issue(), [comment("## Wrap-up: Thursday\n\nDone", "author")], CONFIG)
         self.assertEqual(sp["wrapups"][0]["date"], "2026-10-29")
 
+    def test_template_placeholder_means_today_without_a_warning(self):
+        c = comment("## Wrap-up\ndate: YYYY-MM-DD\n\nDone", "author", created="2026-10-28T18:00:00Z")
+        sp, warnings = build_sprint(issue(), [c], CONFIG)
+        self.assertEqual((sp["wrapups"][0]["date"], warnings), ("2026-10-28", []))
+
     def test_unreadable_wrapup_dates_fall_back_with_a_warning(self):
-        for line, expected in (("2026-10-32", "not a valid date"), ("Saturday", "no Saturday")):
+        for line, expected in (
+            ("date: 2026-10-32", "is not a date"),
+            ("date: Saturday", "no Saturday"),
+            ("date: 2026-11-30", "not during the Sprint Week"),
+            ("date: 10/11", "could be read as Oct 11 or Nov 10"),
+        ):
             c = comment(f"## Wrap-up\n{line}\n\nDone", "author", created="2026-10-27T18:00:00Z")
             sp, warnings = build_sprint(issue(), [c], CONFIG)
             self.assertEqual(sp["wrapups"][0]["date"], "2026-10-27")
             self.assertIn(expected, warnings[0])
+            self.assertIn("shown on the day it was posted (Tue Oct 27)", sp["wrapups"][0]["date_note"])
             self.assertEqual(sp["warnings"], [], "only session problems count as unreadable sessions")
 
     def test_wrapup_in_the_issue_body_is_dated_to_the_last_session(self):

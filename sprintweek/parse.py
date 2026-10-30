@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import re
 
+from .dates import looks_like_date
+
 # Field name -> accepted headings, compared after `_norm`.
 FIELDS = {
     "pitch": ["short pitch", "pitch", "summary", "one sentence description"],
@@ -60,14 +62,12 @@ _FENCE_RE = re.compile(r"^\s*(```|~~~)")
 _COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 _LEGACY_RE = re.compile(r"^\s*[*_]*\s*([A-Za-z][A-Za-z /]{1,40}?)\s*[*_]*\s*:\s*[*_]*\s*(.*)$")
 _CHECKBOX_RE = re.compile(r"^\s*[-*]\s*\[([ xX])\]\s*(.+)$")
-_WRAPUP_RE = re.compile(r"^\s*(?:#{1,6}\s*|\*\*\s*)(?:\W\s*)?wrap[\s-]?up\b([^\n]*)(?:\n|$)", re.I)
-# A wrap-up's date: an ISO date or a weekday name, on the line under the heading or in it.
-_DATE_WORD = (
-    r"\d{4}-\d{1,2}-\d{1,2}|monday|mon|tuesday|tues|tue|wednesday|weds|wed|"
-    r"thursday|thurs|thur|thu|friday|fri|saturday|sat|sunday|sun"
-)
-_DATE_LINE_RE = re.compile(rf"^[\s*_(\[]*({_DATE_WORD})\.?[\s*_)\]]*$", re.I)
-_DATE_IN_HEADING_RE = re.compile(rf"(?<![\w-])({_DATE_WORD})(?![\w-])", re.I)
+# Wrap-up comments: forgiving about heading level, bold, spelling ("Wrap up", "Wrapup",
+# "Wrap-ups") and a missing "#"; see `parse_wrapup_comment`.
+_WRAP = r"wrap[\s\-–—_]?ups?"
+_WRAPUP_HEADING_RE = re.compile(rf"^\s*(?:#{{1,6}}|\*\*|__)\s*(?:[^\w\s]\s*)?{_WRAP}\b([^\n]*)(?:\n|$)", re.I)
+_WRAPUP_PLAIN_RE = re.compile(rf"^\s*(?:[^\w\s]\s*)?{_WRAP}\s*[:.!\-–—]*\s*(?:\n|$)", re.I)
+_DATE_LABEL_RE = re.compile(r"^[\s*_>\-]*date(?![a-z])[\s*_]*[:=\-–—]?[\s*_]*(.*?)[\s*_]*$", re.I)
 
 
 def _norm(text: str) -> str:
@@ -207,38 +207,50 @@ def parse_contacts(text: str) -> list[dict]:
 def parse_wrapup_comment(body: str) -> dict | None:
     """Parse a comment that starts with a "Wrap-up" heading.
 
-    The website's "Add a wrap-up" template is::
+    The welcome comment asks people to write::
 
         ## Wrap-up
-        2026-10-30
+        date: 2026-10-30
 
         What we did...
+
+    Common variations are accepted: any heading level, bold, "Wrap up"/"Wrapup", a plain
+    ``Wrap-up`` line, ``Date - Thursday``, a bare date under the heading, a blank line
+    before the date, or the date in the heading (``## Wrap-up: Thursday``).
 
     Parameters
     ----------
     body : str
-        Comment body. Accepted openings include ``## Wrap-up``, ``# 📝 Wrap up`` and
-        ``**Wrap-up**``. The date may be on the first line under the heading or in the
-        heading itself (``## Wrap-up: Thursday``), as an ISO date or a weekday name.
+        Comment body.
 
     Returns
     -------
     dict or None
-        ``{"date_hint": str or None, "text": str}``, where ``text`` excludes the date
-        line; None if the comment is not a wrap-up or has nothing written yet.
+        ``{"date_hint": str or None, "text": str}``; ``date_hint`` is the date as written
+        (see `sprintweek.dates.parse_loose_date`) and ``text`` excludes the date line.
+        None if the comment is not a wrap-up or nothing has been written yet.
     """
     body = (body or "").replace("\r\n", "\n")
-    m = _WRAPUP_RE.match(body)
+    m = _WRAPUP_HEADING_RE.match(body) or _WRAPUP_PLAIN_RE.match(body)
     if not m:
         return None
-    rest = body[m.end() :].strip()
-    first, _, remainder = rest.partition("\n")
+    lines = body[m.end() :].split("\n")
     hint = None
-    if dm := _DATE_LINE_RE.match(first.strip()):
-        hint, rest = dm.group(1), remainder.strip()
-    elif hm := _DATE_IN_HEADING_RE.search(m.group(1)):
-        hint = hm.group(1)
-    return {"date_hint": hint, "text": rest} if rest else None
+    first = next((i for i, ln in enumerate(lines) if ln.strip()), None)
+    if first is not None:
+        if label := _DATE_LABEL_RE.match(lines[first]):
+            hint = label.group(1)
+        elif looks_like_date(lines[first]):
+            hint = lines[first]
+        if hint is not None:
+            del lines[first]
+    if hint is None and m.groups() and m.group(1):
+        heading = re.sub(r"^\W*(?:for|on)\s+", "", m.group(1).strip(" :–—-("), flags=re.I)
+        hint = heading if looks_like_date(heading) else None
+    if hint is not None:
+        hint = re.sub(r"[*_`]", "", hint).strip(" \t()[]:–—-") or None
+    text = "\n".join(lines).strip()
+    return {"date_hint": hint, "text": text} if text else None
 
 
 def wrapup_from_comment(body: str) -> str | None:

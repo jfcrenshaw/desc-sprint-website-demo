@@ -162,7 +162,7 @@ sprints:
   details: '@bruno-moraes and I had a 3 day sprint while I was visiting CBPF earlier this year and tried pushing Project 460 as far as we can. Some PRs were needed in Firecrown and Augur. Now it is time to clean code, and make these PRs into useful contributions to DESC :)'
   wrapup_comment: |-
     ## Wrap-up
-    2026-10-30
+    date: 2026-10-30
 
     > ℹ️ Demo wrap-up: a summary of the daily notes posted on the original SprintWeek2026 issue.
 

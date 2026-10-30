@@ -619,7 +619,7 @@
    "issue": 6,
    "user": "jfcrenshaw",
    "author_association": "OWNER",
-   "body": "## Wrap-up\n2026-10-30\n\n> ℹ️ Demo wrap-up: a summary of the daily notes posted on the original SprintWeek2026 issue.\n\n- **Augur PR0 merged.** Tests confirmed that the new SACC 2.4 ordering is respected (122 tests passing in a fresh environment).\n- **Neutrino masses:** augur now warns when CCL is asked for a negative neutrino mass in the equal-mass case, with a unit test.\n- **PR audit:** all open PRs are standalone and need rebasing. The plan is to bring `p460-integration` into `refactor` without losing author history.\n- **Still open:** PR10 is not finished yet, and PR g4 waits for the lightest-neutrino work to land in Firecrown.\n- **Next steps:** a summary of the Firecrown-related PRs, and a careful review of PR10.",
+   "body": "## Wrap-up\ndate: 2026-10-30\n\n> ℹ️ Demo wrap-up: a summary of the daily notes posted on the original SprintWeek2026 issue.\n\n- **Augur PR0 merged.** Tests confirmed that the new SACC 2.4 ordering is respected (122 tests passing in a fresh environment).\n- **Neutrino masses:** augur now warns when CCL is asked for a negative neutrino mass in the equal-mass case, with a unit test.\n- **PR audit:** all open PRs are standalone and need rebasing. The plan is to bring `p460-integration` into `refactor` without losing author history.\n- **Still open:** PR10 is not finished yet, and PR g4 waits for the lightest-neutrino work to land in Firecrown.\n- **Next steps:** a summary of the Firecrown-related PRs, and a careful review of PR10.",
    "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/6#issuecomment-4000000018",
    "created_at": "2026-10-19T16:06:00Z",
    "updated_at": "2026-10-19T16:06:00Z"

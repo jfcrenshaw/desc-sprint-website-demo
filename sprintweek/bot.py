@@ -35,10 +35,17 @@ def greeting(number: int, config: Config) -> str:
         lines.append("📅 **Sessions:** the organizers will add your sessions here once you know when you will meet.")
     lines += [
         "",
-        f"📝 **[Add a wrap-up]({config.site_url}#wrapup/{number})** for the plenary: it copies a template "
-        "(`## Wrap-up` and today's date) and opens the comment box here. Paste it, then write what you did; "
-        "plots and links are welcome. Post one whenever you have something to report; each is its own slide in "
-        "the wrap-up presentation for its date.",
+        "> [!IMPORTANT]",
+        "> **📝 Wrap-ups:** after a session, post a comment on this issue that starts like this:",
+        ">",
+        "> ```",
+        "> ## Wrap-up",
+        "> date: YYYY-MM-DD",
+        "> ```",
+        ">",
+        "> Replace `YYYY-MM-DD` with the day of the wrap-up plenary you are presenting at (or leave it, for today), "
+        "then write what you did below it. Plots and links are welcome. Post as many wrap-ups as you like: "
+        "each becomes its own slide in that day's wrap-up presentation.",
         "",
         "<sub>Edit the issue at any time to update the description; the calendar refreshes within a few minutes.</sub>",
     ]

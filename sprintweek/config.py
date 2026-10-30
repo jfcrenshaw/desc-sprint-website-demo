@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import yaml
 
+from .dates import WEEKDAYS
 from .sessions import SessionError, normalize_session
 
 DEFAULT_CONFIG = Path(__file__).resolve().parent.parent / "sprintweek.yaml"
@@ -190,17 +191,6 @@ def _timezone(value, where: str) -> str:
     except (ZoneInfoNotFoundError, ValueError):
         raise ConfigError(f"{where}: unknown time zone {text!r} (use a name like Europe/Paris)") from None
     return text
-
-
-WEEKDAYS = {
-    **dict.fromkeys(("mon", "monday"), 0),
-    **dict.fromkeys(("tue", "tues", "tuesday"), 1),
-    **dict.fromkeys(("wed", "weds", "wednesday"), 2),
-    **dict.fromkeys(("thu", "thur", "thurs", "thursday"), 3),
-    **dict.fromkeys(("fri", "friday"), 4),
-    **dict.fromkeys(("sat", "saturday"), 5),
-    **dict.fromkeys(("sun", "sunday"), 6),
-}
 
 
 def _days(value, days: list[dt.date], where: str) -> list[dt.date]:

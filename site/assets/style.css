@@ -224,9 +224,6 @@ dialog::backdrop { background: rgb(15 18 22 / 55%); }
 .footer-row { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
 .wrapup { background: var(--accent-soft); border-radius: 10px; padding: 10px 16px 12px; margin-top: 10px; }
 .wrapup-meta { margin: 0 0 6px; font-size: 0.9rem; color: var(--muted); }
-textarea.template { width: 100%; font: 0.95rem ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); resize: none; }
-.field { display: flex; gap: 8px; align-items: center; margin: 12px 0 8px; font-weight: 550; }
-.field input { font: inherit; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
 .stack { display: grid; gap: 8px; margin: 14px 0; }
 .copy-row { display: flex; gap: 8px; }
 .copy-row input { flex: 1; min-width: 0; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: 0.85rem; }

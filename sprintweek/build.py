@@ -10,7 +10,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from . import ics
-from .config import WEEKDAYS, Config
+from .config import Config
+from .dates import parse_loose_date
 from .parse import parse_contacts, parse_issue_body, parse_wrapup_comment, plain_text
 from .rooms import room_problem
 from .sessions import SessionError, extract_session_data, normalize_session
@@ -50,23 +51,17 @@ def _tags(fields: dict, labels: list[dict], config: Config) -> list[dict]:
 
 
 def _wrapup_date(hint: str | None, created_at: str, tz: str, config: Config) -> tuple[str, str]:
-    """Resolve a wrap-up's date: its own date line if valid, else the day it was posted (in ``tz``).
+    """Resolve a wrap-up's date: its own date if readable, else the day it was posted (in ``tz``).
 
-    Returns ``(YYYY-MM-DD, warning or "")``.
+    Returns ``(YYYY-MM-DD, problem or "")``.
     """
     posted = dt.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(ZoneInfo(tz)).date()
-    if not hint:
-        return posted.isoformat(), ""
-    key = hint.lower().rstrip(".")
-    if key in WEEKDAYS:
-        days = [d for d in config.days if d.weekday() == WEEKDAYS[key]]
-        if days:
-            return days[0].isoformat(), ""
-        return posted.isoformat(), f"there is no {hint} during the Sprint Week, so the posting date was used"
-    try:
-        return dt.date.fromisoformat("-".join(f"{int(x):02d}" for x in hint.split("-"))).isoformat(), ""
-    except ValueError:
-        return posted.isoformat(), f"{hint!r} is not a valid date, so the posting date was used"
+    date, problem = parse_loose_date(hint or "", config.days)
+    if date:
+        return date.isoformat(), ""
+    if problem:
+        return posted.isoformat(), f"{problem}, so it is shown on the day it was posted ({posted:%a %b} {posted.day})"
+    return posted.isoformat(), ""
 
 
 def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dict, list[str]]:
@@ -136,13 +131,13 @@ def build_sprint(issue: dict, comments: list[dict], config: Config) -> tuple[dic
         if problem:
             notes.append(f"Wrap-up {c['html_url']}: {problem}.")
         wrapups.append(
-            {"id": str(c["id"]), "date": date, "author": c["user"], "created_at": c["created_at"],
+            {"id": str(c["id"]), "date": date, "date_note": problem, "author": c["user"], "created_at": c["created_at"],
              "url": c["html_url"], "text": parsed["text"], "source": "comment"}  # fmt: skip
         )
     if fields["wrapup"]:  # the "Wrap-up" section of older issue forms
         last_day = sessions[-1]["date"] if sessions else config.end_date.isoformat()
         wrapups.append(
-            {"id": f"issue-{issue['number']}", "date": last_day, "author": issue["user"],
+            {"id": f"issue-{issue['number']}", "date": last_day, "date_note": "", "author": issue["user"],
              "created_at": issue["updated_at"], "url": issue["html_url"], "text": fields["wrapup"],
              "source": "issue"}  # fmt: skip
         )

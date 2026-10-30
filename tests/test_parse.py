@@ -196,17 +196,30 @@ class TestWrapupComments(unittest.TestCase):
 
     def test_dates(self):
         cases = {
-            "## Wrap-up\n2026-10-30\n\nWe did it.": ("2026-10-30", "We did it."),
+            "## Wrap-up\ndate: 2026-10-30\n\nWe did it.": ("2026-10-30", "We did it."),
+            "# Wrap-up\nDate - Thursday\nDone": ("Thursday", "Done"),
+            "### wrap up\n**Date:** Oct 29\nDone": ("Oct 29", "Done"),
+            "**Wrap-up**\n\n2026-10-29\nx": ("2026-10-29", "x"),
             "## Wrap-up\n**2026-10-29**\nx": ("2026-10-29", "x"),
+            "Wrap-up:\ndate: YYYY-MM-DD\nok": ("YYYY-MM-DD", "ok"),
+            "##Wrapup\ndate: 10/29\nok": ("10/29", "ok"),
+            "## Wrap-ups for Thursday\nok": ("Thursday", "ok"),
             "## Wrap-up: Thursday\nDone.": ("Thursday", "Done."),
             "**Wrap-up** (Fri)\nDone": ("Fri", "Done"),
+            "## Wrap-up\ndate: nonsense\nok": ("nonsense", "ok"),
             "## Wrap-up of the Monster sprint\nok": (None, "ok"),
             "## Wrap-up\nWednesday was fun\nok": (None, "Wednesday was fun\nok"),
+            "## Wrap-up\nDated results: none\nok": (None, "Dated results: none\nok"),
             "## Wrap-up: day 5\nok": (None, "ok"),
         }
         for body, (hint, text) in cases.items():
             with self.subTest(body=body):
                 self.assertEqual(parse_wrapup_comment(body), {"date_hint": hint, "text": text})
+
+    def test_plain_wrapup_line_without_hash(self):
+        self.assertEqual(parse_wrapup_comment("Wrap-up\ndate: Fri\nDone")["text"], "Done")
+        self.assertIsNone(parse_wrapup_comment("Wrap-up was great!\nreally"))
+        self.assertIsNone(parse_wrapup_comment("Great sprint, wrap-up tomorrow"))
 
     def test_template_without_text_is_ignored(self):
         self.assertIsNone(parse_wrapup_comment("## Wrap-up\n2026-10-30\n"))

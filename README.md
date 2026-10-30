@@ -67,25 +67,24 @@ Malformed entries are skipped and reported as warnings in the build log; they ne
 
 ### Add a wrap-up
 
-A wrap-up is a comment on the sprint's issue that starts with a `## Wrap-up` heading and, on the next line, the date of the plenary it is for:
+Post a comment on the sprint's issue that starts with a `## Wrap-up` heading and, on the next line, the date of the plenary it is for:
 
 ```markdown
 ## Wrap-up
-2026-10-30
+date: 2026-10-30
 
 What we did, with plots and links...
 ```
 
-1. Click **📝 Add a wrap-up** (in the bot's welcome comment, or on the sprint's page on the website).
-   It shows the template with today's date, which you can change, for example to present yesterday's work.
-2. Click **Copy template and open the comment box**.
-   GitHub cannot pre-fill a comment from a link, so the template is copied for you: paste it into the comment box (⌘V or Ctrl+V).
-3. Write the wrap-up below the date, drag in plots, and click *Comment*.
+The bot's welcome comment on every sprint shows this template in a highlighted box (GitHub adds a copy button to it).
+Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you post it.
 
-Post as many wrap-ups as you like, even several for the same day: each is shown separately on the sprint's page and becomes its own slide in the wrap-up presentation for its date.
-The date may also be a weekday name, or go in the heading (`## Wrap-up: Thursday`); without a date, the wrap-up counts for the day it was posted.
-Wrap-ups are accepted from the sprint's author, assignees and listed contacts, and from repository collaborators (or members of the organization that owns the repository).
-You can edit your comment at any time; the website updates a minute later.
+- Post as many wrap-ups as you like, even several for the same day: each is shown separately on the sprint's page and becomes its own slide in the wrap-up presentation for its date.
+- Small slips are understood: any heading level (`#`, `###`), bold, "Wrap up" or "Wrapup", a missing `#`, `Date - Thursday`, and dates such as `Thursday`, `Oct 29`, `29 October` or `10/29` (numeric dates are read whichever way falls in the Sprint Week).
+- A date that still cannot be read, or that is not during the Sprint Week, files the wrap-up under the day it was posted and shows a ⚠️ note on the sprint's page (and a warning in the build log).
+  Edit the comment to fix it.
+- Wrap-ups are accepted from the sprint's author, assignees and listed contacts, and from repository collaborators (or members of the organization that owns the repository).
+  You can edit your comment at any time; the website updates a minute later.
 
 ### Follow the schedule
 
