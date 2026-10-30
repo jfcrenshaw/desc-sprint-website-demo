@@ -16,6 +16,9 @@ event:
   # Time zone shown to first-time visitors: "local" (the viewer's own clock),
   # a site name from below, or an IANA zone such as Europe/Paris.
   default_timezone: local
+  # Optional one-line banner at the top of the calendar (Markdown links allowed).
+  # Delete it for a real Sprint Week.
+  notice: "**Demo.** The sprints are copies of real SprintWeek2026 issues; some of their session times and the Paris program are made up for the demo. Try it: [propose a test sprint](https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/new?template=sprint.yml), schedule a session on it and post a wrap-up."
 
 # Physical sites. Sessions and program items at a site use that site's time zone.
 #
@@ -43,8 +46,8 @@ event:
 #   start, end
 #   location, online (https:// link), note: optional
 #
-# NOTE: the rooms' availability and the program below are illustrative demo data,
-# not the real 2026 schedule.
+# NOTE: the SLAC rooms and program below are the real 2026 ones; the Paris program is
+# illustrative demo data.
 sites:
   - name: SLAC
     timezone: America/Los_Angeles

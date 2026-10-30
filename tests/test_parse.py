@@ -171,7 +171,7 @@ class TestContacts(unittest.TestCase):
 
     def test_emails_and_remarks_are_not_handles(self):
         self.assertEqual(
-            parse_contacts("Leo Sajkov (find on Slack or at sajkov@stanford.edu)"),
+            parse_contacts("Leo Sajkov (find on Slack or at leo@example.org)"),
             [{"login": None, "name": "Leo Sajkov"}],
         )
 

@@ -2,6 +2,7 @@
 
 These files are copied verbatim from npm (via jsDelivr) so the site has no runtime dependency on a CDN.
 To upgrade, change the version numbers below and re-run the commands.
+Their license texts are in the `LICENSE-*.txt` files next to them.
 
 | Library | Version | License | Files |
 |---|---|---|---|

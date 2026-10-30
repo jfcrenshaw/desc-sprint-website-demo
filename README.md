@@ -6,6 +6,7 @@ Each scheduled session is one comment on that issue, posted by a scheduling bot 
 A GitHub Action turns the issues into a static calendar on GitHub Pages, with daily and weekly views, a sprint directory, pitch and wrap-up slides, and calendar subscriptions.
 
 **Demo:** <https://jfcrenshaw.github.io/desc-sprint-website-demo/> (built from the [issues of this repository](https://github.com/jfcrenshaw/desc-sprint-website-demo/issues), which copy real SprintWeek2026 sprints).
+The SLAC rooms, program and info page are the real 2026 ones; the sprints' session times and the Paris program are partly made up for the demo.
 
 There is no database and no new account for participants.
 The calendar runs entirely on free GitHub features; the optional scheduling bot is a small, stateless Cloudflare Worker on the free plan.

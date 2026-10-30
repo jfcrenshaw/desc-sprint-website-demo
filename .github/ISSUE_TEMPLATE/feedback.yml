@@ -1,0 +1,16 @@
+name: Feedback on the calendar
+description: Report a problem or suggest an improvement to the calendar website (this is not a sprint).
+labels: ["not a sprint"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying the calendar! Issues opened with this form are not shown on the calendar.
+
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What happened, or what would you like?
+      description: Screenshots, the page or sprint you were looking at, and your browser or phone all help.
+    validations:
+      required: true

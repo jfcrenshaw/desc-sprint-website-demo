@@ -137,6 +137,7 @@ select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid 
 
 /* ---------------------------------------------------------------- main */
 main { padding: 0 24px 24px; }
+.banner { margin: 14px 0 4px; padding: 8px 14px; border-radius: 8px; background: var(--accent-soft); font-size: 0.92rem; }
 .notice, .warning { padding: 10px 14px; border-radius: 8px; background: var(--surface-2); border-left: 4px solid var(--warn); }
 
 .now-next { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 14px; }

@@ -64,6 +64,7 @@ class Config:
     """Everything the build, the website and the scheduling bot need to know."""
 
     title: str
+    notice: str
     start_date: dt.date
     end_date: dt.date
     default_timezone: str
@@ -114,6 +115,7 @@ class Config:
         noon = dt.datetime.combine(self.start_date, dt.time(12))
         return {
             "title": self.title,
+            "notice": self.notice,
             "start_date": self.start_date.isoformat(),
             "end_date": self.end_date.isoformat(),
             "days": [d.isoformat() for d in self.days],
@@ -427,6 +429,7 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
 
     return Config(
         title=_text(event.get("title"), "event.title") or "Sprint Week",
+        notice=_text(event.get("notice"), "event.notice"),
         start_date=start,
         end_date=end,
         default_timezone=_text(event.get("default_timezone"), "event.default_timezone") or "local",

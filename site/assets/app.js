@@ -643,6 +643,7 @@ function render() {
   const isDir = state.view === 'scheduled' || state.view === 'unscheduled';
   const isInfo = state.view.startsWith('info/');
   const isRooms = state.view === 'rooms';
+  $('today-note').hidden = true;
   $('calendar-wrap').hidden = !isCal;
   $('directory').hidden = !isDir;
   $('info').hidden = !isInfo;
@@ -653,6 +654,10 @@ function render() {
   if (isCal) {
     renderCalendar();
     if (state.view === 'today') renderNowNext();
+    const today = todayIn(state.zone.tz);
+    $('today-note').hidden = state.view !== 'today' || state.config.days.includes(today);
+    $('today-note').textContent = `${state.config.title} runs ${fmtDay(state.config.start_date)} – ${fmtDay(state.config.end_date)}; `
+      + `today is not one of its days, so the first day is shown. Use the arrows to see the others.`;
   } else if (isDir) {
     renderDirectory(state.view);
   } else if (isRooms) {
@@ -719,6 +724,10 @@ async function main() {
   state.roomsSite = recall('rooms-site');
 
   document.title = `${config.title} · Calendar`;
+  if (config.notice) {
+    $('banner').replaceChildren(markdown(config.notice, config, 'md'));
+    $('banner').hidden = false;
+  }
   $('event-title').textContent = config.title;
   const sites = config.sites.map(s => s.name).join(' · ');
   $('event-dates').textContent = `${fmtDay(config.start_date)} – ${fmtDay(config.end_date)}${sites ? ` · ${sites} · online` : ''}`;
