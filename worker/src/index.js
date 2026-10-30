@@ -421,11 +421,30 @@ async function sessionHandler(request, env, url, user, commentId) {
   return donePage(config, issue, session);
 }
 
+/** Setup check for organizers: is the bot configured and installed? Reveals no secrets. */
+async function status(env) {
+  const result = { repo: env.REPO, site: env.SITE_URL, bot: null, installed: false, calendar_config: false };
+  try {
+    const bot = await app(env);
+    result.bot = bot.login;
+    result.installed = true;
+  } catch (err) {
+    result.error = err instanceof HttpError ? err.message : 'GitHub App authentication failed';
+  }
+  try {
+    result.calendar_config = Boolean((await siteConfig(env)).days);
+  } catch { /* reported as false */ }
+  return new Response(JSON.stringify(result, null, 1), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
+}
+
 async function route(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
   if (path === '/login') return login(request, env, url);
   if (path === '/callback') return callback(request, env, url);
+  if (path === '/status') return status(env);
   if (path === '/logout') {
     return new Response(null, { status: 302, headers: { Location: env.SITE_URL, 'Set-Cookie': cookie(SESSION_COOKIE, '', 0) } });
   }

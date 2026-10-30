@@ -82,6 +82,8 @@ openssl rand -base64 32 | npx wrangler@4 secret put SESSION_SECRET
 
 Then delete the downloaded `.pem` file (you can always generate a new key).
 
+Open `https://<worker-url>/status` to check the setup: it reports whether the App is installed on the repository and which bot account it posts as.
+
 ### 4. Point the calendar at the bot
 
 In [sprintweek.toml](../sprintweek.toml):

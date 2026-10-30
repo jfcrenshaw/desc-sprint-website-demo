@@ -37,9 +37,9 @@ auto_label = true
 [scheduler]
 # Public URL of the scheduling bot (the Cloudflare Worker in worker/).
 # Leave empty until the bot is deployed; scheduling links are hidden until then.
-url = ""
+url = "https://sprintweek-scheduler.sprintweek-scheduler.workers.dev"
 # GitHub login of the bot that posts session comments: "<github-app-slug>[bot]".
-bot_login = ""
+bot_login = "desc-sprint-week-demo-bot[bot]"
 # Members of this GitHub organization may add sessions to any sprint.
 # Editing or cancelling a sprint's sessions is limited to its author, assignees,
 # @mentioned contacts, the person who created the session, and repo collaborators.
