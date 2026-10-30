@@ -58,7 +58,7 @@ Building numbers and grid squares refer to the official SLAC visitor map.
 
 Each Redwood room is listed at 60 people: the default layout seats 45, and up to 70 fit with extra tables and chairs.
 Room availability varies by day: see **Rooms** below, or the **Rooms** tab for what is booked where.
-For small-group discussions you can also use the second-floor lounge in FKB and the patio outside ROB.
+For small-group discussions you can also use the second-floor lounge in FKB and the Redwoods patio outside ROB.
 
 The building entrances are open during normal working hours.
 Each building has men's and women's restrooms on the ground floor and gender-neutral restrooms on the second and third floors.
@@ -68,7 +68,7 @@ Each building has men's and women's restrooms on the ground floor and gender-neu
 Coffee and tea are served during the scheduled breaks, and a hot lunch is provided every day (times in the daily program below):
 
 - **Monday and Tuesday:** outside the Kavli auditorium, on the first floor of FKB (building 51).
-- **Wednesday to Friday:** outside the Redwood rooms, in building 48.
+- **Wednesday to Friday:** on the Redwoods patio, outside building 48.
 
 You can also buy food and drinks on site or nearby:
 
@@ -82,7 +82,7 @@ For dinner, downtown Menlo Park and Palo Alto are a short drive or rideshare awa
 ## Staying connected
 
 - **Slack** (Discovery Alliance workspace): **#desc-hack-sprint** is the main channel for the meeting, **#desc-sprint-hotline** is for Zoom and technical support, and **#desc-collab-hangs** is for organizing social activities.
-- **Wi-Fi:** _details to be added._
+- **Wi-Fi:** use **eduroam** or **SLAC-VISITOR**.
 
 ## Accommodation
 
