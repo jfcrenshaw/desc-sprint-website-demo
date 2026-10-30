@@ -135,7 +135,9 @@ class TestBuildData(unittest.TestCase):
     def test_demo_snapshot_builds_cleanly(self):
         snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())
         data = build_data(snapshot, CONFIG)
-        self.assertEqual(data["warnings"], [])
+        # One demo session (#4, Tuesday) is deliberately in a room open only Wed-Fri, to show the notices.
+        self.assertEqual(len(data["warnings"]), 1)
+        self.assertIn("#4: Redwoods A-B is not available on Tue Oct 27", data["warnings"][0])
         counts = [len(s["sessions"]) for s in data["sprints"]]
         self.assertIn(0, counts)
         self.assertIn(1, counts)

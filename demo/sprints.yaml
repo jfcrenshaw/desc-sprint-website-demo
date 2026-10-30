@@ -120,7 +120,7 @@ sprints:
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood A
+    location: Redwoods A-B
 
 - source: 49
   title: Add Smokescreen to TXPipe
@@ -256,7 +256,7 @@ sprints:
     end: '10:30'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood A
+    location: Redwoods A-B
     online: zoom
 
 - source: 43
@@ -314,7 +314,7 @@ sprints:
     end: 08:00
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood B
+    location: Redwoods A-B
     online: zoom
 
 - source: 13
@@ -345,7 +345,7 @@ sprints:
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC
-    location: Redwood B
+    location: Redwoods A-B
     online: zoom
 
 - source: 19
