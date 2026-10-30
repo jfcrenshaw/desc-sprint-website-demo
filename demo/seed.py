@@ -1,4 +1,4 @@
-"""Create the demo sprints from ``demo/sprints.toml``.
+"""Create the demo sprints from ``demo/sprints.yaml``.
 
 Usage
 -----
@@ -21,8 +21,9 @@ import json
 import re
 import sys
 import time
-import tomllib
 from pathlib import Path
+
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -124,7 +125,7 @@ def session_data(raw: dict, zoom: str) -> dict:
 
 
 def load_demo() -> dict:
-    return tomllib.loads((HERE / "sprints.toml").read_text(encoding="utf-8"))
+    return yaml.load((HERE / "sprints.yaml").read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
 
 
 def write_snapshot(path: Path) -> None:
@@ -132,7 +133,7 @@ def write_snapshot(path: Path) -> None:
     demo, config = load_demo(), load_config()
     zones = [(s.name, s.timezone) for s in config.sites]
     issues, comments, cid = [], [], 4_000_000_000
-    for n, sp in enumerate(demo["sprint"], start=1):
+    for n, sp in enumerate(demo["sprints"], start=1):
         url = f"https://github.com/{config.repo}/issues/{n}"
         stamp = f"2026-10-{19 + n % 6:02d}T16:{n:02d}:00Z"
         issues.append(
@@ -194,7 +195,7 @@ def create(dry_run: bool) -> None:
                 gh.request("POST", f"/repos/{repo}/labels", {"name": name, "color": color, "description": desc})
 
     issues = {i["title"]: i for i in gh.paginate(f"/repos/{repo}/issues", {"state": "all"}) if "pull_request" not in i}
-    for sp in demo["sprint"]:
+    for sp in demo["sprints"]:
         issue = issues.get(sp["title"])
         if issue is None:
             print(f"create issue: {sp['title']}")

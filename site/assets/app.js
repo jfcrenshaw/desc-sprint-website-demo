@@ -85,6 +85,41 @@ function clearFilters() {
 
 // ---------------------------------------------------------------- calendar
 
+const PROGRAM_ICONS = { break: '☕', meal: '🍽️', plenary: '🎤', social: '🎉' };
+const PROGRAM_COLORS = { plenary: '#3d4451', social: '#9a6700', break: 'rgba(138, 148, 166, 0.22)', meal: 'rgba(201, 162, 39, 0.22)' };
+const isBand = p => p.kind === 'break' || p.kind === 'meal';
+
+/**
+ * Organizers' program items to show. Plenaries and anything with an online link concern
+ * everyone; breaks, meals and in-person socials only show on their site's clock (or when
+ * filtering by that site).
+ */
+function programItems() {
+  const where = state.active.get('where');
+  return state.config.program.filter(p => {
+    if (where && where.size) return where.has(p.site) || (Boolean(p.online) && where.has('Online'));
+    return p.kind === 'plenary' || Boolean(p.online) || p.tz === state.zone.tz;
+  });
+}
+
+function programEvents(listView) {
+  const tz = state.zone.tz;
+  return programItems().map(p => {
+    const band = isBand(p) && !listView;
+    return {
+      id: `program:${p.id}`,
+      start: wall(p.start_utc, tz).iso,
+      end: wall(p.end_utc, tz).iso,
+      title: p.title,
+      display: band ? 'background' : 'auto',
+      backgroundColor: PROGRAM_COLORS[p.kind],
+      textColor: '#fff',
+      classNames: ['prog', `prog-${p.kind}`],
+      extendedProps: { program: p.id },
+    };
+  });
+}
+
 function events() {
   const tz = state.zone.tz;
   return state.sprints.filter(matches).flatMap(sp => sp.sessions.map(s => {
@@ -103,6 +138,22 @@ function events() {
 }
 
 function eventContent(info) {
+  if (info.event.extendedProps.program) {
+    const p = state.programById.get(info.event.extendedProps.program);
+    const label = `${PROGRAM_ICONS[p.kind]} ${p.title}`;
+    if (info.event.display === 'background') return { domNodes: [h('div', { class: 'prog-label', text: label })] };
+    if (info.event.end - info.event.start < 50 * 60 * 1000 && info.view.type.startsWith('timeGrid')) {
+      return { domNodes: [h('div', { class: 'ev-line' }, h('span', { class: 'ev-time', text: info.timeText }), ' ', h('strong', { text: label }))] };
+    }
+    const place = [p.site, p.location].filter(Boolean).join(' – ') + (p.online ? ' + online' : '');
+    return {
+      domNodes: [
+        h('div', { class: 'ev-time', text: info.timeText }),
+        h('div', { class: 'ev-title', text: label }),
+        place ? h('div', { class: 'ev-place', text: place }) : null,
+      ].filter(Boolean),
+    };
+  }
   const { sprint, session } = info.event.extendedProps;
   const sp = state.byNumber.get(sprint);
   const s = sp.sessions.find(x => x.id === session);
@@ -136,8 +187,9 @@ const hhmm = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 6
 function slotLimits() {
   // Whole hours covering every session (not only filtered ones, so the grid does not jump).
   let lo = 8 * 60, hi = 18 * 60;
-  for (const sp of state.sprints) {
-    for (const s of sp.sessions) {
+  const spans = [...state.sprints.flatMap(sp => sp.sessions), ...programItems()];
+  {
+    for (const s of spans) {
       const a = wall(s.start_utc, state.zone.tz), b = wall(s.end_utc, state.zone.tz);
       lo = Math.min(lo, Math.floor(minutes(a.time) / 60) * 60);
       hi = Math.max(hi, b.date > a.date ? 24 * 60 : Math.ceil(minutes(b.time) / 60) * 60);
@@ -169,7 +221,7 @@ function calendarOptions() {
   return {
     view,
     date: calendarDate(),
-    events: events(),
+    events: [...events(), ...programEvents(view.startsWith('list'))],
     timeZone: state.zone.id === 'local' ? 'local' : currentOffset(state.zone.tz),
     headerToolbar: { start: 'prev,next today', center: 'title', end: '' },
     buttonText: { today: 'Today' },
@@ -188,7 +240,10 @@ function calendarOptions() {
     listDaySideFormat: { month: 'short', day: 'numeric' },
     titleFormat: view === 'timeGridDay' ? { weekday: 'long', month: 'long', day: 'numeric' } : () => weekTitle(),
     eventContent,
-    eventClick: info => { location.hash = `#sprint/${info.event.extendedProps.sprint}`; },
+    eventClick: info => {
+      if (info.event.extendedProps.program) openProgram(info.event.extendedProps.program);
+      else location.hash = `#sprint/${info.event.extendedProps.sprint}`;
+    },
     noEventsContent: 'No sessions match your search or filters.',
   };
 }
@@ -212,16 +267,22 @@ function renderNowNext() {
   const box = $('now-next');
   const now = new Date().toISOString();
   const today = todayIn(state.zone.tz);
-  const rows = state.sprints.filter(matches).flatMap(sp => sp.sessions.map(s => ({ sp, s })));
+  const rows = [
+    ...state.sprints.filter(matches).flatMap(sp => sp.sessions.map(s => ({ sp, s }))),
+    ...programItems().map(p => ({ p, s: p })),
+  ];
   const live = rows.filter(r => r.s.start_utc <= now && now < r.s.end_utc);
   const next = rows.filter(r => r.s.start_utc > now && wall(r.s.start_utc, state.zone.tz).date === today)
     .sort((a, b) => a.s.start_utc.localeCompare(b.s.start_utc)).slice(0, 4);
   box.hidden = !(live.length || next.length);
-  const item = ({ sp, s }) => h('a', { class: 'nn-item', href: `#sprint/${sp.number}` },
-    h('span', { class: 'swatch', style: `background:${typeColor(sp, state.config)}` }),
-    h('span', { class: 'nn-time', text: sessionTimes(s, state.zone.tz, state.config).text }),
-    h('span', { class: 'nn-title', text: sessionTitle(sp, s) }),
-    h('span', { class: 'nn-place', text: sessionPlace(s) }));
+  const item = ({ sp, p, s }) => h('a', {
+    class: 'nn-item', href: sp ? `#sprint/${sp.number}` : '#',
+    onclick: p ? e => { e.preventDefault(); openProgram(p.id); } : null,
+  },
+  h('span', { class: 'swatch', style: `background:${sp ? typeColor(sp, state.config) : PROGRAM_COLORS[p.kind]}` }),
+  h('span', { class: 'nn-time', text: sessionTimes(s, state.zone.tz, state.config).text }),
+  h('span', { class: 'nn-title', text: sp ? sessionTitle(sp, s) : `${PROGRAM_ICONS[p.kind]} ${p.title}` }),
+  h('span', { class: 'nn-place', text: sp ? sessionPlace(s) : [p.site, p.location].filter(Boolean).join(' – ') || (p.online ? 'Online' : '') }));
   box.replaceChildren(
     live.length ? h('div', {}, h('h2', { text: '🔴 Happening now' }), live.map(item)) : null,
     next.length ? h('div', {}, h('h2', { text: 'Up next today' }), next.map(item)) : null,
@@ -290,6 +351,28 @@ function sessionItem(sp, s) {
     s.note ? h('div', { class: 'note', text: s.note }) : null,
     edit ? h('a', { class: 'link small', href: edit, target: '_blank', rel: 'noopener' }, 'Edit or cancel') : null,
   );
+}
+
+function openProgram(id) {
+  const p = state.programById.get(id);
+  const dlg = $('sprint-dialog');
+  if (!p) return;
+  const t = sessionTimes(p, state.zone.tz, state.config);
+  const native = p.tz !== state.zone.tz ? sessionTimes(p, p.tz, state.config) : null;
+  const kind = { break: 'Break', meal: 'Meal', plenary: 'Plenary', social: 'Social event' }[p.kind];
+  dlg.replaceChildren(h('div', { class: 'dialog-body' },
+    h('button', { class: 'close', 'aria-label': 'Close', onclick: () => dlg.close() }, '×'),
+    h('div', { class: 'card-top' }, h('span', { class: 'type', text: `${kind} · organizers' program` })),
+    h('h2', { id: 'sprint-dialog-title', text: `${PROGRAM_ICONS[p.kind]} ${p.title}` }),
+    h('ul', { class: 'sessions-list' }, h('li', { class: 'session' },
+      h('div', { class: 'when' }, h('strong', { text: fmtDay(t.day, 'long') }), ` · ${t.text}`,
+        native ? h('span', { class: 'muted', text: ` (${native.text} local)` }) : null),
+      h('div', { class: 'where' },
+        p.site || p.location ? `📍 ${[p.site, p.location].filter(Boolean).join(' – ')}` : null,
+        p.online ? h('a', { class: 'join', href: p.online, target: '_blank', rel: 'noopener' }, '💻 Join online') : null),
+      p.note ? h('div', { class: 'note', text: p.note }) : null)),
+  ));
+  if (!dlg.open) dlg.showModal();
 }
 
 function openSprint(number) {
@@ -390,6 +473,8 @@ async function main() {
   state.config = config;
   state.sprints = state.data.sprints;
   state.byNumber = new Map(state.sprints.map(sp => [sp.number, sp]));
+  config.program = config.program || [];
+  state.programById = new Map(config.program.map(p => [p.id, p]));
   state.zone = initialZone(config);
 
   document.title = `${config.title} · Calendar`;
@@ -422,7 +507,9 @@ async function main() {
   setupSubscribe();
 
   $('legend').replaceChildren('Colors show the sprint type. ',
-    h('span', { class: 'key key-solid' }), ' in person or hybrid  ', h('span', { class: 'key key-online' }), ' online only');
+    h('span', { class: 'key key-solid' }), ' in person or hybrid  ', h('span', { class: 'key key-online' }), ' online only  ',
+    h('span', { class: 'key key-band' }), ' breaks and meals (shown in their site\'s time)  ',
+    h('span', { class: 'key key-plenary' }), ' plenaries and socials');
   const updated = new Date(state.data.generated_at);
   $('footer').replaceChildren(
     'Generated from the ', h('a', { href: `${config.repo_url}/issues`, target: '_blank', rel: 'noopener', text: 'GitHub issues' }),

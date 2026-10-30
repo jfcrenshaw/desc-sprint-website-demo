@@ -1,0 +1,432 @@
+# Demo content for the prototype.
+#
+# Titles and descriptions are copied (lightly trimmed) from LSSTDESC/SprintWeek2026.
+# Sessions are representative structured versions of each issue's free-text "Day/Time".
+# demo/seed.py turns this file into GitHub issues + session comments, or into an offline
+# snapshot (demo/snapshot.json) used by the tests and for local previews.
+# @mentions and links to other repositories' issues are neutralized by seed.py so that
+# creating the demo never notifies anyone or adds backlinks to other repositories.
+#
+# Session fields: date, start, end (24-hour), tz (IANA zone), and optionally site,
+# location, online ("zoom" means the placeholder link below), label, note.
+
+zoom: https://zoom.us/j/0000000000
+sprints:
+
+- source: 55
+  title: LBG selection sprint
+  pitch: Creating a pipeline for performing a DP2 LBG selection.
+  contacts: John Franklin Crenshaw (@jfcrenshaw)
+  type: General Sprint
+  working_groups: []
+  labels:
+  - LBG
+  goals: Lyman-break Galaxies (LBGs) are high-z star-forming galaxies typically selected from their lack of flux at short wavelengths. I have an ad-hoc selection I developed on a pre-release version of DP2. My goal is to build a real pipeline for this using the official DP2 object catalog, and then to try to optimize the selection in a more principled manner.
+  prerequisites: Proficiency with Python and enthusiasm.
+  links: |-
+    Slack: #desc-lbg
+    Repo: https://github.com/LSSTDESC/lbg-pipelines
+  sessions:
+  - date: '2026-10-26'
+    start: '10:00'
+    end: '12:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: KFB 2nd floor conference room
+
+- source: 14
+  title: PZ Data Challenge Hacking
+  pitch: Hacking for the PZ Data Challenge.
+  contacts: '@ztq1996 @eacharles @jtmyles @jfcrenshaw'
+  type: General Sprint
+  working_groups:
+  - PZ (Photometric Redshifts)
+  labels:
+  - PZ Data Challenge + RAIL
+  goals: |-
+    In this sprint we will discuss:
+    1. summarizing results of the p(z) data challenge into a paper
+    2. progress on pushing forward the n(z) data challenge
+    3. which n(z) algorithms we need to run as entrants to the challenge
+    4. and more
+  prerequisites: Newcomers who would be interested in running an algorithm for the challenge should come by.
+  links: 'Slack: #desc-pz_data_challenge'
+  sessions:
+  - date: '2026-10-26'
+    start: '13:00'
+    end: '15:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood C-D
+    online: zoom
+
+- source: 33
+  title: CCL-Palooza
+  pitch: Let's use and have fun with CCL! Join us for a little CCL tutorial followed by a triage session of CCL open issues and pull requests.
+  contacts: '@aferte @carlosggarcia'
+  type: Infrastructure Sprint
+  working_groups:
+  - MCP (Modelling and Combined Probes)
+  labels:
+  - CCL + Firecrown
+  goals: |-
+    At the end of the session:
+    1. All attendees will be able to run CCL
+    2. Aggressively go through CCL issues and PR (either fix on the spot or defer)
+    3. We will have produced a document prioritizing issues and PRs that can be used as a starting place for the CCL task force
+  prerequisites: Access to NERSC.
+  links: |-
+    Slack: #desc-ccl
+    Repo: https://github.com/LSSTDESC/CCL
+  sessions:
+  - date: '2026-10-26'
+    start: '14:00'
+    end: '17:30'
+    tz: Europe/Paris
+    site: Paris
+
+- source: 51
+  title: Preparing training resources for Meeting Contact Persons (MCPs)
+  pitch: We aim to create a set of resources that prepare MCPs for their very important roles at DESC meetings.
+  contacts: John Franklin Crenshaw (@jfcrenshaw), Yuanyuan Zhang
+  type: Service Sprint
+  working_groups: []
+  options:
+  - New contributor friendly
+  goals: |-
+    MCPs are given the important role of helping DESC members with conflicts and abuse that may arise at DESC meetings. They are not, however, usually provided with detailed information about the role and duties, nor are they provided with resources or trainings that equip them to do a good job. The goal of this sprint is to start developing some resources and training materials to fill this gap. This is the first step in a larger effort to revamp how MCPs are selected and trained.
+
+    Sprint deliverables:
+    1. A slide deck with resources, clarifying the role of an MCP, and providing resources that help them do their job.
+    2. A proposal document for how DESC should select and prepare MCPs in the future
+  prerequisites: Anyone is welcome to contribute to this sprint. Those with previous MCP experience or experience with similar roles are especially welcome!
+  links: 'Slack: thread in #desc-edi; you can also message the contacts on Slack.'
+  sessions:
+  - label: Paris sprint
+    date: '2026-10-27'
+    start: '14:00'
+    end: '16:00'
+    tz: Europe/Paris
+    site: Paris
+  - label: Joint Paris–SLAC Zoom
+    date: '2026-10-27'
+    start: '16:00'
+    end: '16:45'
+    tz: Europe/Paris
+    online: zoom
+  - label: SLAC sprint
+    date: '2026-10-27'
+    start: '10:00'
+    end: '12:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood A
+
+- source: 49
+  title: Add Smokescreen to TXPipe
+  pitch: Add an option to blind TXPipe-generated sacc files with Smokescreen.
+  contacts: '@arthurmloureiro'
+  type: Infrastructure Sprint
+  working_groups:
+  - MCP (Modelling and Combined Probes)
+  labels:
+  - STAR
+  goals: TXPipe can now blind sacc files using Smokescreen.
+  prerequisites: Someone who knows TXPipe well.
+  links: |-
+    Slack: #desc-blinding
+    Repos: https://github.com/LSSTDESC/Smokescreen, https://github.com/LSSTDESC/TXPipe
+  details: Self explanatory... Just gonna try to hack TXPipe to work with Smokescreen.
+  sessions:
+  - date: '2026-10-27'
+    start: '15:00'
+    end: '17:00'
+    tz: Europe/Paris
+    online: zoom
+
+- source: 41
+  title: CMB Lensing Cross-Correlations in Augur and Lightest Neutrino Mass Hack
+  pitch: Solve the PRs and push/review the code needed to do CMB lensing cross-correlations in augur/TJPCov and include the lightest neutrino mass infrastructure in firecrown & augur.
+  contacts: '@arthurmloureiro @paulrogozenski @bruno-moraes @fjaviersanchez'
+  type: Infrastructure Sprint
+  working_groups:
+  - MCP (Modelling and Combined Probes)
+  labels:
+  - CCL + Firecrown
+  - Forecasting
+  - TJPCov
+  prerequisites: Patience :)
+  links: |-
+    Slack: #desc-forecasts (Zoom password is in the thread advertising this sprint)
+    Repos: https://github.com/LSSTDESC/Project460_CMBLensing_6x2pt_neutrinos, https://github.com/LSSTDESC/augur
+  details: '@bruno-moraes and I had a 3 day sprint while I was visiting CBPF earlier this year and tried pushing Project 460 as far as we can. Some PRs were needed in Firecrown and Augur. Now it is time to clean code, and make these PRs into useful contributions to DESC :)'
+  wrapup_comment: |-
+    ## Wrap-up
+
+    > ℹ️ Demo wrap-up: a summary of the daily notes posted on the original SprintWeek2026 issue.
+
+    - **Augur PR0 merged.** Tests confirmed that the new SACC 2.4 ordering is respected (122 tests passing in a fresh environment).
+    - **Neutrino masses:** augur now warns when CCL is asked for a negative neutrino mass in the equal-mass case, with a unit test.
+    - **PR audit:** all open PRs are standalone and need rebasing. The plan is to bring `p460-integration` into `refactor` without losing author history.
+    - **Still open:** PR10 is not finished yet, and PR g4 waits for the lightest-neutrino work to land in Firecrown.
+    - **Next steps:** a summary of the Firecrown-related PRs, and a careful review of PR10.
+  sessions:
+  - label: Daily planning
+    date: '2026-10-27'
+    start: '13:00'
+    end: '13:30'
+    tz: Europe/Paris
+    online: zoom
+  - label: Daily planning
+    date: '2026-10-28'
+    start: '13:00'
+    end: '13:30'
+    tz: Europe/Paris
+    online: zoom
+  - label: Daily planning
+    date: '2026-10-29'
+    start: '13:00'
+    end: '13:30'
+    tz: Europe/Paris
+    online: zoom
+  - label: Daily planning
+    date: '2026-10-30'
+    start: '13:00'
+    end: '13:30'
+    tz: Europe/Paris
+    online: zoom
+
+- source: 6
+  title: HACC Hydro Sim Hackathon
+  pitch: Explore a new suite of hydro sims from the HACC team, with varying cosmological and hydrodynamic parameters.
+  contacts: '@AstroPatty @patricialarsen'
+  type: General Sprint
+  working_groups:
+  - CL (Clusters)
+  - SCS (Survey Computing & Simulation)
+  - MCP (Modelling and Combined Probes)
+  options:
+  - New contributor friendly
+  goals: |-
+    Whatever you want! Some possibilities:
+
+    * Pretty pictures of nice clusters
+    * Plots of scaling relations as a function of subgrid parameters and/or cosmology
+    * Shape measurements of simulated halos or galaxies
+    * Clustering measurements
+    * Measurements of galaxy colors
+
+    Whatever you want to explore in hydro sims, we can help you do it.
+  prerequisites: |-
+    - Access to Perlmutter
+    - Beginner Python knowledge
+  links: 'Slack: #opencosmo'
+  details: |-
+    The SCIDAC 400 suite is a set of 110 hydrodynamic simulations with varying cosmologies and subgrid parameters. They serve as a great laboratory for exploring the effects of hydrodynamics on structure formation, building emulators, or just getting your feet wet working with simulation data. Simulations are 400 Mpc/h boxes.
+
+    This sprint is beginner-friendly. We will provide both scientific and technical support, and extensive software tooling for working with the data. This is a great way to prepare for the upcoming release of the [Frontier-E](https://arxiv.org/abs/2510.03557) simulation, the largest hydro sim ever performed.
+  sessions:
+  - label: Zoom kickoff
+    date: '2026-10-28'
+    start: 08:00
+    end: 09:00
+    tz: America/Los_Angeles
+    online: zoom
+    note: Main Zoom, breakout room 6
+  - label: Hands-on at SLAC
+    date: '2026-10-28'
+    start: '10:00'
+    end: '12:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood C-D
+
+- source: 11
+  title: DP2 n(z) SOM + WZ coordination
+  pitch: Produce a SOM + WZ n(z) ensemble.
+  contacts: '@jtmyles @ztq1996'
+  type: General Sprint
+  working_groups:
+  - PZ (Photometric Redshifts)
+  goals: Produce a SOM + WZ n(z) ensemble.
+  links: 'Slack: #desc-pz-dp2-nz-comb'
+  sessions:
+  - date: '2026-10-28'
+    start: 09:00
+    end: '10:30'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood A
+    online: zoom
+
+- source: 43
+  title: DP2 SN Ia simulations with skysurvey
+  pitch: Discuss skysurvey development needed for DP2 simulations.
+  contacts: '@mginolin'
+  type: General Sprint
+  working_groups:
+  - TD (Time Domain)
+  goals: |-
+    There are two main projects:
+    - Design a way to test if a given SN will have templates (using co-adds as a proxy for now)
+    - Investigate the impact of bandpass leakage on SN parameter recovery
+
+    We will also tackle a list of known issues in skysurvey and discuss new features to implement.
+  prerequisites: Familiarity with [skysurvey](https://skysurvey.readthedocs.io/en/latest/) and NERSC access.
+  links: 'Slack: #desc-sniacosmo-dp2-kp'
+  sessions:
+  - date: '2026-10-28'
+    start: 09:30
+    end: '12:30'
+    tz: Europe/Paris
+    site: Paris
+  - date: '2026-10-29'
+    start: 09:30
+    end: '12:30'
+    tz: Europe/Paris
+    site: Paris
+  - date: '2026-10-30'
+    start: 09:30
+    end: '12:00'
+    tz: Europe/Paris
+    site: Paris
+
+- source: 3
+  title: DESC Agentic AI Technical Coordination
+  pitch: Bring together DESC members who use or build agentic AI tools, agree on a plan for regular telecons, and identify follow-up activities to pursue during the rest of the sprint week and beyond.
+  contacts: François Lanusse (@EiffL)
+  type: Service Sprint
+  working_groups: []
+  goals: |-
+    Several DESC members are already experimenting with agentic AI, but there is no shared venue for their work. This session aims to connect them and decide how to coordinate going forward.
+
+    Deliverables:
+    - [ ] A plan for regular telecons, covering cadence, format (e.g. demos, office hours, open discussion), and hosts.
+    - [ ] A list of follow-up activities, each with volunteers.
+  prerequisites: Just interest. Newcomers and skeptics are welcome as much as experienced users, since part of the goal is to understand the full range of needs in the collaboration.
+  links: |-
+    Slack: #desc-ai
+    Repo: https://github.com/LSSTDESC/agentic-research
+  details: '**This session does not primarily focus on policy discussions, but on technical aspects.** If you have built skills, tools, or agentic workflows for your DESC work, consider bringing them for a short demo.'
+  sessions:
+  - date: '2026-10-29'
+    start: 07:00
+    end: 08:00
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood B
+    online: zoom
+
+- source: 13
+  title: PZ Innovation Brainstorm
+  pitch: Much of our WG activity is centered on implementing existing photometric redshift methods for LSST. In this sprint, we'd like to change things up and have a group discussion at the blackboard to think about how we can innovate in the field.
+  contacts: '@jfcrenshaw @jtmyles'
+  type: General Sprint
+  working_groups:
+  - PZ (Photometric Redshifts)
+  options:
+  - New contributor friendly
+  goals: Ideally, our discussion would lead to a list of project ideas worth pursuing as individual publications.
+  prerequisites: For this sprint, newcomers are especially welcome.
+  links: 'Slack: #desc-pz'
+  wrapup: |-
+    > ℹ️ Illustrative wrap-up written for the calendar demo.
+
+    **What we did:** about a dozen people met at the blackboard (and on Zoom) to brainstorm directions for photo-z research beyond implementing existing methods.
+
+    **Outcomes**
+    - A shortlist of project ideas, each with a volunteer to write a one-page pitch.
+    - Agreement to revisit the list at the next PZ working group telecon.
+
+    **How to get involved:** join #desc-pz and reply in the brainstorm thread.
+  sessions:
+  - date: '2026-10-29'
+    start: '10:00'
+    end: '12:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood B
+    online: zoom
+
+- source: 19
+  title: Refining shear catalog cuts with PZ cuts
+  pitch: Implement cuts on the shear catalog motivated by the photo-z crossmatch, such as bad color regions for PZ and contamination.
+  contacts: '@sidneymau @myamamoto26 @ztq1996 @jtmyles'
+  type: General Sprint
+  working_groups:
+  - PO (Pixels to Objects)
+  - PZ (Photometric Redshifts)
+  goals: Identify magnitude-color space for the shear catalog with particularly bad photo-z or contamination from non-galaxies, such as stars and AGN, and include those cuts into the fiducial selection.
+  prerequisites: |-
+    Resources
+    - TXPipe-ingested shear catalog in both wide and deep fields
+    - Crossmatch of the shear catalog with the redshift reference catalog
+    - SOM or other photo-z results
+
+    Relevant skills: metadetect, anacal, photo-z, reference redshifts, TXPipe
+  links: 'Slack: #desc-dp2-shear'
+  details: This project needs the crossmatch of the reference catalog to each shear catalog, and preferably the SOM or other photo-z results on the shear catalog, so it is scheduled in later days.
+  sessions:
+  - date: '2026-10-29'
+    start: '13:00'
+    end: '16:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood C-D
+    online: zoom
+  - date: '2026-10-30'
+    start: 09:00
+    end: '12:00'
+    tz: America/Los_Angeles
+    site: SLAC
+    location: Redwood C-D
+    online: zoom
+
+- source: 18
+  title: Develop non-Gaia star masking for DP2
+  pitch: Develop masking for relatively bright stars that goes beyond the Gaia catalog, since a Gaia-based selection will be incomplete in redder bands.
+  contacts: Theo Schutt
+  type: General Sprint
+  working_groups:
+  - PO (Pixels to Objects)
+  options:
+  - New contributor friendly
+  goals: |-
+    1. Produce a high-purity catalog of stars to mask beyond what is already in Gaia (likely using morphology/object classification already in the DP2 object catalog)
+    2. Determine how dim of stars we need to mask for the shear catalog
+    3. Determine the minimum radius for this masking
+    4. Produce a mask suitable for TXPipe, etc.
+  prerequisites: Accessing DP2 catalogs, general exploratory analysis plotting, etc.
+  links: 'Slack: #desc-dp2-shear'
+  details: Related work on masking stars in the Gaia catalog down to G=20 is tracked in https://github.com/LSSTDESC/dp2_static_catalog_production/issues/29 and https://github.com/LSSTDESC/dp2_static_catalog_production/issues/31. Generally around all week at SLAC; remote contributions are also welcome!
+
+- source: 36
+  title: Prep for LSST Y1 dynamical dark energy
+  pitch: Set up initial simulated LSST Y1 data vectors for dynamical dark energy analyses.
+  contacts: '@aferte'
+  type: Infrastructure Sprint
+  working_groups:
+  - MCP (Modelling and Combined Probes)
+  labels:
+  - Beyond wCDM
+  goals: We will set up the repo and scripts to produce data vectors for an initial set of observables and run forecasts for dynamical dark energy models (w0wa, maybe Padé-w?). We will aim at visualizing these on the dashboard.
+  links: 'Slack: #desc-y1sharpde'
+
+- source: 58
+  title: Expand and improve Dark Energy Exploration Dashboard visualization aspect
+  pitch: DEED has a prototype implementation of its visualization aspect that we'd like to make usable for the larger community.
+  contacts: Leo Sajkov
+  type: General Sprint
+  working_groups:
+  - MCP (Modelling and Combined Probes)
+  options:
+  - New contributor friendly
+  goals: |-
+    - A stable visualization interface that can take a variety of inputs (data vectors, MCMC chains, etc.) and produce the appropriate plots
+    - Overplot inputs from different data products
+    - Reach goal: make the plots interactive, to allow for easily comparing between different data products
+  prerequisites: Most of this project is vibe-coding, so enthusiasm and creativity with regard to visualizing data products is most useful!
+  links: |-
+    Slack: #desc-de-dashboard
+    Repo: https://github.com/LSSTDESC/DEED
+  details: DEED's visualization aspect is built to flexibly plot different data products that are either stored in the Data Registry or passed as input by the user. This aspect becomes most powerful when it can overplot multiple data products so that they can be compared. Paired with good data provenance, this becomes a great way of understanding how choices in modeling, data, assumptions, etc., propagate into results.

@@ -174,9 +174,33 @@ def build_data(snapshot: dict, config: Config) -> dict:
     }
 
 
+# Organizers' program items worth putting in people's calendars (not coffee or lunch).
+FEED_KINDS = ("plenary", "social")
+
+
 def calendar_events(sprints: list[dict], config: Config) -> list[dict]:
-    """Convert every session into an iCalendar event description."""
+    """Convert every session, plus plenaries and socials of the program, into iCalendar events."""
     events = []
+    for item in config.program:
+        if item["kind"] not in FEED_KINDS:
+            continue
+        place = " – ".join(x for x in (item["site"], item["location"]) if x)
+        desc = [
+            item["note"],
+            f"Join online: {item['online']}" if item["online"] else "",
+            f"Schedule: {config.site_url}",
+        ]
+        events.append(
+            {
+                "uid": f"program-{item['id']}@{config.repo.replace('/', '.')}.sprintweek",
+                "start_utc": item["start_utc"],
+                "end_utc": item["end_utc"],
+                "summary": item["title"],
+                "location": " / ".join(x for x in (place, "Online" if item["online"] else "") if x),
+                "description": "\n\n".join(x for x in desc if x),
+                "url": config.site_url,
+            }
+        )
     for sp in sprints:
         for s in sp["sessions"]:
             summary = sp["title"] + (f" — {s['label']}" if s["label"] else "")

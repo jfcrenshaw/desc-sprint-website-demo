@@ -58,7 +58,7 @@ Each session comment starts with a hidden data line, for example:
 followed by a human-readable summary.
 Times are written in the session's own time zone (an IANA name such as `America/Los_Angeles`), and the website converts them for every viewer.
 
-The build only accepts session comments written by the bot (`bot_login` in `sprintweek.toml`) or by people with write access to the repository (or members of the organization that owns it), so nobody else can put events on the calendar.
+The build only accepts session comments written by the bot (`bot_login` in `sprintweek.yaml`) or by people with write access to the repository (or members of the organization that owns it), so nobody else can put events on the calendar.
 Organizers can therefore also add a session by hand, by copying an existing session comment and editing its data line, or fix one by editing the line.
 Changing `sprintweek:session` to `sprintweek:cancelled` cancels a session.
 Malformed entries are skipped and reported as warnings in the build log; they never break the site.
@@ -79,6 +79,7 @@ Comment wrap-ups are accepted from the sprint's author, assignees and listed con
 ### Follow the schedule
 
 - **Today** shows today's sessions plus *Happening now* and *Up next*.
+- The organizers' program is on the calendar too: plenaries and socials as grey and amber entries, coffee and meals as shaded bands behind the sessions (in the time of the site they belong to).
 - **Week** is an hourly calendar (a list on phones).
 - **All sprints** is a directory, with unscheduled proposals first.
 - **Times in** switches every time on the page between your own clock, each site's local time and UTC.
@@ -116,7 +117,7 @@ issue labels ───────────┘                              b
    Bursts of edits collapse into one queued build.
 4. **[Scheduling bot](worker/)** (a Cloudflare Worker plus a GitHub App) serves the session form and posts the session comments on behalf of signed-in sprint members.
 5. **[Triage workflow](.github/workflows/triage.yml)** posts a welcome comment on new sprint issues and adds the labels matching the type and working groups chosen in the form (only labels that already exist).
-6. **Python package** [`sprintweek/`](sprintweek/) (standard library only) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
+6. **Python package** [`sprintweek/`](sprintweek/) (standard library plus PyYAML) parses the issues and writes `data/sprints.json`, the `.ics` feeds and the static files.
 7. **Frontend** [`site/`](site/) is plain HTML, CSS and JavaScript modules with three small vendored libraries: [EventCalendar](https://github.com/vkurko/calendar) (calendar views, MIT), [marked](https://github.com/markedjs/marked) (Markdown) and [DOMPurify](https://github.com/cure53/DOMPurify) (sanitizing).
    There is no build step.
 
@@ -127,18 +128,46 @@ For example, Paris switched to CET on 2026-10-25 while SLAC stayed on PDT until 
 The browser converts UTC to whatever zone the viewer picks.
 Calendar feeds use UTC.
 
+### Organizers' program (coffee, meals, plenaries)
+
+The fixed schedule set by the organizers lives in [sprintweek.yaml](sprintweek.yaml), under each site, rather than in issues: it is not proposed or discussed, it often repeats every day, and only people with write access to the repository should change it.
+
+```yaml
+sites:
+  - name: SLAC
+    timezone: America/Los_Angeles
+    program:
+      - { title: Coffee, kind: break, days: all, start: 10:30, end: 11:00 }
+      - title: Welcome reception
+        kind: social                  # break | meal | plenary | social
+        days: [2026-10-26]            # or: all
+        start: 17:00
+        end: 19:00
+        location: Redwood lobby
+        online: https://zoom.us/j/... # optional
+        note: Drinks and snacks       # optional
+```
+
+Times are in the site's time zone.
+Edit the file on GitHub (pencil icon) and commit; the calendar updates a minute later.
+
+- **Breaks and meals** are drawn as shaded bands behind the sprint sessions, and only when viewing that site's time zone (or filtering by that site), so Paris coffee does not clutter the SLAC calendar.
+- **Plenaries** are normal calendar entries shown to everyone, and **socials** are shown at their site (or to everyone if they have an online link).
+  Both are included in the calendar feed.
+- A mistake (an impossible time, a misspelled `kind`, an unquoted color) stops the build with a message naming the setting; the website keeps showing the previous version until it is fixed.
+
 ### What counts as a sprint
 
-Every issue in the repository except pull requests, issues closed as *not planned*, and issues with one of the `exclude_labels` in [sprintweek.toml](sprintweek.toml) (by default `duplicate`, `invalid`, `wontfix`, `not a sprint`).
+Every issue in the repository except pull requests, issues closed as *not planned*, and issues with one of the `exclude_labels` in [sprintweek.yaml](sprintweek.yaml) (by default `duplicate`, `invalid`, `wontfix`, `not a sprint`).
 Older free-form issues (like the SprintWeek2026 template with `Contacts:` and `Day/Time:` lines) are understood on a best-effort basis: they appear as unscheduled, with their `Day/Time` text shown as a note.
 
 ## Setting up a new Sprint Week
 
 1. **Create the repository** for the new Sprint Week by copying this one (or use *Use this template*).
    It must be public for free GitHub Pages.
-2. **Edit [sprintweek.toml](sprintweek.toml):** title, dates, sites with time zones and rooms, the repository name, and sprint-type colors.
+2. **Edit [sprintweek.yaml](sprintweek.yaml):** title, dates, sites with their time zones, rooms and [program](#organizers-program-coffee-meals-plenaries), the repository name, and sprint-type colors.
 3. **Edit the dropdowns** in [.github/ISSUE_TEMPLATE/sprint.yml](.github/ISSUE_TEMPLATE/sprint.yml) if the working groups or sprint types change.
-   Sprint types must match the `[types]` table in `sprintweek.toml`.
+   Sprint types must match the `types` section of `sprintweek.yaml`.
 4. **Create labels** for the working groups and sprint types if you want them added automatically (*Issues → Labels*).
 5. **Enable GitHub Pages:** *Settings → Pages → Build and deployment → Source: GitHub Actions*.
 6. **Enable Actions** if needed: *Settings → Actions → General → Allow all actions*.
@@ -154,7 +183,7 @@ To refresh the welcome comments on existing issues (for example after changing t
 
 ## Local development
 
-Requires Python ≥ 3.11 and nothing else.
+Requires Python ≥ 3.11 and PyYAML (`pip install pyyaml`, already present in most DESC environments).
 
 ```sh
 python -m unittest discover -s tests -t .                       # run the tests
@@ -167,7 +196,7 @@ python -m http.server -d _site 8000                              # preview at ht
 Public repositories also work without a token, at a lower rate limit.
 `--save-snapshot file.json` saves the downloaded issues for offline work.
 
-The demo content lives in [demo/sprints.toml](demo/sprints.toml).
+The demo content lives in [demo/sprints.yaml](demo/sprints.yaml).
 `python demo/seed.py snapshot demo/snapshot.json` regenerates the offline snapshot used by the tests.
 `python demo/seed.py create` creates the demo issues in the configured repository.
 It disables @mentions and links to other repositories' issues, so seeding never notifies anyone.
@@ -176,7 +205,7 @@ Repository layout:
 
 | Path | What it is |
 | --- | --- |
-| `sprintweek.toml` | Per-event configuration |
+| `sprintweek.yaml` | Per-event configuration and organizers' program |
 | `sprintweek/` | Build script: GitHub API client, parsers, `.ics` writer, triage bot |
 | `site/` | Static frontend: `index.html` (calendar), `present.html` (slides), `assets/`, `vendor/` |
 | `tests/` | Unit tests (`unittest`, no dependencies) |

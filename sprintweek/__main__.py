@@ -9,13 +9,13 @@ from pathlib import Path
 
 from .bot import triage
 from .build import build_data, write_site
-from .config import load_config
+from .config import ConfigError, load_config
 from .github import GitHub, fetch_snapshot, find_token
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m sprintweek", description=__doc__)
-    parser.add_argument("--config", help="path to sprintweek.toml (default: repository root)")
+    parser.add_argument("--config", help="path to sprintweek.yaml (default: repository root)")
     parser.add_argument("--repo", help="owner/name of the sprint repository (overrides the config)")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -31,7 +31,11 @@ def main(argv: list[str] | None = None) -> int:
     t.add_argument("--greet", action="store_true", help="post or refresh the welcome comment")
 
     args = parser.parse_args(argv)
-    config = load_config(args.config, args.repo)
+    try:
+        config = load_config(args.config, args.repo)
+    except ConfigError as err:
+        print(f"::error title=sprintweek.yaml::{err}")  # shown as an annotation in GitHub Actions
+        return 2
 
     if args.command == "build":
         if args.snapshot:

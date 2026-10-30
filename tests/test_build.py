@@ -9,7 +9,7 @@ from sprintweek.config import load_config
 from sprintweek.sessions import encode_session_data
 
 ROOT = Path(__file__).resolve().parent.parent
-CONFIG = load_config(ROOT / "sprintweek.toml", repo="example/sprints")
+CONFIG = load_config(ROOT / "sprintweek.yaml", repo="example/sprints")
 SESSION = {"date": "2026-10-27", "start": "09:00", "end": "10:00", "tz": "America/Los_Angeles", "location": "Redwood A"}
 
 
@@ -69,7 +69,7 @@ class TestBuildSprint(unittest.TestCase):
             self.assertEqual(len(sp["sessions"]), 1, assoc)
 
     def test_bot_is_trusted(self):
-        config = load_config(ROOT / "sprintweek.toml", repo="example/sprints")
+        config = load_config(ROOT / "sprintweek.yaml", repo="example/sprints")
         config.bot_login = "sprint-bot[bot]"
         sp, _ = build_sprint(issue(), [comment(encode_session_data(SESSION), "sprint-bot[bot]", "NONE")], config)
         self.assertEqual(len(sp["sessions"]), 1)
@@ -155,6 +155,7 @@ class TestBuildData(unittest.TestCase):
             self.assertNotIn("token", json.dumps(published).lower())
             cal = (out / "calendar.ics").read_bytes()
             n = sum(len(s["sessions"]) for s in data["sprints"])
+            n += sum(1 for p in CONFIG.program if p["kind"] in ("plenary", "social"))
             self.assertEqual(cal.count(b"BEGIN:VEVENT"), n)
             self.assertTrue(all(len(line) <= 75 for line in cal.split(b"\r\n")))
             self.assertEqual(len(list((out / "ics").glob("*.ics"))), sum(1 for s in data["sprints"] if s["sessions"]))

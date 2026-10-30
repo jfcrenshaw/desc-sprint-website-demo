@@ -3,7 +3,7 @@ name = "sprintweek"
 version = "0.1.0"
 description = "Build the DESC Sprint Week calendar from GitHub Issues"
 requires-python = ">=3.11"
-dependencies = []  # standard library only
+dependencies = ["pyyaml>=6"]  # everything else is the standard library
 
 [tool.ruff]
 line-length = 120

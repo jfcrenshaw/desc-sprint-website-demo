@@ -1,0 +1,107 @@
+# Configuration for the Sprint Week calendar.
+# For a new Sprint Week this is normally the only file that needs editing
+# (plus the dropdown options in .github/ISSUE_TEMPLATE/sprint.yml).
+#
+# Edit it directly on GitHub (pencil icon); the calendar rebuilds about a minute after
+# you commit. If something is wrong, the build stops with a message saying which line to
+# fix, and the website keeps showing the previous version.
+#
+# YAML tips: quote colors ("#2f6fdf"), because an unquoted # starts a comment.
+# Dates are YYYY-MM-DD and times are 24-hour HH:MM.
+
+event:
+  title: DESC Sprint Week 2026
+  start_date: 2026-10-26 # first day, inclusive
+  end_date: 2026-10-30 # last day, inclusive
+  # Time zone shown to first-time visitors: "local" (the viewer's own clock),
+  # a site name from below, or an IANA zone such as Europe/Paris.
+  default_timezone: local
+
+# Physical sites. Sessions and program items at a site use that site's time zone.
+#   rooms:   suggestions in the scheduling form (people can also type their own)
+#   program: the organizers' schedule at that site (coffee, meals, plenaries, socials):
+#     title     what it is
+#     kind      break | meal | plenary | social
+#               Breaks and meals are drawn as shaded bands behind the sprint sessions,
+#               and only shown when viewing that site's time zone. Plenaries and socials
+#               are normal calendar entries, always shown, and included in the calendar feed.
+#     days      all, or a list of dates, e.g. [2026-10-26, 2026-10-28]
+#     start, end
+#     location, online (https:// link), note: optional
+#
+# NOTE: the program below is illustrative demo data, not the real 2026 schedule.
+sites:
+  - name: SLAC
+    timezone: America/Los_Angeles
+    rooms: [Redwood A, Redwood B, Redwood C-D, KFB 2nd floor conference room]
+    program:
+      - title: Morning sprint pitches
+        kind: plenary
+        days: all
+        start: 08:30
+        end: 09:00
+        location: Redwood C-D
+        online: https://zoom.us/j/0000000000
+        note: Two minutes per sprint; slides come from the GitHub issues.
+      - { title: Coffee, kind: break, days: all, start: 10:30, end: 11:00 }
+      - { title: Lunch, kind: meal, days: all, start: 12:00, end: 13:00, location: Cafeteria }
+      - { title: Coffee, kind: break, days: all, start: 15:00, end: 15:30 }
+      - title: Welcome reception
+        kind: social
+        days: [2026-10-26]
+        start: 17:00
+        end: 19:00
+        location: Redwood lobby
+      - title: Closing plenary and wrap-ups
+        kind: plenary
+        days: [2026-10-30]
+        start: 13:00
+        end: 14:30
+        location: Redwood C-D
+        online: https://zoom.us/j/0000000000
+
+  - name: Paris
+    timezone: Europe/Paris
+    rooms: []
+    program:
+      - { title: Coffee, kind: break, days: all, start: 10:30, end: 11:00 }
+      - { title: Lunch, kind: meal, days: all, start: 12:30, end: 14:00 }
+      - { title: Coffee, kind: break, days: all, start: 16:00, end: 16:30 }
+      - { title: Welcome drinks, kind: social, days: [2026-10-26], start: 18:00, end: 20:00 }
+
+github:
+  # Repository whose issues are the sprints.
+  # Defaults to the repository running the GitHub Action ($GITHUB_REPOSITORY).
+  repo: jfcrenshaw/desc-sprint-website-demo
+  # Issues carrying any of these labels are left off the website.
+  exclude_labels: [duplicate, invalid, wontfix, not a sprint]
+  # Post a welcome comment (calendar + scheduling links) on every new sprint issue.
+  greet_new_issues: true
+  # Add the labels matching the "Sprint type" and "Working groups" chosen in the form.
+  # Only labels that already exist in the repository are added.
+  auto_label: true
+
+scheduler:
+  # Public URL of the scheduling bot (the Cloudflare Worker in worker/).
+  # Leave empty until the bot is deployed; scheduling links are hidden until then.
+  url: https://sprintweek-scheduler.sprintweek-scheduler.workers.dev
+  # GitHub login of the bot that posts session comments: "<github-app-slug>[bot]".
+  bot_login: desc-sprint-week-demo-bot[bot]
+  # Members of this GitHub organization may add sessions to any sprint.
+  # Editing or cancelling a sprint's sessions is limited to its author, assignees,
+  # @mentioned contacts, the person who created the session, and repo collaborators.
+  org: LSSTDESC
+
+site:
+  # Public URL of the calendar. Leave empty for https://<owner>.github.io/<repo>/.
+  url: ""
+
+# Calendar colors for each sprint type (quoted!).
+# The names must match the "Sprint type" options in the issue form.
+types:
+  General Sprint: "#2f6fdf"
+  Infrastructure Sprint: "#0f8a7e"
+  Service Sprint: "#c26a1b"
+  Paper Sprint: "#8250df"
+  Tutorial: "#c93a6b"
+  Other: "#5c6773"

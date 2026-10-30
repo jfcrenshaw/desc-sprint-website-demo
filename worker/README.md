@@ -13,7 +13,7 @@ It costs nothing at Sprint Week scale (Cloudflare's free plan allows 100,000 req
 ## Who may do what
 
 - **Edit or cancel** a sprint's sessions: the issue author, its assignees, the people @mentioned under *Contact person(s)*, the person who created the session, and repository collaborators.
-- **Add** sessions: all of the above, plus members of the organization set in `[scheduler] org` of `sprintweek.toml` (private members are only visible if the App is installed on that organization with *Members: read*).
+- **Add** sessions: all of the above, plus members of the organization set in `scheduler.org` of `sprintweek.yaml` (private members are only visible if the App is installed on that organization with *Members: read*).
 
 Everyone else gets a polite "ask the sprint's contacts" page.
 
@@ -86,12 +86,12 @@ Open `https://<worker-url>/status` to check the setup: it reports whether the Ap
 
 ### 4. Point the calendar at the bot
 
-In [sprintweek.toml](../sprintweek.toml):
+In [sprintweek.yaml](../sprintweek.yaml):
 
-```toml
-[scheduler]
-url = "https://sprintweek-scheduler.<your-subdomain>.workers.dev"
-bot_login = "<app-slug>[bot]"
+```yaml
+scheduler:
+  url: https://sprintweek-scheduler.<your-subdomain>.workers.dev
+  bot_login: <app-slug>[bot]
 ```
 
 Push the change: the calendar shows *Schedule a session* and *Edit or cancel* links, and only comments by `bot_login` (or by collaborators) count as sessions.
