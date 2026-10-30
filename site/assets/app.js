@@ -1,6 +1,6 @@
 // Calendar page: Today / Week / All sprints, filters, and the sprint details dialog.
 import {
-  h, loadData, remember, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
+  h, loadData, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
   sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl,
   searchText, markdown, preview,
 } from './common.js';
@@ -340,6 +340,161 @@ function renderDirectory(kind) {
   );
 }
 
+// ---------------------------------------------------------------- rooms view
+
+const normRoom = s => String(s || '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');
+const nextDay = date => {
+  const d = new Date(`${date}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+};
+
+/** Sessions (and program items) booked in a room of `site`, keyed by normalized room name. */
+function roomBookings(site) {
+  const listed = new Set(site.rooms.map(r => normRoom(r.name)));
+  const out = [];
+  for (const sp of state.sprints) {
+    for (const s of sp.sessions) if (s.site === site.name && s.location) out.push({ key: normRoom(s.location), sp, s });
+  }
+  for (const p of state.config.program) {
+    if (p.site === site.name && listed.has(normRoom(p.location))) out.push({ key: normRoom(p.location), p, s: p });
+  }
+  return out;
+}
+
+/** Listed rooms in config order, then rooms people typed themselves. */
+function roomColumns(site, bookings) {
+  const cols = site.rooms.map(r => ({ id: normRoom(r.name), title: r.name, room: r }));
+  for (const b of bookings) {
+    if (!cols.some(c => c.id === b.key)) cols.push({ id: b.key, title: b.s.location, room: null });
+  }
+  return cols;
+}
+
+/** When a listed room can be used on `date`: null (all day), [] (not at all) or [{start, end}]. */
+function openHours(room, date) {
+  if (!room || !room.available) return null;
+  const w = room.available.filter(x => x.date === date);
+  return w.some(x => !x.start) ? null : w.map(x => ({ start: x.start, end: x.end }));
+}
+
+const hoursText = hours => hours === null ? 'open all day'
+  : !hours.length ? 'not available'
+  : `open ${hours.map(x => x.start === '00:00' ? `until ${x.end}` : x.end === '24:00' ? `from ${x.start}` : `${x.start}–${x.end}`).join(', ')}`;
+
+function roomSites() {
+  return state.config.sites.filter(site => site.rooms.length || roomBookings(site).length);
+}
+
+function renderRooms() {
+  const sites = roomSites();
+  if (!sites.length) {
+    $('rooms-note').textContent = 'No rooms are listed in sprintweek.yaml yet.';
+    return;
+  }
+  const site = sites.find(x => x.name === state.roomsSite) || sites.find(x => x.timezone === state.zone.tz) || sites[0];
+  state.roomsSite = site.name;
+  const today = todayIn(site.timezone);
+  if (!state.config.days.includes(state.roomsDay)) state.roomsDay = state.config.days.includes(today) ? today : state.config.days[0];
+  const day = state.roomsDay;
+  const seg = (items, current, pick) => items.map(([value, label]) =>
+    h('button', { type: 'button', class: value === current ? 'on' : '', 'aria-pressed': String(value === current), onclick: () => pick(value) }, label));
+  $('rooms-sites').replaceChildren(...seg(sites.map(x => [x.name, x.name]), site.name, v => { state.roomsSite = v; remember('rooms-site', v); renderRooms(); }));
+  $('rooms-days').replaceChildren(...seg(state.config.days.map(d => [d, fmtDay(d)]), day, v => { state.roomsDay = v; renderRooms(); }));
+  $('rooms-note').textContent = `Times are ${site.name} time (${tzAbbr(site.timezone, `${day}T12:00:00Z`, state.config)}). `
+    + 'Grey means the room is not available. Rooms can be shared: this shows what is booked, it does not stop anyone from booking.';
+
+  const bookings = roomBookings(site);
+  const cols = roomColumns(site, bookings);
+  const local = b => ({ start: wall(b.s.start_utc, site.timezone), end: wall(b.s.end_utc, site.timezone) });
+  const onDay = bookings.filter(b => local(b).start.date === day);
+
+  if (narrow.matches) { // phones: one card per room
+    $('rooms-cal').hidden = true;
+    $('rooms-list').hidden = false;
+    $('rooms-list').replaceChildren(...cols.map(c => {
+      const mine = onDay.filter(b => b.key === c.id).sort((a, b) => a.s.start_utc.localeCompare(b.s.start_utc));
+      return h('article', { class: 'room-card' },
+        h('h3', {}, c.title, c.room ? null : h('span', { class: 'muted small', text: ' (not listed)' })),
+        h('p', { class: 'muted small', text: c.room ? hoursText(openHours(c.room, day)) : 'typed in by a sprint' }),
+        mine.length ? h('ul', {}, mine.map(b => h('li', {},
+          h('strong', { text: `${local(b).start.time}–${local(b).end.time}` }), ' ',
+          b.sp ? h('a', { href: `#sprint/${b.sp.number}`, text: sessionTitle(b.sp, b.s) }) : `${PROGRAM_ICONS[b.p.kind]} ${b.p.title}`)))
+          : h('p', { class: 'small', text: 'Nothing booked.' }));
+    }));
+    return;
+  }
+
+  $('rooms-cal').hidden = false;
+  $('rooms-list').hidden = true;
+  const events = bookings.map(b => {
+    const color = b.sp ? typeColor(b.sp, state.config) : PROGRAM_COLORS[b.p.kind];
+    return {
+      id: `room:${b.sp ? b.s.id : b.p.id}`,
+      resourceIds: [b.key],
+      start: local(b).start.iso,
+      end: local(b).end.iso,
+      title: b.sp ? sessionTitle(b.sp, b.s) : b.p.title,
+      backgroundColor: color,
+      textColor: inkFor(color),
+      classNames: b.s.room_issue ? ['room-issue'] : [],
+      extendedProps: b.sp ? { sprint: b.sp.number, session: b.s.id } : { program: b.p.id },
+    };
+  });
+  // Grey out the hours when listed rooms are not available.
+  for (const c of cols) {
+    if (!c.room || !c.room.available) continue;
+    for (const d of state.config.days) {
+      const hours = openHours(c.room, d);
+      if (hours === null) continue;
+      let from = '00:00';
+      const gaps = [];
+      for (const w of [...hours].sort((a, b) => a.start.localeCompare(b.start))) {
+        if (w.start > from) gaps.push([from, w.start]);
+        if (w.end > from) from = w.end;
+      }
+      if (from < '24:00') gaps.push([from, '24:00']);
+      for (const [a, b] of gaps) {
+        events.push({
+          start: `${d}T${a}:00`, end: b === '24:00' ? `${nextDay(d)}T00:00:00` : `${d}T${b}:00`,
+          display: 'background', resourceIds: [c.id], classNames: ['unavailable'], backgroundColor: 'rgba(120, 120, 130, 0.28)',
+        });
+      }
+    }
+  }
+  const hm = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
+  const opts = {
+    view: 'resourceTimeGridDay',
+    date: day,
+    resources: cols.map(c => ({ id: c.id, title: c.title, extendedProps: { listed: Boolean(c.room), hours: c.room ? hoursText(openHours(c.room, day)) : 'not listed' } })),
+    events,
+    timeZone: currentOffset(site.timezone),
+    headerToolbar: { start: '', center: 'title', end: '' },
+    titleFormat: { weekday: 'long', month: 'long', day: 'numeric' },
+    allDaySlot: false,
+    nowIndicator: true,
+    slotDuration: '00:30',
+    slotMinTime: '07:00',
+    slotMaxTime: '20:00',
+    flexibleSlotTimeLimits: true,
+    scrollTime: '07:00',
+    eventTimeFormat: hm,
+    slotLabelFormat: hm,
+    resourceLabelContent: ({ resource }) => ({
+      domNodes: [h('div', { class: 'room-head' }, h('strong', { text: resource.title }), h('span', { class: 'muted small', text: resource.extendedProps.hours }))],
+    }),
+    eventContent: info => (info.event.display === 'background' ? { domNodes: [] } : {
+      domNodes: [h('div', { class: 'ev-time', text: info.timeText }), h('div', { class: 'ev-title', text: info.event.title })],
+    }),
+    eventClick: info => {
+      if (info.event.extendedProps.program) openProgram(info.event.extendedProps.program);
+      else if (info.event.extendedProps.sprint) location.hash = `#sprint/${info.event.extendedProps.sprint}`;
+    },
+  };
+  if (!state.roomsEc) state.roomsEc = window.EventCalendar.create($('rooms-cal'), opts);
+  else for (const [k, v] of Object.entries(opts)) state.roomsEc.setOption(k, v);
+}
+
 // ---------------------------------------------------------------- site info pages
 
 function renderInfo(slug) {
@@ -471,10 +626,12 @@ function render() {
   const isCal = state.view === 'today' || state.view === 'week';
   const isDir = state.view === 'scheduled' || state.view === 'unscheduled';
   const isInfo = state.view.startsWith('info/');
+  const isRooms = state.view === 'rooms';
   $('calendar-wrap').hidden = !isCal;
   $('directory').hidden = !isDir;
   $('info').hidden = !isInfo;
-  $('toolbar').hidden = isInfo;
+  $('rooms').hidden = !isRooms;
+  $('toolbar').hidden = isInfo || isRooms;
   $('now-next').hidden = true;
   renderFacets();
   if (isCal) {
@@ -482,6 +639,8 @@ function render() {
     if (state.view === 'today') renderNowNext();
   } else if (isDir) {
     renderDirectory(state.view);
+  } else if (isRooms) {
+    renderRooms();
   } else {
     renderInfo(state.view.slice(5));
   }
@@ -493,7 +652,7 @@ function render() {
 /** Hash -> view name: "today", "week", "scheduled", "unscheduled" or "info/<site>". */
 function viewFor(hash) {
   if (hash === 'sprints') return 'scheduled'; // links from before the tabs were split
-  if (['today', 'week', 'scheduled', 'unscheduled'].includes(hash)) return hash;
+  if (['today', 'week', 'scheduled', 'unscheduled', 'rooms'].includes(hash)) return hash;
   const info = hash.match(/^info\/([\w-]+)$/);
   return info && state.data.site_info.some(p => p.slug === info[1]) ? hash : null;
 }
@@ -540,6 +699,7 @@ async function main() {
   config.program = config.program || [];
   state.programById = new Map(config.program.map(p => [p.id, p]));
   state.zone = initialZone(config);
+  state.roomsSite = recall('rooms-site');
 
   document.title = `${config.title} · Calendar`;
   $('event-title').textContent = config.title;

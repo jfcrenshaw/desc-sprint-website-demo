@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   validateSession, encodeSessionData, extractSessionData, renderSessionComment, renderCancelledComment, zonedToUtc,
   describeTimes, contactHandles, mdEscape, cleanText, sign, verify, pkcs1ToPkcs8, importPrivateKey, appJwt, fromB64url,
-  isTimeZone, roomProblem, siteRooms,
+  isTimeZone, roomProblem, siteRooms, roomBookings,
 } from '../src/lib.js';
 
 const config = {
@@ -196,4 +196,30 @@ test('the bot refuses unavailable rooms', () => {
   assert.match(bad.errors.location, /^Redwood A is not available on Tue Oct 27 at 10:00–12:00/);
   assert.ok(validateSession({ ...slac, location: 'Redwood A', start: '13:00', end: '15:00' }, roomConfig).session);
   assert.ok(validateSession({ ...slac, location: 'Redwood C-D' }, roomConfig).session);
+});
+
+test('room bookings for the form hint', () => {
+  const data = { sprints: [
+    { title: 'Sprint A', sessions: [
+      { id: '1', site: 'SLAC', location: 'Redwoods  C-D', label: 'Kickoff', start_utc: '2026-10-29T20:00:00Z', end_utc: '2026-10-29T23:00:00Z' },
+      { id: '2', site: 'SLAC', location: '', start_utc: '2026-10-29T16:00:00Z', end_utc: '2026-10-29T17:00:00Z' },
+      { id: '3', site: '', location: 'Zoom', start_utc: '2026-10-29T16:00:00Z', end_utc: '2026-10-29T17:00:00Z' },
+    ] },
+    { title: 'Sprint B', sessions: [{ id: '4', site: 'SLAC', location: 'redwoods c-d', start_utc: '2026-10-29T16:00:00Z', end_utc: '2026-10-29T17:00:00Z' }] },
+  ] };
+  const all = roomBookings(data, config.sites);
+  assert.deepEqual(all.map(b => [b.title, b.room, b.date, b.start, b.end]), [
+    ['Sprint B', 'redwoods c-d', '2026-10-29', '09:00', '10:00'],
+    ['Sprint A — Kickoff', 'redwoods c-d', '2026-10-29', '13:00', '16:00'],
+  ]);
+  assert.equal(roomBookings(data, config.sites, '4').length, 1, 'the session being edited is left out');
+  assert.deepEqual(roomBookings(undefined, config.sites), []);
+});
+
+test('the form page script survives being embedded in a template string', async () => {
+  const { formPage } = await import('../src/index.js');
+  const res = formPage({ config, issue: { number: 1, title: 'T', html_url: 'https://x' }, user: 'u', values: {}, mode: 'create', action: '/', csrf: 'c' });
+  const html = await res.text();
+  assert.ok(html.includes('split(/\\s+/)'), 'regex escapes must reach the browser intact');
+  assert.ok(!/<script nonce[^>]*>[^<]*\bsplit\(\/s\+\//.test(html));
 });

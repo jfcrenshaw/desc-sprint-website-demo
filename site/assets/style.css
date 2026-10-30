@@ -141,7 +141,7 @@ main { padding: 0 24px 24px; }
 /* EventCalendar */
 #calendar { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 10px; min-width: 0; max-width: 100%; overflow: hidden; }
 #calendar-wrap, main, .toolbar { min-width: 0; max-width: 100%; }
-#calendar .ec {
+#calendar .ec, #rooms-cal .ec {
   --ec-bg-color: var(--surface); --ec-day-bg-color: var(--surface); --ec-border-color: var(--border);
   --ec-text-color: var(--text); --ec-today-bg-color: var(--accent-soft); --ec-now-indicator-color: var(--live);
   --ec-button-bg-color: var(--surface); --ec-button-border-color: var(--border); --ec-button-text-color: var(--text);
@@ -243,6 +243,22 @@ dialog::backdrop { background: rgb(15 18 22 / 55%); }
 .md blockquote { margin: 0 0 1em; padding: 2px 12px; border-left: 3px solid var(--border); color: var(--muted); }
 .md ul, .md ol { padding-left: 1.4em; }
 .md.lead { font-size: 1.05rem; }
+
+/* Rooms view */
+.rooms-bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 14px 0 4px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.seg button { font: inherit; font-size: 0.9rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.seg button.on { background: var(--accent-soft); border-color: var(--accent); font-weight: 650; }
+#rooms-cal { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 10px; overflow-x: auto; }
+#rooms-cal .ec { --ec-today-bg-color: transparent; }
+#rooms-cal .ec-bg-event.unavailable { opacity: 1; background: repeating-linear-gradient(135deg, rgb(120 124 135 / 30%) 0 6px, rgb(120 124 135 / 14%) 6px 12px) !important; }
+.room-head { display: flex; flex-direction: column; line-height: 1.2; padding: 2px 0; }
+.room-head .small { font-weight: 400; }
+#rooms-list { display: grid; gap: 10px; }
+.room-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
+.room-card h3 { margin: 0; font-size: 1rem; }
+.room-card p { margin: 2px 0 6px; }
+.room-card ul { margin: 0; padding-left: 1.1em; font-size: 0.92rem; }
 
 /* Site info pages */
 .info-page { max-width: 820px; margin: 18px auto 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 28px 26px; }

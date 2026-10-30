@@ -35,7 +35,7 @@ Each appears on the calendar on its own and links back to the same issue.
 
 1. Click **📅 Schedule a session**: it is in the bot's welcome comment on your issue, and on the sprint's page on the website.
 2. Sign in with GitHub, then pick the day, start and end time, the site (or *Online only*) and optionally a room, a Zoom link, a session name and a note.
-   The form shows the time at the other sites as you type.
+   The form shows the time at the other sites as you type, and what is already booked in the room you picked that day (rooms can be shared, so this is for information).
 3. Click **Schedule session**.
    The bot posts the session as a comment on the issue, and the calendar shows it a minute or two later.
 
@@ -92,6 +92,7 @@ Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you 
 - The organizers' program is on the calendar too: plenaries and socials as grey and amber entries, coffee and meals as shaded bands behind the sessions (in the time of the site they belong to).
 - **Week** is an hourly calendar (a list on phones).
 - **Scheduled** and **Unscheduled** list the sprints as cards; *Unscheduled* holds proposals still looking for a time (and for collaborators).
+- **Rooms** shows one site and day at a time with a column per room: what is booked where, and (striped) when a room is not available. Use it to find a free room before scheduling; on phones it is a list per room.
 - **SLAC info** and **Paris info** (one tab per site) have practical information: getting there, access, Wi-Fi, food, contacts, plus each site's rooms and daily program.
 - **Times in** switches every time on the page between your own clock, each site's local time and UTC.
 - **Filter** narrows everything by sprint type, working group, label, site/online, or "new contributor friendly".

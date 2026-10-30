@@ -140,6 +140,27 @@ export function roomProblem(session, sites) {
   return `${room.name} is not available on ${part({ weekday: 'short' })} ${part({ month: 'short' })} ${d.getUTCDate()} at ${session.start}–${session.end} (available: ${room.summary}).`;
 }
 
+/**
+ * Sessions already booked in rooms, from the website's data/sprints.json, for the form's
+ * "already in this room" hint. Dates and times are in each site's local time.
+ */
+export function roomBookings(data, sites, exceptId = '') {
+  const out = [];
+  for (const sp of data?.sprints || []) {
+    for (const s of sp.sessions || []) {
+      const site = sites.find(x => x.name === s.site);
+      if (!site || !s.location || String(s.id) === String(exceptId)) continue;
+      const a = parts(new Date(s.start_utc), site.timezone);
+      const b = parts(new Date(s.end_utc), site.timezone);
+      out.push({
+        site: site.name, room: normName(s.location), date: a.date, start: a.time, end: b.time,
+        start_utc: s.start_utc, end_utc: s.end_utc, title: s.label ? `${sp.title} — ${s.label}` : sp.title,
+      });
+    }
+  }
+  return out.sort((x, y) => x.start_utc.localeCompare(y.start_utc));
+}
+
 // ---------------------------------------------------------------- sessions
 
 /**

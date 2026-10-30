@@ -15,7 +15,7 @@
 import {
   esc, contactHandles, validateSession, extractSessionData, renderSessionComment, renderCancelledComment,
   describeTimes, sign, verify, hmac, parseCookies, randomToken, b64url, importPrivateKey, appJwt, isLogin,
-  TRUSTED_ASSOCIATIONS, CANCELLED_MARKER,
+  TRUSTED_ASSOCIATIONS, CANCELLED_MARKER, roomBookings,
 } from './lib.js';
 
 const SESSION_COOKIE = '__Host-sw_session';
@@ -77,6 +77,17 @@ async function siteConfig(env) {
   if (!res.ok) throw new HttpError(502, 'Calendar unavailable', 'Could not load the calendar configuration.');
   configCache = { data: await res.json(), expires: Date.now() + 60 * 1000 };
   return configCache.data;
+}
+
+let dataCache = null;
+
+/** The website's published sessions (for the "already booked in this room" hint). */
+async function siteData(env) {
+  if (dataCache && dataCache.expires > Date.now()) return dataCache.data;
+  const res = await fetch(new URL('data/sprints.json', env.SITE_URL), { cf: { cacheTtl: 60 } });
+  const data = res.ok ? await res.json() : { sprints: [] }; // the hint is optional: never fail the form over it
+  dataCache = { data, expires: Date.now() + 60 * 1000 };
+  return data;
 }
 
 async function getSprint(env, token, number) {
@@ -147,7 +158,7 @@ function header(config, issue, user) {
 }
 
 // Exported so the form can be rendered locally for previews.
-export function formPage({ config, issue, user, values, errors = {}, mode, action, csrf, status = 200 }) {
+export function formPage({ config, issue, user, values, errors = {}, mode, action, csrf, status = 200, bookings = [] }) {
   const nonce = randomToken(16);
   const err = k => (errors[k] ? `<p class="error">${esc(errors[k])}</p>` : '');
   const days = [...config.days];
@@ -184,6 +195,7 @@ export function formPage({ config, issue, user, values, errors = {}, mode, actio
       <label id="room-row">Room <input name="location" list="rooms" maxlength="200" value="${esc(values.location || '')}" placeholder="e.g. Redwoods C-D (leave blank if not known yet)"></label>
       <datalist id="rooms"></datalist>
       <p class="error" id="room-hint" hidden></p>${err('location')}
+      <div class="booked" id="room-booked" hidden></div>
       <label>Online link <input type="url" name="online" maxlength="500" value="${esc(values.online || '')}" placeholder="https://…zoom.us/j/… (optional for in-person sessions)"></label>${err('online')}
     </fieldset>
     <fieldset><legend>Optional</legend>
@@ -197,6 +209,7 @@ export function formPage({ config, issue, user, values, errors = {}, mode, actio
     <p class="muted small">The session is posted as a comment on the <a href="${esc(issue.html_url)}">GitHub issue</a> and appears on the calendar a minute or two later.</p>
   </form>
   <script type="application/json" id="sites">${JSON.stringify(config.sites).replace(/</g, '\\u003c')}</script>
+  <script type="application/json" id="bookings">${JSON.stringify(bookings).replace(/</g, '\\u003c')}</script>
   <script nonce="${nonce}">${FORM_SCRIPT}</script>`;
   return page(editing ? 'Edit session' : 'Schedule a session', body, { nonce, status });
 }
@@ -204,6 +217,7 @@ export function formPage({ config, issue, user, values, errors = {}, mode, actio
 // Live preview of the time in other sites' zones, and site-dependent defaults.
 const FORM_SCRIPT = `
 const f = document.getElementById('f'), sites = JSON.parse(document.getElementById('sites').textContent);
+const bookings = JSON.parse(document.getElementById('bookings').textContent);
 const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
 if (local && ![...f.tz.options].some(o => o.value === local)) f.tz.add(new Option(local + ' (your time)', local));
 function wall(d, tz) {
@@ -231,12 +245,36 @@ function update(e) {
     if (date && !w.some(x => !x.start)) o.label = 'open ' + w.map(hours).join(', ');
     return [o];
   }));
-  const norm = t => String(t || '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');
+  const norm = t => String(t || '').toLowerCase().split(/\\s+/).filter(Boolean).join(' ');
   const room = rooms.find(r => norm(r.name) === norm(f.location.value));
   const hint = document.getElementById('room-hint');
   const ok = !room || !room.available || !date || !s || !en || room.available.some(x => x.date === date && (!x.start || (x.start <= s && en <= x.end)));
   hint.hidden = ok;
   hint.textContent = ok ? '' : room.name + ' is not available then (available: ' + room.summary + ').';
+  // What is already booked in this room that day (shared rooms are fine; this is for information).
+  const booked = document.getElementById('room-booked');
+  const key = norm(f.location.value);
+  booked.hidden = !(site && key && date);
+  if (!booked.hidden) {
+    const a = s ? toUtc(date, s, tz).toISOString() : '', b = en ? toUtc(date, en, tz).toISOString() : '';
+    const localDate = s ? wall(new Date(a), site.timezone).date : date;
+    const same = bookings.filter(x => x.site === site.name && x.room === key && x.date === localDate);
+    const name = (room && room.name) || f.location.value.trim();
+    if (!same.length) {
+      booked.textContent = 'Nothing else is booked in ' + name + ' that day.';
+    } else {
+      const items = same.map(x => {
+        const li = document.createElement('li');
+        const overlaps = a && b && x.start_utc < b && a < x.end_utc;
+        li.textContent = x.start + '–' + x.end + ' ' + x.title + (overlaps ? '  ⚠ overlaps your time' : '');
+        if (overlaps) li.className = 'overlap';
+        return li;
+      });
+      const ul = document.createElement('ul');
+      ul.append(...items);
+      booked.replaceChildren('Already in ' + name + ' that day (' + site.name + ' time); rooms can be shared:', ul);
+    }
+  }
   const out = document.getElementById('preview');
   if (!date || !s || !en) { out.textContent = ''; return; }
   const a = toUtc(date, s, tz), b = toUtc(date, en, tz);
@@ -273,6 +311,7 @@ input:not([type=radio]), select { font: inherit; padding: 8px 10px; border: 1px 
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--ink); }
 .btn.danger { color: var(--bad); border-color: var(--bad); background: transparent; }
 .error { color: var(--bad); margin: 0; font-size: .9rem; } .error.box { padding: 8px 12px; border: 1px solid var(--bad); border-radius: 8px; }
+.booked { font-size: .9rem; color: var(--muted); } .booked ul { margin: 4px 0 0; padding-left: 1.2em; } .booked .overlap { color: var(--bad); font-weight: 600; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
 [hidden] { display: none !important; }
 `;
@@ -387,11 +426,12 @@ async function scheduleHandler(request, env, url, user) {
   if (!(await permission(env, bot.token, config, user, issue, { creating: true }))) return notAllowed(config, issue, user);
   const action = `/schedule?sprint=${number}`;
   const csrf = await csrfFor(env, request);
-  if (request.method === 'GET') return formPage({ config, issue, user, values: {}, mode: 'create', action, csrf });
+  const bookings = roomBookings(await siteData(env), config.sites);
+  if (request.method === 'GET') return formPage({ config, issue, user, values: {}, mode: 'create', action, csrf, bookings });
 
   const form = await readForm(request, env, url);
   const { session, errors } = validateSession(form, config);
-  if (!session) return formPage({ config, issue, user, values: form, errors, mode: 'create', action, csrf, status: 400 });
+  if (!session) return formPage({ config, issue, user, values: form, errors, mode: 'create', action, csrf, bookings, status: 400 });
   session.by = user;
   const created = await githubJson(`/repos/${env.REPO}/issues/${number}/comments`, bot.token, {
     method: 'POST', body: { body: renderSessionComment(session, { sites: config.sites }) },
@@ -419,8 +459,9 @@ async function sessionHandler(request, env, url, user, commentId) {
 
   const action = `/session/${commentId}`;
   const csrf = await csrfFor(env, request);
+  const bookings = roomBookings(await siteData(env), config.sites, commentId);
   const current = { ...data, where: data.site || (data.online ? 'online' : '') };
-  if (request.method === 'GET') return formPage({ config, issue, user, values: current, mode: 'edit', action, csrf });
+  if (request.method === 'GET') return formPage({ config, issue, user, values: current, mode: 'edit', action, csrf, bookings });
 
   const form = await readForm(request, env, url);
   if (form.action === 'cancel') {
@@ -431,7 +472,7 @@ async function sessionHandler(request, env, url, user, commentId) {
     return donePage(config, issue, old, { cancelled: true });
   }
   const { session, errors } = validateSession(form, config, [data.date]);
-  if (!session) return formPage({ config, issue, user, values: form, errors, mode: 'edit', action, csrf, status: 400 });
+  if (!session) return formPage({ config, issue, user, values: form, errors, mode: 'edit', action, csrf, bookings, status: 400 });
   session.by = creator || user;
   await githubJson(`/repos/${env.REPO}/issues/comments/${commentId}`, bot.token, {
     method: 'PATCH', body: { body: renderSessionComment(session, { sites: config.sites, editUrl: `${url.origin}${action}`, updatedBy: user }) },

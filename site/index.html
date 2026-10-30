@@ -31,6 +31,7 @@
     <a href="#week" data-view="week">Week</a>
     <a href="#scheduled" data-view="scheduled">Scheduled <span class="count" id="count-scheduled"></span></a>
     <a href="#unscheduled" data-view="unscheduled">Unscheduled <span class="count" id="count-unscheduled"></span></a>
+    <a href="#rooms" data-view="rooms">Rooms</a>
     <!-- "<site> info" tabs are added from the configuration -->
   </nav>
 
@@ -52,6 +53,12 @@
       <p class="legend" id="legend"></p>
     </div>
     <section id="directory" hidden></section>
+    <section id="rooms" class="rooms" hidden>
+      <div class="rooms-bar"><div class="seg" id="rooms-sites" role="group" aria-label="Site"></div><div class="seg" id="rooms-days" role="group" aria-label="Day"></div></div>
+      <p class="muted small" id="rooms-note"></p>
+      <div id="rooms-cal" class="ec-auto-dark"></div>
+      <div id="rooms-list"></div>
+    </section>
     <article id="info" class="info-page" hidden></article>
   </main>
 
