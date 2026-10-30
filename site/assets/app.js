@@ -89,16 +89,19 @@ const PROGRAM_ICONS = { break: '☕', meal: '🍽️', plenary: '🎤', social: 
 const PROGRAM_COLORS = { plenary: '#3d4451', social: '#9a6700', break: 'rgba(138, 148, 166, 0.22)', meal: 'rgba(201, 162, 39, 0.22)' };
 const isBand = p => p.kind === 'break' || p.kind === 'meal';
 
+/** Does the clock of `tz` read the same as the item's own site clock (e.g. America/Vancouver vs. Los Angeles)? */
+const sameClock = (p, tz) => ['start_utc', 'end_utc'].every(k => wall(p[k], tz).iso === wall(p[k], p.tz).iso);
+
 /**
  * Organizers' program items to show. Plenaries and anything with an online link concern
- * everyone; breaks, meals and in-person socials only show on their site's clock (or when
- * filtering by that site).
+ * everyone; breaks, meals and in-person socials only show when the displayed clock matches
+ * their site's clock (or when filtering by that site).
  */
 function programItems() {
   const where = state.active.get('where');
   return state.config.program.filter(p => {
     if (where && where.size) return where.has(p.site) || (Boolean(p.online) && where.has('Online'));
-    return p.kind === 'plenary' || Boolean(p.online) || p.tz === state.zone.tz;
+    return p.kind === 'plenary' || Boolean(p.online) || sameClock(p, state.zone.tz);
   });
 }
 
