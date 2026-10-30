@@ -81,7 +81,7 @@ sprints:
   sessions:
   - date: '2026-10-26'
     start: '14:00'
-    end: '17:30'
+    end: '17:00'
     tz: Europe/Paris
     site: Paris
 
@@ -253,8 +253,8 @@ sprints:
   links: 'Slack: #desc-pz-dp2-nz-comb'
   sessions:
   - date: '2026-10-28'
-    start: 09:00
-    end: '10:30'
+    start: '10:00'
+    end: '11:30'
     tz: America/Los_Angeles
     site: SLAC
     location: Redwoods A-B
@@ -376,7 +376,7 @@ sprints:
     location: Redwoods C-D
     online: zoom
   - date: '2026-10-30'
-    start: 09:00
+    start: '10:00'
     end: '12:00'
     tz: America/Los_Angeles
     site: SLAC

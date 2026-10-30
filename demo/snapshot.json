@@ -504,7 +504,7 @@
    "issue": 3,
    "user": "jfcrenshaw",
    "author_association": "OWNER",
-   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-26\",\"start\":\"14:00\",\"end\":\"17:30\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Monday, October 26 · 14:00–17:30 CET\n<sub>= 06:00–09:30 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-26\",\"start\":\"14:00\",\"end\":\"17:00\",\"tz\":\"Europe/Paris\",\"site\":\"Paris\",\"location\":\"\",\"online\":\"\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Monday, October 26 · 14:00–17:00 CET\n<sub>= 06:00–09:00 PDT (SLAC)</sub>\n**Where:** 📍 Paris\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
    "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/3#issuecomment-4000000006",
    "created_at": "2026-10-22T16:03:00Z",
    "updated_at": "2026-10-22T16:03:00Z"
@@ -674,7 +674,7 @@
    "issue": 8,
    "user": "jfcrenshaw",
    "author_association": "OWNER",
-   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"09:00\",\"end\":\"10:30\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwoods A-B\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Wednesday, October 28 · 09:00–10:30 PDT\n<sub>= 17:00–18:30 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwoods A-B · 💻 [Join online](<https://zoom.us/j/0000000000>)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-28\",\"start\":\"10:00\",\"end\":\"11:30\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwoods A-B\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Wednesday, October 28 · 10:00–11:30 PDT\n<sub>= 18:00–19:30 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwoods A-B · 💻 [Join online](<https://zoom.us/j/0000000000>)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
    "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/8#issuecomment-4000000023",
    "created_at": "2026-10-21T16:08:00Z",
    "updated_at": "2026-10-21T16:08:00Z"
@@ -784,7 +784,7 @@
    "issue": 12,
    "user": "jfcrenshaw",
    "author_association": "OWNER",
-   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-30\",\"start\":\"09:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwoods C-D\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Friday, October 30 · 09:00–12:00 PDT\n<sub>= 17:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwoods C-D · 💻 [Join online](<https://zoom.us/j/0000000000>)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
+   "body": "<!-- sprintweek:session {\"v\":1,\"date\":\"2026-10-30\",\"start\":\"10:00\",\"end\":\"12:00\",\"tz\":\"America/Los_Angeles\",\"site\":\"SLAC\",\"location\":\"Redwoods C-D\",\"online\":\"https://zoom.us/j/0000000000\",\"label\":\"\",\"note\":\"\",\"by\":\"jfcrenshaw\"} -->\n📅 **Session scheduled**\n\n**When:** Friday, October 30 · 10:00–12:00 PDT\n<sub>= 18:00–20:00 CET (Paris)</sub>\n**Where:** 📍 SLAC – Redwoods C-D · 💻 [Join online](<https://zoom.us/j/0000000000>)\n\n<sub>Scheduled by [jfcrenshaw](https://github.com/jfcrenshaw)</sub>\n",
    "html_url": "https://github.com/jfcrenshaw/desc-sprint-website-demo/issues/12#issuecomment-4000000034",
    "created_at": "2026-10-19T16:12:00Z",
    "updated_at": "2026-10-19T16:12:00Z"

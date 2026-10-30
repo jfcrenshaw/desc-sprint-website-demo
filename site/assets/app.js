@@ -772,7 +772,7 @@ async function main() {
   for (const p of state.data.site_info) {
     $('tabs').append(h('a', { href: `#info/${p.slug}`, 'data-view': `info/${p.slug}` }, `${p.site} info`));
   }
-  state.view = viewFor(location.hash.slice(1)) || 'today';
+  state.view = viewFor(location.hash.slice(1)) || 'week';
   if (location.hash.startsWith('#sprint/')) {
     state.view = 'week';
     render();

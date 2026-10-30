@@ -92,9 +92,9 @@ Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you 
 
 ### Follow the schedule
 
-- **Today** shows today's sessions plus *Happening now* and *Up next*.
 - The organizers' program is on the calendar too: plenaries and socials as grey and amber entries, coffee and meals as shaded bands behind the sessions (in the time of the site they belong to).
-- **Week** is an hourly calendar (a list on phones).
+- **Week** (the default) is an hourly calendar (a list on phones).
+- **Today** shows today's sessions plus *Happening now* and *Up next*.
 - **Scheduled** and **Unscheduled** list the sprints as cards; *Unscheduled* holds proposals still looking for a time (and for collaborators).
 - **Rooms** shows one site and day at a time with a column per room: what is booked where, and (striped) when a room is not available. Use it to find a free room before scheduling; on phones it is a list per room.
 - **SLAC info** and **Paris info** (one tab per site) have practical information: getting there, access, Wi-Fi, food, contacts, plus each site's rooms and daily program.
