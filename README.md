@@ -98,7 +98,7 @@ Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you 
 - **Filter** narrows everything by sprint type, working group, label, site/online, or "new contributor friendly".
 - The **☀/☾ switch** (top right, and on the Present page) toggles light and dark mode; until you use it, the site follows your device's setting.
 - **Subscribe** adds the whole schedule to Google Calendar, Apple Calendar or Outlook, and it stays up to date.
-  Each sprint page also has an *Add to my calendar* button for just that sprint.
+  Each session on a sprint's page also has *Add to calendar* links: Google Calendar and Outlook open a pre-filled new event, and the .ics file adds it to Apple Calendar or anything else (sprints with several sessions also offer all of them in one file).
 
 ### Present pitches and wrap-ups
 

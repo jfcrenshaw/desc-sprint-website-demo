@@ -221,7 +221,12 @@ class TestBuildData(unittest.TestCase):
             n += sum(1 for p in CONFIG.program if p["kind"] in ("plenary", "social"))
             self.assertEqual(cal.count(b"BEGIN:VEVENT"), n)
             self.assertTrue(all(len(line) <= 75 for line in cal.split(b"\r\n")))
-            self.assertEqual(len(list((out / "ics").glob("*.ics"))), sum(1 for s in data["sprints"] if s["sessions"]))
+            self.assertEqual(len(list((out / "ics").glob("sprint-*.ics"))), sum(1 for s in data["sprints"] if s["sessions"]))
+            for sp in data["sprints"]:
+                for s in sp["sessions"]:
+                    single = (out / "ics" / f"session-{s['id']}.ics").read_bytes()
+                    self.assertEqual(single.count(b"BEGIN:VEVENT"), 1)
+            self.assertEqual(len(list((out / "ics").glob("program-*.ics"))), len(CONFIG.program))
 
 
 class TestIcs(unittest.TestCase):

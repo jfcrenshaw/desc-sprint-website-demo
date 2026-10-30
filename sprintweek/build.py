@@ -10,7 +10,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from . import ics
-from .config import Config
+from .config import PROGRAM_KINDS, Config
 from .dates import parse_loose_date
 from .parse import parse_contacts, parse_issue_body, parse_wrapup_comment, plain_text
 from .rooms import room_problem
@@ -223,11 +223,11 @@ def build_data(snapshot: dict, config: Config) -> dict:
 FEED_KINDS = ("plenary", "social")
 
 
-def calendar_events(sprints: list[dict], config: Config) -> list[dict]:
-    """Convert every session, plus plenaries and socials of the program, into iCalendar events."""
+def calendar_events(sprints: list[dict], config: Config, program_kinds: tuple[str, ...] = FEED_KINDS) -> list[dict]:
+    """Convert every session, plus program items of ``program_kinds``, into iCalendar events."""
     events = []
     for item in config.program:
-        if item["kind"] not in FEED_KINDS:
+        if item["kind"] not in program_kinds:
             continue
         place = " – ".join(x for x in (item["site"], item["location"]) if x)
         desc = [
@@ -312,3 +312,8 @@ def write_site(data: dict, config: Config, out_dir: str | Path, site_dir: str | 
             (out / "ics" / f"sprint-{sp['number']}.ics").write_text(
                 ics.calendar(name, mine, data["generated_at"]), encoding="utf-8", newline=""
             )
+    # One file per session and per program item, for "Add to calendar: Apple / other (.ics)".
+    for ev in calendar_events(data["sprints"], config, program_kinds=PROGRAM_KINDS):
+        (out / "ics" / f"{ev['uid'].split('@')[0]}.ics").write_text(
+            ics.calendar(ev["summary"], [ev], data["generated_at"]), encoding="utf-8", newline=""
+        )

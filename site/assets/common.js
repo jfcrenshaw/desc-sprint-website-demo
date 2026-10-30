@@ -203,6 +203,23 @@ export function editSessionUrl(config, session) {
   return config.scheduler_url ? `${config.scheduler_url}/session/${encodeURIComponent(session.id)}` : '';
 }
 
+/**
+ * "Add to calendar" links for one event: Google Calendar and Outlook open their new-event
+ * form already filled in; the .ics file is for Apple Calendar and everything else (on an
+ * iPhone or Mac it opens straight into "Add to Calendar").
+ */
+export function addToCalendar({ title, start_utc, end_utc, location, details, ics }) {
+  const compact = iso => iso.replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const google = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: title, details, location })
+    + `&dates=${compact(start_utc)}/${compact(end_utc)}`;
+  const outlook = 'https://outlook.office.com/calendar/0/action/compose?' + new URLSearchParams({
+    rru: 'addevent', subject: title, startdt: start_utc, enddt: end_utc, body: details, location,
+  });
+  const link = (href, text, external = true) => h('a', external ? { href, target: '_blank', rel: 'noopener' } : { href }, text);
+  return h('div', { class: 'add-cal' }, '🗓️ Add to calendar: ',
+    link(google, 'Google'), ' · ', link(outlook, 'Outlook'), ' · ', link(ics, 'Apple / other (.ics)', false));
+}
+
 /** Lowercased text used by the search box. */
 export function searchText(sprint) {
   if (!sprint._search) {

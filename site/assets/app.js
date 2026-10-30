@@ -1,7 +1,7 @@
 // Calendar page: Today / Week / All sprints, filters, and the sprint details dialog.
 import {
   h, setupThemeToggle, loadData, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
-  sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl,
+  sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl, addToCalendar,
   searchText, markdown, preview,
 } from './common.js';
 
@@ -547,6 +547,14 @@ function sessionItem(sp, s) {
       s.online ? h('a', { class: 'join', href: s.online, target: '_blank', rel: 'noopener' }, '💻 Join online') : null),
     s.note ? h('div', { class: 'note', text: s.note }) : null,
     s.room_issue ? h('div', { class: 'room-warning', text: `⚠️ ${s.room_issue} The sprint team has been asked to pick another room.` }) : null,
+    addToCalendar({
+      title: sessionTitle(sp, s),
+      start_utc: s.start_utc,
+      end_utc: s.end_utc,
+      location: [sessionPlace(s), s.online].filter(Boolean).join(' · '),
+      details: [preview(sp.pitch, 400), s.note, s.online ? `Join online: ${s.online}` : '', `Details: ${state.config.site_url}#sprint/${sp.number}`, `GitHub issue: ${sp.url}`].filter(Boolean).join('\n\n'),
+      ics: `ics/session-${encodeURIComponent(s.id)}.ics`,
+    }),
     edit ? h('a', { class: 'link small', href: edit, target: '_blank', rel: 'noopener' }, 'Edit or cancel') : null,
   );
 }
@@ -568,7 +576,15 @@ function openProgram(id) {
       h('div', { class: 'where' },
         p.site || p.location ? `📍 ${[p.site, p.location].filter(Boolean).join(' – ')}` : null,
         p.online ? h('a', { class: 'join', href: p.online, target: '_blank', rel: 'noopener' }, '💻 Join online') : null),
-      p.note ? h('div', { class: 'note', text: p.note }) : null)),
+      p.note ? h('div', { class: 'note', text: p.note }) : null,
+      addToCalendar({
+        title: p.title,
+        start_utc: p.start_utc,
+        end_utc: p.end_utc,
+        location: [[p.site, p.location].filter(Boolean).join(' – '), p.online].filter(Boolean).join(' · '),
+        details: [p.note, p.online ? `Join online: ${p.online}` : '', `Schedule: ${state.config.site_url}`].filter(Boolean).join('\n\n'),
+        ics: `ics/program-${encodeURIComponent(p.id)}.ics`,
+      }))),
   ));
   if (!dlg.open) dlg.showModal();
 }
@@ -595,7 +611,7 @@ function openSprint(number) {
           sp.schedule_note ? h('span', { class: 'muted', text: ` Notes from the issue: “${sp.schedule_note}”` }) : null),
       h('div', { class: 'row' },
         sched ? h('a', { class: 'btn small primary', href: sched, target: '_blank', rel: 'noopener' }, sp.sessions.length ? '＋ Add a session' : '📅 Schedule a session') : null,
-        sp.sessions.length ? h('a', { class: 'btn small', href: `ics/sprint-${sp.number}.ics`, download: '' }, '🗓️ Add to my calendar') : null)),
+        sp.sessions.length > 1 ? h('a', { class: 'btn small', href: `ics/sprint-${sp.number}.ics` }, '🗓️ All sessions (.ics)') : null)),
     h('section', { class: 'wrapups' },
       h('h3', { text: sp.wrapups.length > 1 ? `Wrap-ups (${sp.wrapups.length})` : 'Wrap-up' }),
       sp.wrapups.length ? sp.wrapups.map(w => h('article', { class: 'wrapup' },

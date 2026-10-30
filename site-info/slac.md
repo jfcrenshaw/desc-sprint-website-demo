@@ -1,4 +1,4 @@
-The Sprint Week is hosted at SLAC National Accelerator Laboratory and at LPNHE (Sorbonne Université) in Paris; both sites are equal partners.
+
 The SLAC site is supported by the Kavli Institute for Particle Astrophysics and Cosmology (KIPAC), whose workshop program also provides the coffee breaks and lunches.
 
 ![Aerial view of the SLAC meeting area: the main entrance, the Fred Kavli Building (FKB), Building 48 (Redwood rooms), Building 53 (SLACafé, Tulare, Toluca, Yosemite), the fountain, the Stanford Guest House and Verve coffee](slac-map.jpg)

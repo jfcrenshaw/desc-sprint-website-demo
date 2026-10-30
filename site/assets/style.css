@@ -236,6 +236,7 @@ dialog::backdrop { background: rgb(15 18 22 / 55%); }
 .session .label { font-weight: 650; }
 .session .where { display: flex; gap: 14px; flex-wrap: wrap; }
 .session .note { color: var(--muted); font-size: 0.9rem; }
+.add-cal { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
 .room-warning { color: var(--warn); font-size: 0.9rem; font-weight: 550; }
 .ec-event.room-issue, .ec-time-grid .ec-event.room-issue { box-shadow: 0 0 0 1px var(--surface), inset 0 0 0 2px #f2b600; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
