@@ -1,6 +1,6 @@
 // Calendar page: Today / Week / All sprints, filters, and the sprint details dialog.
 import {
-  h, loadData, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
+  h, setupThemeToggle, loadData, remember, recall, zoneOptions, initialZone, wall, currentOffset, todayIn, fmtDay, sessionTimes, tzAbbr,
   sessionTitle, sessionPlace, typeColor, inkFor, chip, contactList, scheduleUrl, editSessionUrl,
   searchText, markdown, preview,
 } from './common.js';
@@ -685,6 +685,7 @@ function setupSubscribe() {
 }
 
 async function main() {
+  setupThemeToggle(document.getElementById('theme-toggle'));
   try {
     state.data = await loadData();
   } catch (err) {

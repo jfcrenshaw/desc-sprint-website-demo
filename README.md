@@ -96,6 +96,7 @@ Leaving `date: YYYY-MM-DD` as it is, or leaving the date out, means the day you 
 - **SLAC info** and **Paris info** (one tab per site) have practical information: getting there, access, Wi-Fi, food, contacts, plus each site's rooms and daily program.
 - **Times in** switches every time on the page between your own clock, each site's local time and UTC.
 - **Filter** narrows everything by sprint type, working group, label, site/online, or "new contributor friendly".
+- The **☀/☾ switch** (top right, and on the Present page) toggles light and dark mode; until you use it, the site follows your device's setting.
 - **Subscribe** adds the whole schedule to Google Calendar, Apple Calendar or Outlook, and it stays up to date.
   Each sprint page also has an *Add to my calendar* button for just that sprint.
 

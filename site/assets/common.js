@@ -34,6 +34,41 @@ export function recall(key) {
   try { return localStorage.getItem(`sprintweek:${key}`); } catch { return null; }
 }
 
+// ---------------------------------------------------------------- light / dark theme
+
+const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+export const currentTheme = () => document.documentElement.dataset.theme || (prefersDark.matches ? 'dark' : 'light');
+
+/** Apply 'light', 'dark' or '' (follow the device). EventCalendar needs its own class. */
+function applyTheme(theme) {
+  if (theme) document.documentElement.dataset.theme = theme;
+  else delete document.documentElement.dataset.theme;
+  for (const el of document.querySelectorAll('.ec-themed')) {
+    el.classList.toggle('ec-auto-dark', !theme);
+    el.classList.toggle('ec-dark', theme === 'dark');
+  }
+}
+
+/** Wire up the sun/moon switch: follows the device until clicked, then remembers the choice. */
+export function setupThemeToggle(button) {
+  if (!button) return;
+  const sync = () => {
+    const dark = currentTheme() === 'dark';
+    button.classList.toggle('is-dark', dark);
+    button.setAttribute('aria-pressed', String(dark));
+    button.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  };
+  applyTheme(recall('theme') || '');
+  sync();
+  prefersDark.addEventListener('change', sync);
+  button.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    remember('theme', next);
+    sync();
+  });
+}
+
 // ---------------------------------------------------------------- time zones
 
 export const LOCAL_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';

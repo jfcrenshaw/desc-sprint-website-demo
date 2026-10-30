@@ -1,6 +1,6 @@
 // Presentation mode: full-screen slides for the morning pitches and the closing wrap-ups.
 import {
-  h, loadData, remember, zoneOptions, initialZone, wall, todayIn, fmtDay, sessionTimes, sessionTitle,
+  h, setupThemeToggle, loadData, remember, zoneOptions, initialZone, wall, todayIn, fmtDay, sessionTimes, sessionTitle,
   sessionPlace, typeColor, chip, contactList, markdown,
 } from './common.js';
 
@@ -199,6 +199,7 @@ function toggleFullscreen() {
 }
 
 async function main() {
+  setupThemeToggle(document.getElementById('theme-toggle'));
   const data = await loadData();
   state.config = data.config;
   state.sprints = data.sprints;

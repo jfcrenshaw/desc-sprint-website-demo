@@ -7,6 +7,7 @@
   <meta name="description" content="Schedule of the DESC Sprint Week, generated from GitHub Issues.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📅%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="vendor/event-calendar.min.css">
+  <script>try { const t = localStorage.getItem('sprintweek:theme'); if (t) document.documentElement.dataset.theme = t; } catch { /* private mode */ }</script>
   <link rel="stylesheet" href="assets/style.css">
   <script src="vendor/event-calendar.min.js" defer></script>
   <script src="vendor/marked.umd.js" defer></script>
@@ -23,6 +24,7 @@
       <a class="btn primary" id="new-sprint" href="#" target="_blank" rel="noopener">＋ Propose a sprint</a>
       <button class="btn" id="subscribe-btn" type="button">Subscribe</button>
       <a class="btn" href="present.html">Present</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false"><span class="theme-knob" aria-hidden="true"><svg class="icon-sun" viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg><svg class="icon-moon" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg></span></button>
     </nav>
   </header>
 
@@ -49,14 +51,14 @@
     <p class="notice" id="notice" hidden></p>
     <section id="now-next" class="now-next" hidden></section>
     <div id="calendar-wrap">
-      <div id="calendar" class="ec-auto-dark"></div>
+      <div id="calendar" class="ec-themed ec-auto-dark"></div>
       <p class="legend" id="legend"></p>
     </div>
     <section id="directory" hidden></section>
     <section id="rooms" class="rooms" hidden>
       <div class="rooms-bar"><div class="seg" id="rooms-sites" role="group" aria-label="Site"></div><div class="seg" id="rooms-days" role="group" aria-label="Day"></div></div>
       <p class="muted small" id="rooms-note"></p>
-      <div id="rooms-cal" class="ec-auto-dark"></div>
+      <div id="rooms-cal" class="ec-themed ec-auto-dark"></div>
       <div id="rooms-list"></div>
     </section>
     <article id="info" class="info-page" hidden></article>
