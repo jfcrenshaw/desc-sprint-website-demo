@@ -135,9 +135,7 @@ class TestBuildData(unittest.TestCase):
     def test_demo_snapshot_builds_cleanly(self):
         snapshot = json.loads((ROOT / "demo" / "snapshot.json").read_text())
         data = build_data(snapshot, CONFIG)
-        # The demo config deliberately makes one session's room unavailable (to show the notices).
-        self.assertEqual(len(data["warnings"]), 1)
-        self.assertIn("#4: Redwood A is not available", data["warnings"][0])
+        self.assertEqual(data["warnings"], [])
         counts = [len(s["sessions"]) for s in data["sprints"]]
         self.assertIn(0, counts)
         self.assertIn(1, counts)

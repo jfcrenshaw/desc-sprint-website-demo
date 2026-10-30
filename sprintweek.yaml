@@ -45,10 +45,7 @@ sites:
   - name: SLAC
     timezone: America/Los_Angeles
     rooms:
-      - name: Redwood A
-        available:
-          - days: [Wed, Thu, Fri]
-      - name: Redwood B
+      - name: Redwoods A-B
         available:
           - days: [Wed, Thu, Fri]
       - Redwood C-D

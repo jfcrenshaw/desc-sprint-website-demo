@@ -92,7 +92,7 @@ def resolved_body(old_body: str, key: str) -> str:
     skip = ("<!--", "<sub>", "[✏️")
     lines = [ln for ln in old_body.splitlines() if ln.strip() and not ln.lstrip().startswith(skip)]
     text = " ".join(lines).replace("⚠️ ", "")
-    return f"<!-- {RESOLVED_MARKER} {key} -->\n✅ ~~{text}~~ Resolved: the session was moved or cancelled.\n"
+    return f"<!-- {RESOLVED_MARKER} {key} -->\n✅ ~~{text}~~ Resolved: the session, or the organizers' room list, has changed.\n"
 
 
 def plan_notices(

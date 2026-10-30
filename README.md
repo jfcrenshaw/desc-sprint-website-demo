@@ -177,7 +177,7 @@ A plain name is available all week; a room can also be limited to some days and 
   People can still type a room that is not in the list ("Alice's office"); only listed rooms are checked.
 - **Changing availability after people have scheduled** never moves or deletes anyone's session.
   Instead, sessions now outside their room's availability are listed as warnings in the build, flagged on the website, and the sprint issue gets one automatic comment asking the team to pick another room, with an edit link.
-  When the session is moved (or cancelled), that comment is struck through and marked resolved.
+  When the session is moved or cancelled (or the room's availability or name changes so it is no longer flagged), that comment is struck through and marked resolved.
 - Renaming a room in the config leaves older sessions with the old name, which then counts as a typed-in room and is not checked.
 
 ### What counts as a sprint
