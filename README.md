@@ -223,6 +223,7 @@ Older free-form issues (like the SprintWeek2026 template with `Contacts:` and `D
 1. **Create the repository** for the new Sprint Week by copying this one (or use *Use this template*).
    It must be public for free GitHub Pages.
 2. **Edit [sprintweek.yaml](sprintweek.yaml):** title, dates, sites with their time zones, rooms and [program](#organizers-program-coffee-meals-plenaries), the repository name, and sprint-type colors.
+   Set `event.registration` to the registration page to show a *Register* button in the header, and delete it once registration closes.
 3. **Edit the dropdowns** in [.github/ISSUE_TEMPLATE/sprint.yml](.github/ISSUE_TEMPLATE/sprint.yml) if the working groups or sprint types change.
    Sprint types must match the `types` section of `sprintweek.yaml`.
 4. **Create labels** for the working groups and sprint types if you want them added automatically (*Issues → Labels*).

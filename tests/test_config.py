@@ -133,6 +133,16 @@ class TestValues(unittest.TestCase):
         self.assertEqual(c.default_timezone, "local")
         self.assertTrue(c.greet_new_issues)
         self.assertEqual(c.program, [])
+        self.assertEqual(c.registration_url, "")
+
+    def test_registration_link(self):
+        url = "https://example.org/register?event=sprint+week"
+        c = load(**{"  title: Test Week": f"  title: Test Week\n  registration: {url}"})
+        self.assertEqual(c.registration_url, url)
+        self.assertEqual(c.public()["registration_url"], url)
+        with self.assertRaises(ConfigError) as ctx:
+            load(**{"  title: Test Week": "  title: Test Week\n  registration: javascript:alert(1)"})
+        self.assertIn("event.registration", str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -771,6 +771,9 @@ async function main() {
   const sites = config.sites.map(s => s.name).join(' · ');
   $('event-dates').textContent = `${fmtDay(config.start_date)} – ${fmtDay(config.end_date)}${sites ? ` · ${sites} · online` : ''}`;
   $('new-sprint').href = config.new_sprint_url;
+  if (config.registration_url) {
+    $('new-sprint').before(h('a', { class: 'btn', href: config.registration_url, target: '_blank', rel: 'noopener' }, 'Register'));
+  }
 
   const tzSel = $('tz');
   for (const o of zoneOptions(config)) tzSel.append(h('option', { value: o.id, text: o.label }));

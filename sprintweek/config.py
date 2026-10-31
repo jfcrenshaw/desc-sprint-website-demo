@@ -65,6 +65,7 @@ class Config:
 
     title: str
     notice: str
+    registration_url: str
     start_date: dt.date
     end_date: dt.date
     default_timezone: str
@@ -127,6 +128,7 @@ class Config:
         return {
             "title": self.title,
             "notice": self.notice,
+            "registration_url": self.registration_url,
             "start_date": self.start_date.isoformat(),
             "end_date": self.end_date.isoformat(),
             "days": [d.isoformat() for d in self.days],
@@ -172,6 +174,13 @@ def _text(value, where: str, required: bool = False) -> str:
     if required and not value:
         raise ConfigError(f"{where}: this setting is required")
     return value
+
+
+def _web_link(value, where: str) -> str:
+    url = _text(value, where)
+    if url and not re.match(r"https?://", url):
+        raise ConfigError(f"{where}: expected a web address starting with https://")
+    return url
 
 
 def _bool(value, where: str, default: bool) -> bool:
@@ -458,6 +467,7 @@ def load_config(path: str | Path | None = None, repo: str | None = None) -> Conf
     return Config(
         title=_text(event.get("title"), "event.title") or "Sprint Week",
         notice=_text(event.get("notice"), "event.notice"),
+        registration_url=_web_link(event.get("registration"), "event.registration"),
         start_date=start,
         end_date=end,
         default_timezone=_text(event.get("default_timezone"), "event.default_timezone") or "local",
