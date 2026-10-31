@@ -229,7 +229,8 @@ function calendarOptions() {
     headerToolbar: { start: 'prev,next today', center: 'title', end: '' },
     buttonText: { today: 'Today' },
     firstDay: 1,
-    hiddenDays: range.hidden,
+    // EventCalendar's day view jumps past validRange when hiddenDays is set; the weekend is outside the range anyway.
+    hiddenDays: view === 'timeGridDay' ? [] : range.hidden,
     validRange: { start: range.start, end: range.end },
     allDaySlot: false,
     nowIndicator: true,
@@ -806,9 +807,10 @@ async function main() {
   for (const p of state.data.site_info) {
     $('tabs').append(h('a', { href: `#info/${p.slug}`, 'data-view': `info/${p.slug}` }, `${p.site} info`));
   }
-  state.view = viewFor(location.hash.slice(1)) || 'week';
+  const start = narrow.matches ? 'today' : 'week'; // a whole week is a long list on a phone
+  state.view = viewFor(location.hash.slice(1)) || start;
   if (location.hash.startsWith('#sprint/')) {
-    state.view = 'week';
+    state.view = start;
     render();
   }
   route();
